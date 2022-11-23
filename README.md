@@ -4,6 +4,45 @@ Gathering all the literature on shoulder kinematics, and scapulo-humeral rhythm
 With this repository, We aim to gather all the literature on shoulder kinematics, and scapulo-humeral rhythm.
 We will try to keep it updated as much as possible. If you have any suggestions, please let us know.
 
+
+# Table of Contents
+[The dataset columns](#The-dataset-columns)
+ - [Metadata](##Metadata)
+    - [article_title](###article_title)
+    - [authors](###authors)
+    - [year](###year)
+    - [journal](###journal)
+- [Experimental conditions](##Experimental-conditions)
+    - [invivo](###invivo)
+    - [experimental means](###experimental-means)
+    - [nb_shoulders](###nb_shoulders)
+    - [type_of_movement](###type_of_movement)
+    - [posture](###posture)
+- [Generic segment columns](##Generic-segment-columns)
+    - [XXX_is_isb](###XXX_is_isb)
+    - [XXX_is_correctable](###XXX_is_correctable)
+    - [XXX_correction_method](###XXX_correction_method)
+    - [XXX_origin](###XXX_origin)
+    - [XXX_X, XXX_Y or XXX_Z](###XXX_X,-XXX_Y-or-XXX_Z)
+- [Other columns](##Other-columns)
+    - [Thoracohumeral_sequence](###Thoracohumeral_sequence)
+- [Joint motion columns](##Joint-motion-columns)
+    - [joint](###joint)
+    - [euler_sequence](###euler_sequence)
+    - [origin_translation](###origin_translation)
+    - [translation_cs](###translation_cs)
+-[Data columns and array of data](##Data-columns-and-array-of-data)
+    - [is_data_mean](###is_data_mean)
+    - [shoulder_id](###shoulder_id)
+    - [source_extraction](###source_extraction)
+    - [data_humero_thoracic_elevation](###data_humero_thoracic_elevation)
+    - [dof_1st_euler](###dof_1st_euler)
+    - [dof_2nd_euler](###dof_2nd_euler)
+    - [dof_3rd_euler](###dof_3rd_euler)
+    - [data_translation_x](###data_translation_x)
+    - [data_translation_y](###data_translation_y)
+    - [data_translation_z](###data_translation_z)
+    
 # The dataset columns
 The dataset is a csv file, each row aim to represent a joint movement as a function of the humerothoracic elevation angle.
 The columns are the following:
