@@ -76,6 +76,7 @@ variable type: string
 The experimental means used in the article:
 - intra cortical pins
 - to be completed ...
+- biplanar x-ray
 
 ### nb shoulders
 variable type: integer
