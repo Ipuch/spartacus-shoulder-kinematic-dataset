@@ -18,6 +18,7 @@ We assume the continuity of the data between articles. For example, if the same 
     - [experimental means](###experimental-means)
     - [nb_shoulders](###nb_shoulders)
     - [type_of_movement](###type_of_movement)
+    - [active](###active)
     - [posture](###posture)
 - [Generic segment columns](##Generic-segment-columns)
     - [XXX_is_isb](###XXX_is_isb)
@@ -26,12 +27,20 @@ We assume the continuity of the data between articles. For example, if the same 
     - [XXX_origin](###XXX_origin)
     - [XXX_X, XXX_Y or XXX_Z](###XXX_X,-XXX_Y-or-XXX_Z)
 - [Other columns](##Other-columns)
-    - [Thoracohumeral_sequence](###Thoracohumeral_sequence)
+    - [Thoracohumeral_sequence](###thoracohumeral_sequence)
+    - [thoracohumeral_angle](###thoracohumeral_angle)
+    - [thoracohumeral_usable](###thoracohumeral_usable)
+    - [thoracohumeral_risk](###thoracohumeral_risk)
 - [Joint motion columns](##Joint-motion-columns)
+    - [humeral_motion](###humeral_motion)
     - [joint](###joint)
+    - [parent](###parent)
+    - [child](###child)
     - [euler_sequence](###euler_sequence)
-    - [origin_translation](###origin_translation)
-    - [translation_cs](###translation_cs)
+    - [origin_displacement](###origin_displacement)
+    - [displacement_cs](###displacement_cs)
+    - [displacement_absolute](###displacement_absolute)
+    - [displacement_correction_method](###displacement_correction_method)
 -[Data columns and array of data](##Data-columns-and-array-of-data)
     - [is_data_mean](###is_data_mean)
     - [shoulder_id](###shoulder_id)
@@ -87,7 +96,12 @@ The number of shoulders/ subjects in the article, sometimes right and left shoul
 variable type: string
 The type of movement:
 - Dynamic
+- Quasi-static
 - to be completed ...
+
+### active
+variable type: boolean
+True if the movement is active, False if it is passive
 
 ### posture
 variable type: string
@@ -98,11 +112,12 @@ The posture of the subject when the data was collected:
 ## Generic segment columns
 
 This columns are generic for the following key words:
+- thorax
 - humerus
-- parent : referring to the parent segment of a joint
-- child : referring to the child segment of a joint
+- scapula
+- clavicle
 
-examples: humerus_is_isb, parent_is_isb, child_is_isb
+examples: humerus_is_isb, clavicle_is_isb, scapula_is_isb
 
 ### XXX_is_isb
 variable type: boolean
@@ -130,26 +145,50 @@ The anatomical landmark used as origin for the segment coordinates system:
 
 ### XXX_X, XXX_Y or XXX_Z
 variable type: string
-X, Y and Z denote the axis of the segment coordinates system. The anatomical direction of the axis:
+X, Y and Z denote the axis of the segment coordinates system.
+The anatomical direction of the axis:
 - +anteroposterior: the axis is pointing anteriorly
 - -anteroposterior: the axis is pointing posteriorly
 - +mediolateral: the axis is pointing medially
 - -mediolateral: the axis is pointing laterally
-- +vertical: the axis is pointing superiorly
-- -vertical: the axis is pointing inferiorly
+- +superioinferior: the axis is pointing superiorly
+- -superioinferior: the axis is pointing inferiorly
 
 This nomenclature/terminology has been chosen because in the case the segement coordinate system doesn't properly follow the ISB recommandations,
 the axis can vaguely point in the direction, but not strictly regarding the ISB recommendations.
 
 ## Other columns
-### Thoracohumeral_sequence
+### thoracohumeral_sequence
 variable type: string
 The sequence of the thoracohumeral joint:
 - yxy
 - zyx
-- to be completed ...
+
+### thoracohumeral_angle
+variable type: string
+When no sequence is given, the thoracohumeral angle is given:
+- angle(yt, yh)
+
+### thoracohumeral_usable
+variable type: boolean
+True if the thoracohumeral joint can be used to compute the humerothoracic elevation angle, False otherwise
+
+### thoracohumeral_risk
+variable type: boolean
+True if the thoracohumeral joint is usable, but can be used with a risk, False otherwise
+A risk is known when the thoracohumeral joint is not perfectly in accordance with the ISB recommendations,
+but the thoracohumeral joint can still be used as the data may be valuable.
+
 
 ## Joint motion columns
+
+### humeral_motion
+variable type: string
+The motion performed:
+- frontal elevation
+- scapular elevation
+- sagittal elevation
+- to be completed ...
 
 ### joint
 variable type: string
@@ -159,6 +198,14 @@ The joint name considered on the row: of the csv file :
 - acromioclavicular
 - glenohumeral
 
+### parent or child
+variable type: string
+The segment considered as parent of the joint:
+- thorax
+- scapula
+- clavicle
+- humerus
+
 ### euler_sequence
 variable type: string
 The sequence of the joint:
@@ -167,14 +214,23 @@ The sequence of the joint:
 - zyx
 - to be completed ...
 
-### origin_translation
+### origin_displacement
 variable type: string
 The anatomical landmark used as origin for the translation:
-- to be completed ...
+- humeral head
 
-### translation_cs
+### displacement_cs
 variable type: string
 segment name or joint name. It may refer to the proximal, distal or joint coordinate system
+
+### displacement_absolute
+variable type: boolean
+True if the displacement is absolute, False if it is relative (in percentage).
+
+### displacement_correction_method
+variable type: string
+The method used to correct the displacement:
+- Lagace2012 (not sure yet)
 
 ## Data columns and array of data
 
