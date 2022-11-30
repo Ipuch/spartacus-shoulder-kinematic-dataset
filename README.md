@@ -171,8 +171,8 @@ The anatomical landmark used as origin for the translation:
 - to be completed ...
 
 ### translation_cs
-variable type: boolean
-True if the translation follows the segment coordinates system, False otherwise
+variable type: string
+segment name or joint name. It may refer to the proximal, distal or joint coordinate system
 
 ## Data columns and array of data
 
