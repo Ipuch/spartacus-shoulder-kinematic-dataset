@@ -85,8 +85,9 @@ True if the article is in vivo, False if it is ex vivo
 variable type: string
 The experimental means used in the article:
 - intra cortical pins
-- to be completed ...
 - biplanar x-ray
+- biplane x-ray fluoroscopy  (when this not static, but dynamic)
+- to be completed ...
 
 ### nb shoulders
 variable type: integer
@@ -106,8 +107,8 @@ True if the movement is active, False if it is passive
 ### posture
 variable type: string
 The posture of the subject when the data was collected:
-- Upright standing
-- Upright sitting
+- standing
+- sitting
 
 ## Generic segment columns
 
@@ -139,9 +140,43 @@ Note: two methods can be combined, to get back to the ISB recommendations, might
 
 ### XXX_origin
 variable type: string
+
 The anatomical landmark used as origin for the segment coordinates system:
-- acromion
-- to be completed ...
+Most of the landmarks comes from Wu et al. 2005:
+
+
+#### Thorax:
+- From Wu et al. 2005
+  - C7, Processus Spinosus (spinous process) of the 7th cervical vertebra
+  - T8, Processus Spinosus (spinal process) of the 8th thoracic vertebra
+  - IJ, (Incisura Jugularis), also refered as Deepest point of Incisura Jugularis (suprasternal notch)
+  - PX, Processus Xiphoideus (xiphoid process), most caudal point on the sternum
+- Other landmarks
+  - T7, (7th thoracic vertebra)
+  - anterior face of T1
+
+#### Clavicle:
+- Wu et al. 2005 :
+  - SC, Most ventral point on the sternoclavicular joint
+  - AC, Most dorsal point on the acromioclavicular joint (shared with the scapula)
+
+#### Scapula:
+- Wu et al. 2005 :
+  - TS, Trigonum Spinae Scapulae (root of the spine), the midpoint of the triangular surface on the medial border of the scapula in line with the scapular spine
+  - AI, Angulus Inferior (inferior angle), most caudal point of the scapula
+  - AA, Angulus Acromialis (acromial angle), most laterodorsal point of the scapula
+  - PC, Most ventral point of processus coracoideus
+- Other landmarks:
+  - Glenoid center
+
+#### Humerus:
+- Wu et al. 2005:
+  - GH, Glenohumeral rotation center, (or gleno-humeral head center )
+  - EL, Most caudal point on lateral epicondyle
+  - EM, Most caudal point on medial epicondyle
+- Other landmarks:
+  - midpoint EM EL: the middle of the two latters
+
 
 ### XXX_X, XXX_Y or XXX_Z
 variable type: string
@@ -151,8 +186,8 @@ The anatomical direction of the axis:
 - -anteroposterior: the axis is pointing posteriorly
 - +mediolateral: the axis is pointing medially
 - -mediolateral: the axis is pointing laterally
-- +superioinferior: the axis is pointing superiorly
-- -superioinferior: the axis is pointing inferiorly
+- +superoinferior: the axis is pointing superiorly
+- -superoinferior: the axis is pointing inferiorly
 
 This nomenclature/terminology has been chosen because in the case the segement coordinate system doesn't properly follow the ISB recommandations,
 the axis can vaguely point in the direction, but not strictly regarding the ISB recommendations.
@@ -188,6 +223,7 @@ The motion performed:
 - frontal elevation
 - scapular elevation
 - sagittal elevation
+- internal-external rotation 90 degree-abducted
 - to be completed ...
 
 ### joint
