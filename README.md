@@ -124,6 +124,11 @@ examples: humerus_is_isb, clavicle_is_isb, scapula_is_isb
 variable type: boolean
 True if the segment follows the ISB recommendations, False otherwise
 
+### Thorax_is_global
+variable type: boolean
+True if the global coordinate system is considered as the thorax.
+This column is only revelant for the Thorax.
+
 ### XXX_is_isb_correctable
 variable type: boolean
 True if the segment coordinates system can be corrected to follow the ISB recommendations, False otherwise
@@ -143,7 +148,6 @@ variable type: string
 
 The anatomical landmark used as origin for the segment coordinates system:
 Most of the landmarks comes from Wu et al. 2005:
-
 
 #### Thorax:
 - From Wu et al. 2005
