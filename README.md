@@ -332,3 +332,6 @@ Sahara et al 2006 : The scapula coordinate system is the clavicle coordinate sys
 
 ### Risks evocated
 - Gutierez et al. 2017: X-clavicule not built with x thoracic in reference posture but it is very close.
+
+### Risks too high
+- Hallström et al. 2006: no euler sequence, no scapula coordinate systems. cannot even considered as reliable. not even possible to understand what has is done.
