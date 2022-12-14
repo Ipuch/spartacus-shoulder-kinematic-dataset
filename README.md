@@ -324,7 +324,8 @@ The translation along the z axis of the joint, in mm (to be confirmed)
 
 
 
-
+### Exceptions, too exotic
+Sahara et al 2006 : The scapula coordinate system is the clavicle coordinate system at abduction zero degree. The scapua frame is very exotic and not convertable to ISB standards.
 
 
 
