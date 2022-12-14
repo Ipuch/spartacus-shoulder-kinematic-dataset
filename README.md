@@ -166,6 +166,8 @@ Most of the landmarks comes from Wu et al. 2005:
 - Wu et al. 2005 :
   - SC, Most ventral point on the sternoclavicular joint
   - AC, Most dorsal point on the acromioclavicular joint (shared with the scapula)
+- Other:
+  - Point of intersection between the mesh model and the Zc axis (Sahara et al. 2006)
 
 #### Scapula:
 - Wu et al. 2005 :
