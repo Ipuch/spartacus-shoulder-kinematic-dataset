@@ -161,6 +161,7 @@ Most of the landmarks comes from Wu et al. 2005:
 - Other landmarks
   - T7, (7th thoracic vertebra)
   - anterior face of T1
+  - Glenoid center (Sahara et al. 2007)
 
 #### Clavicle:
 - Wu et al. 2005 :
