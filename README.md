@@ -142,6 +142,7 @@ The method used to correct the segment coordinates system to follow the ISB reco
 - to_isb : consisting in switching axis to follow the ISB recommendations
 - to_isb_like : consisting in switching axis to follow the ISB recommendations as much as possible
 - to_kolz_ac_to_pa : consisting in switching axis from acromio-clavicular joint to posterior aspect of the acromion
+- glenoid_to_isb_cs : available from Dal Maso et al. 2014
 - to be completed ...
 
 Note: two methods can be combined, to get back to the ISB recommendations, might be a list of strings at the end of the day
