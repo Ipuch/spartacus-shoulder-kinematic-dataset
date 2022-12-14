@@ -7,8 +7,7 @@ We will try to keep it updated as much as possible. If you have any suggestions,
 We assume the continuity of the data between articles. For example, if the same data is used in two articles, and some information is missing in the last one, we pick the information in the previous article.
 
 # todo
-- write a script that is able to recognize isb joint sequences from segment coordinates systems and euler sequence.
-- for example: the two segement coordinates system are not isb, and nor the sequence, but when segment coordinates system is flipped to isb, the joint sequence is isb.
+- write a script that is able to recognize isb joint sequences from segment coordinates systems and euler sequence. For example: the two segement coordinates system are not isb, and nor the sequence, but when segment coordinates system is flipped to isb, the joint sequence is isb.
 
 # Table of Contents
 [The dataset columns](#The-dataset-columns)
@@ -211,6 +210,7 @@ The sequence of the thoracohumeral joint:
 variable type: string
 When no sequence is given, the thoracohumeral angle is given:
 - angle(yt, yh)
+- controlled by operator: probably goniometer
 
 ### thoracohumeral_usable
 variable type: boolean
