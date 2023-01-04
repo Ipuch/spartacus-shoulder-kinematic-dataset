@@ -105,7 +105,7 @@ The type of movement:
 
 ### active
 variable type: boolean
-True if the movement is active, False if it is passive
+True if the movement is active, False if it is passive (i.e. related to a muscular control, e.g. in vivo quasi-static in standing posture is active, but in vivo quasi-static in lying posture may be inactive)
 
 ### posture
 variable type: string
