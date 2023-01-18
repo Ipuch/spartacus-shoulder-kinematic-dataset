@@ -8,6 +8,9 @@ We assume the continuity of the data between articles. For example, if the same 
 
 # todo
 - write a script that is able to recognize isb joint sequences from segment coordinates systems and euler sequence. For example: the two segement coordinates system are not isb, and nor the sequence, but when segment coordinates system is flipped to isb, the joint sequence is isb.
+- Withdraw the red into comments
+- Yoshida, maybe a mix of sagittal and scapular elevation
+- Dal Maso to thoraco-humeral rythm.
 
 # Table of Contents
 [The dataset columns](#The-dataset-columns)
