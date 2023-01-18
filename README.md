@@ -90,6 +90,7 @@ The experimental means used in the article:
 - intra cortical pins
 - biplanar x-ray
 - biplane x-ray fluoroscopy  (when this not static, but dynamic)
+- 4DCT: 3D CT-scan with time.
 - to be completed ...
 
 ### nb shoulders
