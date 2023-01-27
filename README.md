@@ -240,7 +240,7 @@ The motion performed:
 - scapular elevation
 - sagittal elevation
 - internal-external rotation 90 degree-abducted
-- to be completed ...
+- internal-external rotation 0 degree-abducted
 
 ### joint
 variable type: string
