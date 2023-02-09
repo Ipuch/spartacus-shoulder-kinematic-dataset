@@ -11,6 +11,7 @@ We assume the continuity of the data between articles. For example, if the same 
 - Withdraw the red into comments
 - Yoshida, maybe a mix of sagittal and scapular elevation
 - Dal Maso to thoraco-humeral rythm.
+- Interrelationship between columns has to detailed to test the database.
 
 # Table of Contents
 [The dataset columns](#The-dataset-columns)
