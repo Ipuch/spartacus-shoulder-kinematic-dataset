@@ -33,8 +33,8 @@ We assume the continuity of the data between articles. For example, if the same 
     - [XXX_correction_method](###XXX_correction_method)
     - [XXX_origin](###XXX_origin)
     - [XXX_X, XXX_Y or XXX_Z](###XXX_X,-XXX_Y-or-XXX_Z)
-- [Other columns](##Other-columns)
-    - [Thoracohumeral_sequence](###thoracohumeral_sequence)
+- [Thoracohumeral](##Thoracohumeral-columns)
+    - [thoracohumeral_sequence](###thoracohumeral_sequence)
     - [thoracohumeral_angle](###thoracohumeral_angle)
     - [thoracohumeral_usable](###thoracohumeral_usable)
     - [thoracohumeral_risk](###thoracohumeral_risk)
@@ -208,7 +208,7 @@ The anatomical direction of the axis:
 This nomenclature/terminology has been chosen because in the case the segement coordinate system doesn't properly follow the ISB recommandations,
 the axis can vaguely point in the direction, but not strictly regarding the ISB recommendations.
 
-## Other columns
+## Thoracohumeral columns
 ### thoracohumeral_sequence
 variable type: string
 The sequence of the thoracohumeral joint:
