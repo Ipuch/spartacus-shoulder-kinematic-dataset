@@ -11,7 +11,7 @@ setup(
     author_email="",
     description="Shoulder dataset treatment",
     long_description=long_description,
-    packages=[".", "shoulder", "examples", "shoulder/datasets"],
+    packages=[".", "shoulder", "examples", "shoulder/dataset"],
     python_requires=">=3.10",
     zip_safe=False,
 )
