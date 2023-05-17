@@ -1,12 +1,14 @@
-from enums import CartesianAxis, EulerSequence, JointType
+from .enums import CartesianAxis, EulerSequence, JointType
 
 
 class BiomechCoordinateSystem:
-    def __init__(self,
-                    antero_posterior_axis: CartesianAxis,
-                    infero_superior_axis: CartesianAxis,
-                    medio_lateral_axis: CartesianAxis,
-                    origin=None):
+    def __init__(
+        self,
+        antero_posterior_axis: CartesianAxis,
+        infero_superior_axis: CartesianAxis,
+        medio_lateral_axis: CartesianAxis,
+        origin=None,
+    ):
         self.anterior_posterior_axis = antero_posterior_axis
         self.infero_superior_axis = infero_superior_axis
         self.medio_lateral_axis = medio_lateral_axis
@@ -20,10 +22,11 @@ class BiomechCoordinateSystem:
 
 
 class Joint:
-    def __init__(self,
-                 joint_type: JointType,
-                 euler_sequence: EulerSequence,
-                 ):
+    def __init__(
+        self,
+        joint_type: JointType,
+        euler_sequence: EulerSequence,
+    ):
         self.joint_type = joint_type
         self.euler_sequence = euler_sequence
 
@@ -43,10 +46,10 @@ class Joint:
 
 
 def check_coordinates_and_euler_sequence_compatibility(
-        parent_segment: BiomechCoordinateSystem,
-        child_segment: BiomechCoordinateSystem,
-        joint: Joint,
-)-> tuple[bool, tuple[int, int, int]]:
+    parent_segment: BiomechCoordinateSystem,
+    child_segment: BiomechCoordinateSystem,
+    joint: Joint,
+) -> tuple[bool, tuple[int, int, int]]:
     """
     Check if the combination of the coordinates and the euler sequence is valid to be used, according to the ISB
 
@@ -72,10 +75,7 @@ def check_coordinates_and_euler_sequence_compatibility(
     # create an empty list of 7 element
     condition = [None] * 7
     # all the joints have the same rotation sequence for the ISB YXZ
-    if joint.joint_type.STERNO_CLAVICULAR \
-            or joint.joint_type.ACROMIO_CLAVICULAR \
-            or joint.joint_type.SCAPULO_THORACIC:
-
+    if joint.joint_type.STERNO_CLAVICULAR or joint.joint_type.ACROMIO_CLAVICULAR or joint.joint_type.SCAPULO_THORACIC:
         # rotation 90° along X for each segment coordinate system
         condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
         condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
@@ -86,8 +86,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.ZXY
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                  "y=z, x=x, z=-y")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=z, x=x, z=-y")
             return True, (1, 1, -1)
 
         # rotation 180° along X for each segment coordinate system
@@ -100,8 +99,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YXZ
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                  "y=-y, x=x, z=-z")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=-y, x=x, z=-z")
             return True, (-1, 1, -1)
 
         # rotation 270° along X for each segment coordinate system
@@ -114,8 +112,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.ZXY
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                    "y=-z, x=x, z=y")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=-z, x=x, z=y")
             return True, (-1, 1, 1)
 
         # Rotation -90° along Y for each segment coordinate system
@@ -128,8 +125,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YZX
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                    "y=y, x=-z, z=x")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=y, x=-z, z=x")
             return True, (1, -1, 1)
 
         # Rotation 180° along Y for each segment coordinate system
@@ -142,8 +138,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YXZ
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                    "y=y, x=-x, z=-z")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=y, x=-x, z=-z")
             return True, (1, -1, -1)
 
         # Rotation -270° along Y for each segment coordinate system
@@ -156,8 +151,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YZX
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                    "y=y, x=z, z=-x")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=y, x=z, z=-x")
             return True, (1, 1, -1)
 
         # Rotation 90° along Z for each segment coordinate system
@@ -170,8 +164,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.XYZ
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                    "y=x, x=-y, z=z")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=x, x=-y, z=z")
             return True, (1, -1, 1)
 
         # Rotation -90° along Z for each segment coordinate system
@@ -184,8 +177,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.XYZ
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                    "y=-x, x=y, z=z")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=-x, x=y, z=z")
             return True, (-1, 1, 1)
 
         # Rotation 180° along Z for each segment coordinate system
@@ -198,8 +190,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.XYZ
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXZ."
-                    "y=-y, x=-x, z=z")
+            print("This is a valid combination, of the ISB sequence YXZ." "y=-y, x=-x, z=z")
             return True, (-1, -1, 1)
 
         print("This is not a valid combination, of the ISB sequence YXZ.")
@@ -207,7 +198,6 @@ def check_coordinates_and_euler_sequence_compatibility(
 
     # all the joints have the same rotation sequence for the ISB YXY
     elif joint.joint_type in (JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL):
-
         # Rotation -90° along X for each segment coordinate system
         condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
         condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
@@ -218,8 +208,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.ZXZ
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=z, x=x, y=z")
+            print("This is a valid combination, of the ISB sequence YXY." " y=z, x=x, y=z")
             return True, (1, 1, 1)
 
         # Rotation 90° along X for each segment coordinate system
@@ -232,10 +221,8 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.ZXZ
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=-z, x=x, y=-z")
+            print("This is a valid combination, of the ISB sequence YXY." " y=-z, x=x, y=-z")
             return True, (-1, 1, -1)
-
 
         # Rotation 180° along X for each segment coordinate system
         condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
@@ -247,8 +234,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YXY
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=-y, x=x, y=-y")
+            print("This is a valid combination, of the ISB sequence YXY." " y=-y, x=x, y=-y")
             return True, (-1, 1, -1)
 
         # Rotation -90° along Y for each segment coordinate system
@@ -261,8 +247,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YZY
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=y, x=-z, y=y")
+            print("This is a valid combination, of the ISB sequence YXY." " y=y, x=-z, y=y")
             return True, (1, -1, 1)
 
         # Rotation 90° along Y for each segment coordinate system
@@ -275,8 +260,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YZY
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=y, x=z, y=y")
+            print("This is a valid combination, of the ISB sequence YXY." " y=y, x=z, y=y")
             return True, (1, 1, 1)
 
         # Rotation 180° along Y for each segment coordinate system
@@ -289,8 +273,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YXY
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=y, x=-x, y=y")
+            print("This is a valid combination, of the ISB sequence YXY." " y=y, x=-x, y=y")
             return True, (1, -1, 1)
 
         # Rotation -90° along Z for each segment coordinate system
@@ -303,10 +286,8 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.XYX
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                  " y=-x, x=y, y=-x")
+            print("This is a valid combination, of the ISB sequence YXY." " y=-x, x=y, y=-x")
             return True, (-1, 1, -1)
-
 
         # Rotation 90° along Z for each segment coordinate system
         condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusY
@@ -318,8 +299,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.XYX
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=x, x=-y, y=x")
+            print("This is a valid combination, of the ISB sequence YXY." " y=x, x=-y, y=x")
             return True, (1, -1, 1)
 
         # Rotation 180° along Z for each segment coordinate system
@@ -332,23 +312,25 @@ def check_coordinates_and_euler_sequence_compatibility(
         condition[6] = joint.euler_sequence == EulerSequence.YXY
 
         if all(condition):
-            print("This is a valid combination, of the ISB sequence YXY."
-                    " y=-y, x=-x, y=-y")
+            print("This is a valid combination, of the ISB sequence YXY." " y=-y, x=-x, y=-y")
             return True, (-1, -1, -1)
 
         return False, (0, 0, 0)
 
     else:
-        raise ValueError("The JointType is not supported. Please use:"
-                         "JointType.GLENO_HUMERAL, JointType.ACROMIO_CLAVICULAR,"
-                            "JointType.STERNO_CLAVICULAR, JointType.THORACO_HUMERAL,"
-                         "or JointType.SCAPULO_THORACIC")
+        raise ValueError(
+            "The JointType is not supported. Please use:"
+            "JointType.GLENO_HUMERAL, JointType.ACROMIO_CLAVICULAR,"
+            "JointType.STERNO_CLAVICULAR, JointType.THORACO_HUMERAL,"
+            "or JointType.SCAPULO_THORACIC"
+        )
 
 
-def check_biomech_consistency(parent_segment: BiomechCoordinateSystem,
-              child_segment: BiomechCoordinateSystem,
-              joint: Joint,
-              ) -> tuple[bool, tuple[int, int, int]]:
+def check_biomech_consistency(
+    parent_segment: BiomechCoordinateSystem,
+    child_segment: BiomechCoordinateSystem,
+    joint: Joint,
+) -> tuple[bool, tuple[int, int, int]]:
     """
     Check if the biomechanical coordinate system of the parent and child segment
     are compatible with the joint type and ISB sequences
@@ -397,7 +379,6 @@ def check_biomech_consistency(parent_segment: BiomechCoordinateSystem,
 
 
 def main():
-
     # A very standard example of the sterno-clavicular joint, already in ISB
     print(" -- Sterno-clavicular joint -- ISB")
     thorax = BiomechCoordinateSystem(

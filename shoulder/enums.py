@@ -20,6 +20,7 @@ class CartesianAxis(Enum):
 
 class BiomechDirection(Enum):
     """Enum for the biomechanical direction"""
+
     AnteroPosterior = "Antero-Posterior"
     InferoSuperior = "Infero-Superior"
     MedioLateral = "Medio-Lateral"
@@ -41,6 +42,7 @@ class EulerSequence(Enum):
 
 class JointType(Enum):
     """Enum for the joint"""
+
     GLENO_HUMERAL = "GH"
     SCAPULO_THORACIC = "ST"
     ACROMIO_CLAVICULAR = "AC"

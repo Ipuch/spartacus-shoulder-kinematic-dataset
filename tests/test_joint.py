@@ -1,0 +1,72 @@
+from shoulder import JointType, EulerSequence, Joint
+
+
+def test_joint():
+    print(" -- Sterno-clavicular joint -- ISB")
+    sterno_clav = Joint(
+        joint_type=JointType.STERNO_CLAVICULAR,
+        euler_sequence=EulerSequence.YXZ,
+    )
+    assert sterno_clav.is_joint_sequence_isb() == True
+
+    print(" -- Sterno-clavicular joint -- not ISB")
+    sterno_clav = Joint(
+        joint_type=JointType.STERNO_CLAVICULAR,
+        euler_sequence=EulerSequence.XYZ,
+    )
+    assert sterno_clav.is_joint_sequence_isb() == False
+
+    print(" -- Gleno-humeral joint -- ISB")
+    gleno_hum = Joint(
+        joint_type=JointType.GLENO_HUMERAL,
+        euler_sequence=EulerSequence.YXY,
+    )
+    assert gleno_hum.is_joint_sequence_isb() == True
+
+    print(" -- Gleno-humeral joint -- not ISB")
+    gleno_hum = Joint(
+        joint_type=JointType.GLENO_HUMERAL,
+        euler_sequence=EulerSequence.XYZ,
+    )
+    assert gleno_hum.is_joint_sequence_isb() == False
+
+    print(" -- Scapulo-thoracic joint -- ISB")
+    scapulo_thor = Joint(
+        joint_type=JointType.SCAPULO_THORACIC,
+        euler_sequence=EulerSequence.YXZ,
+    )
+    assert scapulo_thor.is_joint_sequence_isb() == True
+
+    print(" -- Scapulo-thoracic joint -- not ISB")
+    scapulo_thor = Joint(
+        joint_type=JointType.SCAPULO_THORACIC,
+        euler_sequence=EulerSequence.XYZ,
+    )
+
+    print(" -- Acromio-clavicular joint -- ISB")
+    acromio_clav = Joint(
+        joint_type=JointType.ACROMIO_CLAVICULAR,
+        euler_sequence=EulerSequence.YXZ,
+    )
+    assert acromio_clav.is_joint_sequence_isb() == True
+
+    print(" -- Acromio-clavicular joint -- not ISB")
+    acromio_clav = Joint(
+        joint_type=JointType.ACROMIO_CLAVICULAR,
+        euler_sequence=EulerSequence.XYZ,
+    )
+    assert acromio_clav.is_joint_sequence_isb() == False
+
+    print(" -- Thoraco-humeral joint -- ISB")
+    thoraco_hum = Joint(
+        joint_type=JointType.THORACO_HUMERAL,
+        euler_sequence=EulerSequence.YXY,
+    )
+    assert thoraco_hum.is_joint_sequence_isb() == True
+
+    print(" -- Thoraco-humeral joint -- not ISB")
+    thoraco_hum = Joint(
+        joint_type=JointType.THORACO_HUMERAL,
+        euler_sequence=EulerSequence.XYZ,
+    )
+    assert thoraco_hum.is_joint_sequence_isb() == False

@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import pytest
 
 
 def test_no_nan_in_columns():
