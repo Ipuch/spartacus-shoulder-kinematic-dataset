@@ -15,7 +15,7 @@ def copy_folder_with_csv(src_folder: str, dst_folder: str):
         # Iterates over files in the folder
         os.makedirs(os.path.join(dst_folder, folder), exist_ok=True)
         for filename in os.listdir(os.path.join(src_folder, folder)):
-            if filename.endswith('.csv') or filename.endswith('.txt'):
+            if filename.endswith(".csv") or filename.endswith(".txt"):
                 src_file = os.path.join(src_folder, filename)
 
                 dst_file = os.path.join(dst_folder, folder, filename)
