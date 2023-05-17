@@ -68,7 +68,7 @@ def check_coordinates_and_euler_sequence_compatibility(
         usable : bool
             True if the combination is valid, False otherwise
         tuple[int,int,int]
-            Sign to apply to the data to make it compatible with the ISB
+            Sign to apply to the dataset to make it compatible with the ISB
 
     """
 

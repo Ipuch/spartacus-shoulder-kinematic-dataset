@@ -9,13 +9,9 @@ setup(
     version="0.0.1",
     author="Ipuch, ANaaim, FMoissenet",
     author_email="",
-    description="Shoulder data treatment",
+    description="Shoulder dataset treatment",
     long_description=long_description,
-    packages=[
-        ".",
-        "shoulder",
-        "examples",
-    ],
+    packages=[".", "shoulder", "examples", "shoulder/datasets"],
     python_requires=">=3.10",
     zip_safe=False,
 )
