@@ -35,6 +35,12 @@ jobs:
       - name: Install extra dependencies
         run: mamba install pytest-cov black pytest pytest-cov codecov -cconda-forge
 
+      - name: Test installed version of shoulder
+        run: |
+            python setup.py install
+            cd
+            python -c "import shoulder"
+
       - name: Run the actual tests
         run: pytest -v --color=yes --cov-report term-missing --cov=shoulder tests
         
