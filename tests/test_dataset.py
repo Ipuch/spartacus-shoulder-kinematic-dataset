@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
+from shoulder import DatasetCSV
 
 
 def test_no_nan_in_columns():
-    file = "../data/dataset_clean.csv"
+    file = DatasetCSV.CLEAN.value
     df = pd.read_csv(file)
     # define a list of columns that should contain no nan
     col = [
