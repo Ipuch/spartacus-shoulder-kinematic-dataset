@@ -12,4 +12,4 @@ df.columns = [col.lower() for col in df.columns]
 # save the cleaned dataset
 df.to_csv(DatasetCSV.CLEAN.value, index=False)
 
-# todo: add a function that fill the cells with that contains the location of data with the actual data
+# todo: add a function that fill the cells with that contains the location of dataset with the actual dataset
