@@ -16,8 +16,14 @@ for i, row in df.iterrows():
         ["scapula_x", "scapula_y", "scapula_z"],
         ["clavicle_x", "clavicle_y", "clavicle_z"],
     ]
+    segment_is_isb = [
+        "thorax_is_isb",
+        "humerus_is_isb",
+        "scapula_is_isb",
+        "clavicle_is_isb",
+    ]
 
-    for segment in tested_segments:
+    for segment, is_isb in zip(tested_segments, segment_is_isb):
         print(segment)
         # if any of each is nan, skip
         if isinstance(row[segment[0]], float) or isinstance(row[segment[1]], float) or isinstance(
@@ -28,9 +34,12 @@ for i, row in df.iterrows():
                 continue
 
         # build the coordinate system
-        sys = BiomechCoordinateSystem.from_biomech_directions(
+        bsys = BiomechCoordinateSystem.from_biomech_directions(
             x=biomech_direction_string_to_enum(row[segment[0]]),
             y=biomech_direction_string_to_enum(row[segment[1]]),
             z=biomech_direction_string_to_enum(row[segment[2]]),
         )
-        print("is segment coordinate system ISB :", sys.is_isb())
+        print("is segment coordinate system ISB :", bsys.is_isb())
+
+        if not bsys.is_isb() == row[is_isb]:
+            raise ValueError("inconsistency in the dataset")

@@ -9,6 +9,8 @@ df = pd.read_csv(DatasetCSV.RAW.value)
 df = df.dropna(how="all")
 # rename all the columns with only lower cases
 df.columns = [col.lower() for col in df.columns]
+# set all the "true" to True and "false" to False
+df = df.replace({"true": True, "false": False})
 # save the cleaned dataset
 df.to_csv(DatasetCSV.CLEAN.value, index=False)
 
