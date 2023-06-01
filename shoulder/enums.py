@@ -41,6 +41,7 @@ class EulerSequence(Enum):
     ZXZ = "zxz"
     ZXY = "zxy"
     ZYZ = "zyz"
+    ZYX = "zyx"
 
 
 class JointType(Enum):

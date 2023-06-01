@@ -6,4 +6,7 @@ from .utils import (
     biomech_direction_sign,
     BiomechCoordinateSystem,
     Joint,
+    joint_string_to_enum,
+    euler_sequence_to_enum,
+    check_parent_child_joint,
 )

@@ -8,7 +8,7 @@ df = pd.read_csv(DatasetCSV.CLEAN.value)
 # for each row verify the ISB convention
 for i, row in df.iterrows():
 
-    print(row.article_author_year)
+    # print(row.article_author_year)
 
     tested_segments = [
         ["thorax_x", "thorax_y", "thorax_z"],
@@ -24,13 +24,13 @@ for i, row in df.iterrows():
     ]
 
     for segment, is_isb in zip(tested_segments, segment_is_isb):
-        print(segment)
+        # print(segment)
         # if any of each is nan, skip
         if isinstance(row[segment[0]], float) or isinstance(row[segment[1]], float) or isinstance(
             row[segment[2]], float
         ):
             if np.isnan(row[segment[0]]) or np.isnan(row[segment[1]]) or np.isnan(row[segment[2]]):
-                print(segment, "is nan")
+                # print(segment, "is nan")
                 continue
 
         # build the coordinate system
@@ -39,7 +39,11 @@ for i, row in df.iterrows():
             y=biomech_direction_string_to_enum(row[segment[1]]),
             z=biomech_direction_string_to_enum(row[segment[2]]),
         )
-        print("is segment coordinate system ISB :", bsys.is_isb())
+
+        # print("is segment coordinate system ISB :", bsys.is_isb())
 
         if not bsys.is_isb() == row[is_isb]:
-            raise ValueError("inconsistency in the dataset")
+            print("WARNING : inconsistency in the dataset")
+            print(segment[0][:-2], row.article_author_year)
+            print('detected :', bsys.is_isb())
+            print("expected :", row[is_isb])

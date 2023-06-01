@@ -9,6 +9,15 @@ class BiomechCoordinateSystem:
             medio_lateral_axis: CartesianAxis,
             origin=None,
     ):
+
+        # verify isinstance
+        if not isinstance(antero_posterior_axis, CartesianAxis):
+            raise TypeError("antero_posterior_axis should be of type CartesianAxis")
+        if not isinstance(infero_superior_axis, CartesianAxis):
+            raise TypeError("infero_superior_axis should be of type CartesianAxis")
+        if not isinstance(medio_lateral_axis, CartesianAxis):
+            raise TypeError("medio_lateral_axis should be of type CartesianAxis")
+
         self.anterior_posterior_axis = antero_posterior_axis
         self.infero_superior_axis = infero_superior_axis
         self.medio_lateral_axis = medio_lateral_axis
@@ -23,7 +32,6 @@ class BiomechCoordinateSystem:
             origin=None,
     ):
         my_arg = dict()
-        my_arg["origin"] = origin
 
         # verify each of the x, y, z is different
         if x == y or x == z or y == z:
@@ -31,10 +39,10 @@ class BiomechCoordinateSystem:
 
         # verify is positive or negative
         actual_axes = [x, y, z]
-        positive_enums_axis = [ CartesianAxis.plusX, CartesianAxis.plusY, CartesianAxis.plusZ]
-        negative_enums_axis = [ CartesianAxis.minusX, CartesianAxis.minusY, CartesianAxis.minusZ]
+        positive_enums_axis = [CartesianAxis.plusX, CartesianAxis.plusY, CartesianAxis.plusZ]
+        negative_enums_axis = [CartesianAxis.minusX, CartesianAxis.minusY, CartesianAxis.minusZ]
 
-        for (axis, positive_enum, negative_enum) in zip(actual_axes,positive_enums_axis, negative_enums_axis):
+        for (axis, positive_enum, negative_enum) in zip(actual_axes, positive_enums_axis, negative_enums_axis):
             if biomech_direction_sign(axis) == 1:
                 if axis == BiomechDirection.PlusAnteroPosterior:
                     my_arg["antero_posterior_axis"] = positive_enum
@@ -47,16 +55,18 @@ class BiomechCoordinateSystem:
                     continue
             elif biomech_direction_sign(axis) == -1:
                 if axis == BiomechDirection.MinusAnteroPosterior:
-                    my_arg["antero_posterior_axis"] = negative_enums_axis
+                    my_arg["antero_posterior_axis"] = negative_enum
                     continue
                 elif axis == BiomechDirection.MinusMedioLateral:
-                    my_arg["medio_lateral_axis"] = negative_enums_axis
+                    my_arg["medio_lateral_axis"] = negative_enum
                     continue
                 elif axis == BiomechDirection.MinusInferoSuperior:
-                    my_arg["infero_superior_axis"] = negative_enums_axis
+                    my_arg["infero_superior_axis"] = negative_enum
                     continue
 
-        return cls(*my_arg)
+        my_arg["origin"] = origin
+
+        return cls(**my_arg)
 
     def is_isb(self) -> bool:
         condition_1 = self.anterior_posterior_axis is CartesianAxis.plusX
@@ -455,3 +465,63 @@ def biomech_direction_sign(direction: BiomechDirection) -> int:
         return -1
     else:
         raise ValueError(f"{direction} is not a valid BiomechDirection.")
+
+
+def joint_string_to_enum(joint: str) -> JointType:
+    if joint == "glenohumeral":
+        return JointType.GLENO_HUMERAL
+    elif joint == "acromioclavicular":
+        return JointType.ACROMIO_CLAVICULAR
+    elif joint == "sternoclavicular":
+        return JointType.STERNO_CLAVICULAR
+    elif joint == "thoracohumeral":
+        return JointType.THORACO_HUMERAL
+    elif joint == "scapulothoracic":
+        return JointType.SCAPULO_THORACIC
+    else:
+        raise ValueError(f"{joint} is not a valid joint.")
+
+
+def euler_sequence_to_enum(sequence: str) -> EulerSequence:
+    if sequence == "xyz":
+        return EulerSequence.XYZ
+    elif sequence == "xzy":
+        return EulerSequence.XZY
+    elif sequence == "xyx":
+        return EulerSequence.XYX
+    elif sequence == "xzx":
+        return EulerSequence.XZX
+    elif sequence == "yzx":
+        return EulerSequence.YZX
+    elif sequence == "yxz":
+        return EulerSequence.YXZ
+    elif sequence == "yxy":
+        return EulerSequence.YXY
+    elif sequence == "yzy":
+        return EulerSequence.YZY
+    elif sequence == "zxy":
+        return EulerSequence.ZXY
+    elif sequence == "zyx":
+        return EulerSequence.ZYX
+    elif sequence == "zxz":
+        return EulerSequence.ZXZ
+    elif sequence == "zyz":
+        return EulerSequence.ZYZ
+    else:
+        raise ValueError(f"{sequence} is not a valid euler sequence.")
+
+
+def check_parent_child_joint(joint_type: JointType, parent_name: str, child_name: str) -> bool:
+    if joint_type == JointType.GLENO_HUMERAL:
+        return parent_name == "scapula" and child_name == "humerus"
+    elif joint_type == JointType.ACROMIO_CLAVICULAR:
+        return parent_name == "clavicle" and child_name == "scapula"
+    elif joint_type == JointType.STERNO_CLAVICULAR:
+        return parent_name == "thorax" and child_name == "clavicle"
+    elif joint_type == JointType.THORACO_HUMERAL:
+        return parent_name == "thorax" and child_name == "humerus"
+    elif joint_type == JointType.SCAPULO_THORACIC:
+        return parent_name == "thorax" and child_name == "scapula"
+    else:
+        raise ValueError(f"{joint_type} is not a valid joint type.")
+
