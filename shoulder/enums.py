@@ -21,9 +21,12 @@ class CartesianAxis(Enum):
 class BiomechDirection(Enum):
     """Enum for the biomechanical direction"""
 
-    AnteroPosterior = "Antero-Posterior"
-    InferoSuperior = "Infero-Superior"
-    MedioLateral = "Medio-Lateral"
+    PlusAnteroPosterior = "PlusAntero-Posterior"
+    PlusInferoSuperior = "PlusInfero-Superior"
+    PlusMedioLateral = "PlusMedio-Lateral"
+    MinusAnteroPosterior = "MinusAntero-Posterior"
+    MinusInferoSuperior = "MinusInfero-Superior"
+    MinusMedioLateral = "MinusMedio-Lateral"
 
 
 class EulerSequence(Enum):
