@@ -3,6 +3,11 @@ import shutil
 
 
 def copy_folder_with_csv(src_folder: str, dst_folder: str):
+    """
+    This function is made for the maintainers of the project.
+    It copies the folder src_folder to dst_folder, but only the files that end with .csv or .txt.
+    We exclude .pdf, .png, and .dig files for example.
+    """
     # make sure the source and dst are different
     if src_folder == dst_folder:
         raise ValueError("Source and destination folders must be different.")

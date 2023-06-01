@@ -137,3 +137,6 @@ dmypy.json
 .idea/shoulder-kinematic-dataset.iml
 
 .idea/
+.xlsx
+
+*.xlsx
