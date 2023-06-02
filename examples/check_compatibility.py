@@ -1,4 +1,11 @@
-from shoulder import EulerSequence, BiomechCoordinateSystem, CartesianAxis, Joint, JointType, check_biomech_consistency
+from shoulder import (
+    EulerSequence,
+    BiomechCoordinateSystem,
+    CartesianAxis,
+    Joint,
+    JointType,
+    check_biomech_consistency,
+)
 
 
 def main():
@@ -17,7 +24,7 @@ def main():
     )
     print(clavicle.is_isb())
     sterno_clav = Joint(
-        joint_type=JointType.STERNO_CLAVICULAR,
+        joint_type=JointType.ACROMIO_CLAVICULAR,
         euler_sequence=EulerSequence.YXZ,
     )
     print(sterno_clav.is_joint_sequence_isb())
