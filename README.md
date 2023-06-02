@@ -214,12 +214,14 @@ variable type: string
 The sequence of the thoracohumeral joint:
 - yxy
 - zyx
+- unknown (we have clear data but don't know how it has been computed)
 
 ### thoracohumeral_angle
 variable type: string
 When no sequence is given, the thoracohumeral angle is given:
 - angle(yt, yh)
 - controlled by operator: probably goniometer
+- unknown (we have clear data but don't know how it has been computed)
 
 ### thoracohumeral_usable
 variable type: boolean
