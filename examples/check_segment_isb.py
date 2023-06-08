@@ -59,5 +59,8 @@ for i, row in df.iterrows():
             print('detected ISB oriented + origin:', bsys.is_isb())
             print("expected ISB:", row[is_isb])
 
-# does the origin defines the segment ? if not, rotation can be used directly.
-# frame, origin, correction, then risk should be true.
+# todo: does the origin defines the segment frame ?
+#  if not, rotation can be used directly.
+#  if yes, the origin as to be along ISB axis
+# todo: if isb false, but a correction exists, it should be usable.
+# 
