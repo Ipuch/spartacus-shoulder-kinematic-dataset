@@ -1,9 +1,10 @@
-from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection
-
+from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment
+import math
 
 class BiomechCoordinateSystem:
     def __init__(
             self,
+            segment: Segment,
             antero_posterior_axis: CartesianAxis,
             infero_superior_axis: CartesianAxis,
             medio_lateral_axis: CartesianAxis,
@@ -22,6 +23,7 @@ class BiomechCoordinateSystem:
         self.infero_superior_axis = infero_superior_axis
         self.medio_lateral_axis = medio_lateral_axis
         self.origin = origin
+        self.segment = segment
 
     @classmethod
     def from_biomech_directions(
@@ -29,7 +31,8 @@ class BiomechCoordinateSystem:
             x: BiomechDirection,
             y: BiomechDirection,
             z: BiomechDirection,
-            origin=None,
+            origin: BiomechOrigin =None,
+            segment: Segment = None,
     ):
         my_arg = dict()
 
@@ -65,10 +68,26 @@ class BiomechCoordinateSystem:
                     continue
 
         my_arg["origin"] = origin
+        my_arg["segment"] = segment
 
         return cls(**my_arg)
 
+    def is_isb_origin(self) -> bool:
+        if self.segment == Segment.THORAX and self.origin == BiomechOrigin.Thorax.IJ:
+            return True
+        elif self.segment == Segment.CLAVICLE and self.origin == BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER:
+            return True
+        elif self.segment == Segment.SCAPULA and self.origin == BiomechOrigin.Scapula.ANGULAR_ACROMIALIS:
+            return True
+        elif self.segment == Segment.HUMERUS and self.origin == BiomechOrigin.Humerus.GLENOHUMERAL_HEAD:
+            return True
+        else:
+            return False
+
     def is_isb(self) -> bool:
+        return self.is_isb_oriented() and self.is_isb_origin()
+
+    def is_isb_oriented(self) -> bool:
         condition_1 = self.anterior_posterior_axis is CartesianAxis.plusX
         condition_2 = self.infero_superior_axis is CartesianAxis.plusY
         condition_3 = self.medio_lateral_axis is CartesianAxis.plusZ
@@ -409,8 +428,8 @@ def check_biomech_consistency(
 
     """
 
-    parent_isb = parent_segment.is_isb()
-    child_isb = child_segment.is_isb()
+    parent_isb = parent_segment.is_isb_oriented()
+    child_isb = child_segment.is_isb_oriented()
 
     if parent_isb and child_isb:
         if joint.is_joint_sequence_isb():
@@ -450,6 +469,42 @@ def biomech_direction_string_to_enum(biomech_direction: str) -> BiomechDirection
                          "biomech_direction must be one of the following: "
                          "+mediolateral, +anteroposterior, +inferosuperior, "
                          "-mediolateral, -anteroposterior, -inferosuperior")
+
+
+def biomech_origin_string_to_enum(biomech_origin: str) -> BiomechOrigin:
+
+    if biomech_origin == "T7":
+        return BiomechOrigin.Thorax.T7
+    elif biomech_origin == "IJ":
+        return BiomechOrigin.Thorax.IJ
+    elif biomech_origin == "T1 anterior face":
+        return BiomechOrigin.Thorax.T1_ANTERIOR_FACE
+    elif biomech_origin == "GH":
+        return BiomechOrigin.Humerus.GLENOHUMERAL_HEAD
+    elif biomech_origin == "midpoint EM EL":
+        return BiomechOrigin.Humerus.MIDPOINT_CONDYLES
+    elif biomech_origin == "SC":
+        return BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER
+    elif biomech_origin == "volume centroid of a cylinder mapped to the midthird of the clavicle":
+        return BiomechOrigin.Clavicle.MIDTHIRD
+    elif biomech_origin == "point of intersection between the mesh model and the Zc axis":
+        return BiomechOrigin.Clavicle.CUSTOM
+    elif biomech_origin == "AC":
+        return BiomechOrigin.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER
+    elif biomech_origin == "AA":
+        return BiomechOrigin.Scapula.ANGULAR_ACROMIALIS
+    elif biomech_origin == "glenoid center":
+        return BiomechOrigin.Scapula.GLENOID_CENTER
+    elif biomech_origin == "TS":
+        return BiomechOrigin.Scapula.TRIGNONUM_SPINAE
+    elif biomech_origin == "clavicle origin":
+        return BiomechOrigin.Clavicle.CUSTOM
+    elif biomech_origin == "nan" or biomech_origin == "None" or math.isnan(biomech_origin):
+        return None
+    else:
+        raise ValueError(f"{biomech_origin} is not a valid biomech_origin."
+                         "biomech_origin must be one of the following: "
+                         "joint, parent, child")
 
 
 def biomech_direction_sign(direction: BiomechDirection) -> int:
