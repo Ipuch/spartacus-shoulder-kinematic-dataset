@@ -57,7 +57,6 @@ class BiomechOrigin:
         NAN = "nan"
 
 
-
 class EulerSequence(Enum):
     XYX = "xyx"
     XZX = "xzx"

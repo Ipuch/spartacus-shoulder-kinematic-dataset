@@ -1,16 +1,16 @@
 from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment
 import math
 
+
 class BiomechCoordinateSystem:
     def __init__(
-            self,
-            segment: Segment,
-            antero_posterior_axis: CartesianAxis,
-            infero_superior_axis: CartesianAxis,
-            medio_lateral_axis: CartesianAxis,
-            origin=None,
+        self,
+        segment: Segment,
+        antero_posterior_axis: CartesianAxis,
+        infero_superior_axis: CartesianAxis,
+        medio_lateral_axis: CartesianAxis,
+        origin=None,
     ):
-
         # verify isinstance
         if not isinstance(antero_posterior_axis, CartesianAxis):
             raise TypeError("antero_posterior_axis should be of type CartesianAxis")
@@ -27,12 +27,12 @@ class BiomechCoordinateSystem:
 
     @classmethod
     def from_biomech_directions(
-            cls,
-            x: BiomechDirection,
-            y: BiomechDirection,
-            z: BiomechDirection,
-            origin: BiomechOrigin =None,
-            segment: Segment = None,
+        cls,
+        x: BiomechDirection,
+        y: BiomechDirection,
+        z: BiomechDirection,
+        origin: BiomechOrigin = None,
+        segment: Segment = None,
     ):
         my_arg = dict()
 
@@ -45,7 +45,7 @@ class BiomechCoordinateSystem:
         positive_enums_axis = [CartesianAxis.plusX, CartesianAxis.plusY, CartesianAxis.plusZ]
         negative_enums_axis = [CartesianAxis.minusX, CartesianAxis.minusY, CartesianAxis.minusZ]
 
-        for (axis, positive_enum, negative_enum) in zip(actual_axes, positive_enums_axis, negative_enums_axis):
+        for axis, positive_enum, negative_enum in zip(actual_axes, positive_enums_axis, negative_enums_axis):
             if biomech_direction_sign(axis) == 1:
                 if axis == BiomechDirection.PlusAnteroPosterior:
                     my_arg["antero_posterior_axis"] = positive_enum
@@ -96,9 +96,9 @@ class BiomechCoordinateSystem:
 
 class Joint:
     def __init__(
-            self,
-            joint_type: JointType,
-            euler_sequence: EulerSequence,
+        self,
+        joint_type: JointType,
+        euler_sequence: EulerSequence,
     ):
         self.joint_type = joint_type
         self.euler_sequence = euler_sequence
@@ -119,9 +119,9 @@ class Joint:
 
 
 def check_coordinates_and_euler_sequence_compatibility(
-        parent_segment: BiomechCoordinateSystem,
-        child_segment: BiomechCoordinateSystem,
-        joint: Joint,
+    parent_segment: BiomechCoordinateSystem,
+    child_segment: BiomechCoordinateSystem,
+    joint: Joint,
 ) -> tuple[bool, tuple[int, int, int]]:
     """
     Check if the combination of the coordinates and the euler sequence is valid to be used, according to the ISB
@@ -400,9 +400,9 @@ def check_coordinates_and_euler_sequence_compatibility(
 
 
 def check_biomech_consistency(
-        parent_segment: BiomechCoordinateSystem,
-        child_segment: BiomechCoordinateSystem,
-        joint: Joint,
+    parent_segment: BiomechCoordinateSystem,
+    child_segment: BiomechCoordinateSystem,
+    joint: Joint,
 ) -> tuple[bool, tuple[int, int, int]]:
     """
     Check if the biomechanical coordinate system of the parent and child segment
@@ -465,14 +465,15 @@ def biomech_direction_string_to_enum(biomech_direction: str) -> BiomechDirection
     elif biomech_direction == "-inferosuperior":
         return BiomechDirection.MinusInferoSuperior
     else:
-        raise ValueError(f"{biomech_direction} is not a valid biomech_direction."
-                         "biomech_direction must be one of the following: "
-                         "+mediolateral, +anteroposterior, +inferosuperior, "
-                         "-mediolateral, -anteroposterior, -inferosuperior")
+        raise ValueError(
+            f"{biomech_direction} is not a valid biomech_direction."
+            "biomech_direction must be one of the following: "
+            "+mediolateral, +anteroposterior, +inferosuperior, "
+            "-mediolateral, -anteroposterior, -inferosuperior"
+        )
 
 
 def biomech_origin_string_to_enum(biomech_origin: str) -> BiomechOrigin:
-
     if biomech_origin == "T7":
         return BiomechOrigin.Thorax.T7
     elif biomech_origin == "IJ":
@@ -502,21 +503,25 @@ def biomech_origin_string_to_enum(biomech_origin: str) -> BiomechOrigin:
     elif biomech_origin == "nan" or biomech_origin == "None" or math.isnan(biomech_origin):
         return None
     else:
-        raise ValueError(f"{biomech_origin} is not a valid biomech_origin."
-                         "biomech_origin must be one of the following: "
-                         "joint, parent, child")
+        raise ValueError(
+            f"{biomech_origin} is not a valid biomech_origin."
+            "biomech_origin must be one of the following: "
+            "joint, parent, child"
+        )
 
 
 def biomech_direction_sign(direction: BiomechDirection) -> int:
-    if direction in (BiomechDirection.PlusMedioLateral,
-                     BiomechDirection.PlusAnteroPosterior,
-                     BiomechDirection.PlusInferoSuperior,
-                     ):
+    if direction in (
+        BiomechDirection.PlusMedioLateral,
+        BiomechDirection.PlusAnteroPosterior,
+        BiomechDirection.PlusInferoSuperior,
+    ):
         return 1
-    elif direction in (BiomechDirection.MinusMedioLateral,
-                       BiomechDirection.MinusAnteroPosterior,
-                       BiomechDirection.MinusInferoSuperior,
-                       ):
+    elif direction in (
+        BiomechDirection.MinusMedioLateral,
+        BiomechDirection.MinusAnteroPosterior,
+        BiomechDirection.MinusInferoSuperior,
+    ):
         return -1
     else:
         raise ValueError(f"{direction} is not a valid BiomechDirection.")
@@ -579,4 +584,3 @@ def check_parent_child_joint(joint_type: JointType, parent_name: str, child_name
         return parent_name == "thorax" and child_name == "scapula"
     else:
         raise ValueError(f"{joint_type} is not a valid joint type.")
-
