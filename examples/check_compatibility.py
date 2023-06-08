@@ -5,6 +5,7 @@ from shoulder import (
     Joint,
     JointType,
     check_biomech_consistency,
+    Segment,
 )
 
 
@@ -12,12 +13,14 @@ def main():
     # A very standard example of the sterno-clavicular joint, already in ISB
     print(" -- Sterno-clavicular joint -- ISB")
     thorax = BiomechCoordinateSystem(
+        segment=Segment.THORAX,
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusY,
         medio_lateral_axis=CartesianAxis.plusZ,
     )
     print(thorax.is_isb_oriented())
     clavicle = BiomechCoordinateSystem(
+        segment=Segment.CLAVICLE,
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusY,
         medio_lateral_axis=CartesianAxis.plusZ,
@@ -39,12 +42,14 @@ def main():
     # A not standard example of the sterno-clavicular joint, not in ISB
     print(" -- Sterno-clavicular joint -- not ISB")
     thorax = BiomechCoordinateSystem(
+        segment=Segment.THORAX,
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusY,
         medio_lateral_axis=CartesianAxis.plusZ,
     )
     print(thorax.is_isb_oriented())
     clavicle = BiomechCoordinateSystem(
+        segment=Segment.CLAVICLE,
         antero_posterior_axis=CartesianAxis.minusY,
         infero_superior_axis=CartesianAxis.plusX,
         medio_lateral_axis=CartesianAxis.plusZ,
@@ -66,12 +71,14 @@ def main():
     # A not standard example of the sterno-clavicular joint, not in ISB, but compatible with ISB
     print(" -- Sterno-clavicular joint -- not ISB but compatible")
     thorax = BiomechCoordinateSystem(
+        segment=Segment.THORAX,
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusZ,
         medio_lateral_axis=CartesianAxis.minusY,
     )
     print(thorax.is_isb_oriented())
     clavicle = BiomechCoordinateSystem(
+        segment=Segment.CLAVICLE,
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusZ,
         medio_lateral_axis=CartesianAxis.minusY,

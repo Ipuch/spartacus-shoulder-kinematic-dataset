@@ -456,13 +456,13 @@ def biomech_direction_string_to_enum(biomech_direction: str) -> BiomechDirection
         return BiomechDirection.PlusMedioLateral
     elif biomech_direction == "+anteroposterior":
         return BiomechDirection.PlusAnteroPosterior
-    elif biomech_direction == "+superoinferior":
+    elif biomech_direction == "+inferosuperior":
         return BiomechDirection.PlusInferoSuperior
     elif biomech_direction == "-mediolateral":
         return BiomechDirection.MinusMedioLateral
     elif biomech_direction == "-anteroposterior":
         return BiomechDirection.MinusAnteroPosterior
-    elif biomech_direction == "-superoinferior":
+    elif biomech_direction == "-inferosuperior":
         return BiomechDirection.MinusInferoSuperior
     else:
         raise ValueError(f"{biomech_direction} is not a valid biomech_direction."
