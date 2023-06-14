@@ -1,6 +1,7 @@
 from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment
 from .angle_conversion_callbacks import get_angle_conversion_callback_from_tuple, get_angle_conversion_callback_from_sequence
 import math
+import numpy as np
 
 
 class BiomechCoordinateSystem:
@@ -448,7 +449,7 @@ def check_biomech_consistency(
             return output[0], get_angle_conversion_callback_from_tuple(output[1])
         else:
             # return print("NotImplementedError: Check conversion not implemented yet")
-            return output[0], get_angle_conversion_callback_from_tuple(output[1])
+            return output[0], lambda rot1, rot2, rot3: (np.nan, np.nan, np.nan)
     else:
         raise NotImplementedError("Check conversion not implemented yet")
 

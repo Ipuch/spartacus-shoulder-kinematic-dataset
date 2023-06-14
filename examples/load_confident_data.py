@@ -33,9 +33,13 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False)-> pd.Dat
         "scapula_is_isb",
         "clavicle_is_isb",
     ]
+    # columns
+    columns = df.columns
+    # add a callback_function column
+    columns = np.append(columns, "callback_function")
 
     # create an empty dataframe
-    df_confident = pd.DataFrame(columns=df.columns)
+    df_confident = pd.DataFrame(columns=columns)
 
     for i, row in df.iterrows():
         # print(row.article_author_year)
@@ -117,6 +121,8 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False)-> pd.Dat
         )
         if not usable:
             continue
+        # add the callback function to the dataframe
+        row.callback_function = callback_function
 
         # add the row to the dataframe
         df_confident = pd.concat([df_confident, row.to_frame().T], ignore_index=True)
