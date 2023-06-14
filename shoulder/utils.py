@@ -1,4 +1,5 @@
 from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment
+from .angle_conversion_callbacks import get_angle_conversion_callback_from_tuple, get_angle_conversion_callback_from_sequence
 import math
 
 
@@ -93,6 +94,13 @@ class BiomechCoordinateSystem:
         condition_3 = self.medio_lateral_axis is CartesianAxis.plusZ
         return condition_1 and condition_2 and condition_3
 
+    def __print__(self):
+        print(f"Segment: {self.segment}")
+        print(f"Origin: {self.origin}")
+        print(f"Anterior Posterior Axis: {self.anterior_posterior_axis}")
+        print(f"Medio Lateral Axis: {self.medio_lateral_axis}")
+        print(f"Infero Superior Axis: {self.infero_superior_axis}")
+
 
 class Joint:
     def __init__(
@@ -104,18 +112,7 @@ class Joint:
         self.euler_sequence = euler_sequence
 
     def is_joint_sequence_isb(self) -> bool:
-        if self.joint_type == JointType.GLENO_HUMERAL:
-            return self.euler_sequence is EulerSequence.YXY
-        elif self.joint_type == JointType.SCAPULO_THORACIC:
-            return self.euler_sequence is EulerSequence.YXZ
-        elif self.joint_type == JointType.ACROMIO_CLAVICULAR:
-            return self.euler_sequence is EulerSequence.YXZ
-        elif self.joint_type == JointType.STERNO_CLAVICULAR:
-            return self.euler_sequence is EulerSequence.YXZ
-        elif self.joint_type == JointType.THORACO_HUMERAL:
-            return self.euler_sequence is EulerSequence.YXY
-        else:
-            raise ValueError("JointType not recognized")
+        return get_isb_sequence_from_joint_type(self.joint_type) == self.euler_sequence
 
 
 def check_coordinates_and_euler_sequence_compatibility(
@@ -148,7 +145,7 @@ def check_coordinates_and_euler_sequence_compatibility(
     # create an empty list of 7 element
     condition = [None] * 7
     # all the joints have the same rotation sequence for the ISB YXZ
-    if joint.joint_type.STERNO_CLAVICULAR or joint.joint_type.ACROMIO_CLAVICULAR or joint.joint_type.SCAPULO_THORACIC:
+    if joint.joint_type in (JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR, JointType.SCAPULO_THORACIC):
         # rotation 90° along X for each segment coordinate system
         condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
         condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
@@ -403,7 +400,7 @@ def check_biomech_consistency(
     parent_segment: BiomechCoordinateSystem,
     child_segment: BiomechCoordinateSystem,
     joint: Joint,
-) -> tuple[bool, tuple[int, int, int]]:
+) -> tuple[bool, callable]:
     """
     Check if the biomechanical coordinate system of the parent and child segment
     are compatible with the joint type and ISB sequences
@@ -419,7 +416,7 @@ def check_biomech_consistency(
 
     Returns
     -------
-    tuple(bool, tuple(int, int, int))
+    tuple(bool, callable)
         bool
             True if the biomechanical coordinate system is compatible with ISB
         tuple
@@ -433,9 +430,14 @@ def check_biomech_consistency(
 
     if parent_isb and child_isb:
         if joint.is_joint_sequence_isb():
-            return True, (1, 1, 1)
+            return True, get_angle_conversion_callback_from_tuple((1, 1, 1))
         else:
-            raise NotImplementedError("Check conversion not implemented yet")
+            # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
+            return True, get_angle_conversion_callback_from_sequence(previous_sequence=joint.euler_sequence,
+                                                                     new_sequence=get_isb_sequence_from_joint_type(
+                                                                            joint_type=joint.joint_type
+                                                                     )
+                                                                     )
     elif not parent_isb or not child_isb:
         output = check_coordinates_and_euler_sequence_compatibility(
             parent_segment=parent_segment,
@@ -443,10 +445,10 @@ def check_biomech_consistency(
             joint=joint,
         )
         if output[0]:
-            return output
+            return output[0], get_angle_conversion_callback_from_tuple(output[1])
         else:
-            return print("NotImplementedError: Check conversion not implemented yet")
-            # raise NotImplementedError("Check conversion not implemented yet")
+            # return print("NotImplementedError: Check conversion not implemented yet")
+            return output[0], get_angle_conversion_callback_from_tuple(output[1])
     else:
         raise NotImplementedError("Check conversion not implemented yet")
 
@@ -572,15 +574,59 @@ def euler_sequence_to_enum(sequence: str) -> EulerSequence:
 
 
 def check_parent_child_joint(joint_type: JointType, parent_name: str, child_name: str) -> bool:
+    parent_segment = segment_str_to_enum(parent_name)
+    child_segment = segment_str_to_enum(child_name)
+
     if joint_type == JointType.GLENO_HUMERAL:
-        return parent_name == "scapula" and child_name == "humerus"
+        return parent_segment == Segment.SCAPULA and child_segment == Segment.HUMERUS
     elif joint_type == JointType.ACROMIO_CLAVICULAR:
-        return parent_name == "clavicle" and child_name == "scapula"
+        return parent_segment == Segment.CLAVICLE and child_segment == Segment.SCAPULA
     elif joint_type == JointType.STERNO_CLAVICULAR:
-        return parent_name == "thorax" and child_name == "clavicle"
+        return parent_segment == Segment.THORAX and child_segment == Segment.CLAVICLE
     elif joint_type == JointType.THORACO_HUMERAL:
-        return parent_name == "thorax" and child_name == "humerus"
+        return parent_segment == Segment.THORAX and child_segment == Segment.HUMERUS
     elif joint_type == JointType.SCAPULO_THORACIC:
-        return parent_name == "thorax" and child_name == "scapula"
+        return parent_segment == Segment.THORAX and child_segment == Segment.SCAPULA
     else:
         raise ValueError(f"{joint_type} is not a valid joint type.")
+
+
+def segment_str_to_enum(segment: str) -> Segment:
+    if segment == "clavicle":
+        return Segment.CLAVICLE
+    elif segment == "humerus":
+        return Segment.HUMERUS
+    elif segment == "scapula":
+        return Segment.SCAPULA
+    elif segment == "thorax":
+        return Segment.THORAX
+    else:
+        raise ValueError(f"{segment} is not a valid segment.")
+
+
+def get_segment_columns(segment: Segment) -> list[str]:
+    if segment == Segment.THORAX:
+        return ["thorax_x", "thorax_y", "thorax_z", "thorax_origin"]
+    elif segment == Segment.CLAVICLE:
+        return ["clavicle_x", "clavicle_y", "clavicle_z", "clavicle_origin"]
+    elif segment == Segment.SCAPULA:
+        return ["scapula_x", "scapula_y", "scapula_z", "scapula_origin"]
+    elif segment == Segment.HUMERUS:
+        return ["humerus_x", "humerus_y", "humerus_z", "humerus_origin"]
+    else:
+        raise ValueError(f"{segment} is not a valid segment.")
+
+
+def get_isb_sequence_from_joint_type(joint_type: JointType):
+    if joint_type == JointType.GLENO_HUMERAL:
+        return EulerSequence.YXY
+    elif joint_type == JointType.SCAPULO_THORACIC:
+        return EulerSequence.YXZ
+    elif joint_type == JointType.ACROMIO_CLAVICULAR:
+        return EulerSequence.YXZ
+    elif joint_type == JointType.STERNO_CLAVICULAR:
+        return EulerSequence.YXZ
+    elif joint_type == JointType.THORACO_HUMERAL:
+        return EulerSequence.YXY
+    else:
+        raise ValueError("JointType not recognized")
