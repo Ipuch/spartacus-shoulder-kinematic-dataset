@@ -17,6 +17,7 @@ def main():
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusY,
         medio_lateral_axis=CartesianAxis.plusZ,
+        origin=None,
     )
     print(thorax.is_isb_oriented())
     clavicle = BiomechCoordinateSystem(
@@ -24,6 +25,7 @@ def main():
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusY,
         medio_lateral_axis=CartesianAxis.plusZ,
+        origin=None,
     )
     print(clavicle.is_isb_oriented())
     sterno_clav = Joint(
@@ -46,6 +48,7 @@ def main():
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusY,
         medio_lateral_axis=CartesianAxis.plusZ,
+        origin=None,
     )
     print(thorax.is_isb_oriented())
     clavicle = BiomechCoordinateSystem(
@@ -75,6 +78,7 @@ def main():
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusZ,
         medio_lateral_axis=CartesianAxis.minusY,
+        origin=None,
     )
     print(thorax.is_isb_oriented())
     clavicle = BiomechCoordinateSystem(
@@ -82,6 +86,7 @@ def main():
         antero_posterior_axis=CartesianAxis.plusX,
         infero_superior_axis=CartesianAxis.plusZ,
         medio_lateral_axis=CartesianAxis.minusY,
+        origin=None,
     )
     print(clavicle.is_isb_oriented())
     sterno_clav = Joint(
