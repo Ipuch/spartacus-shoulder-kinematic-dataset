@@ -5,14 +5,14 @@ from shoulder import (
 )
 import pytest
 
-def test_checks():
 
+def test_checks():
     callack = get_angle_conversion_callback_from_tuple((1, 1, 1))
-    assert callack(1,2,3) == (1, 2, 3)
+    assert callack(1, 2, 3) == (1, 2, 3)
     callack = get_angle_conversion_callback_from_tuple((-1, 1, -1))
-    assert callack(1,2,3) == (-1, 2, -3)
+    assert callack(1, 2, 3) == (-1, 2, -3)
     callack = get_angle_conversion_callback_from_tuple((1, -1, 1))
-    assert callack(1,2,3) == (1, -2, 3)
+    assert callack(1, 2, 3) == (1, -2, 3)
     with pytest.raises(ValueError, match="tuple_factors must be a tuple of 1 and -1"):
         get_angle_conversion_callback_from_tuple((1, 1, 2))
 
@@ -31,5 +31,3 @@ def test_checks():
     assert tuple(callack(1, 2, 3)) == (-1.0268907336660056, -0.6499256902050641, -1.857115353462594)
     callack = get_angle_conversion_callback_from_sequence(EulerSequence.XYZ, EulerSequence.YXY)
     assert tuple(callack(1, 2, 3)) == (3.064847992801699, 2.2690392880128885, -2.045600530404556)
-
-

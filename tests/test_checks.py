@@ -33,7 +33,7 @@ def test_checks():
     )
     print(output)  # (True, (1, 1, 1))
     assert output[0] == True
-    assert output[1](1,2,3) == (1, 2, 3)
+    assert output[1](1, 2, 3) == (1, 2, 3)
 
     # A not standard example of the sterno-clavicular joint, not in ISB
     print(" -- Sterno-clavicular joint -- not ISB")
@@ -104,4 +104,4 @@ def test_checks():
     # (True, (1, 1, -1))
     print(output)
     assert output[0] == True
-    assert output[1](1,2,3) == (1, 2, -3)
+    assert output[1](1, 2, 3) == (1, 2, -3)

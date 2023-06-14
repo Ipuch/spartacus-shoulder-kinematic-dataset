@@ -1,5 +1,8 @@
 from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment
-from .angle_conversion_callbacks import get_angle_conversion_callback_from_tuple, get_angle_conversion_callback_from_sequence
+from .angle_conversion_callbacks import (
+    get_angle_conversion_callback_from_tuple,
+    get_angle_conversion_callback_from_sequence,
+)
 import math
 import numpy as np
 
@@ -434,11 +437,10 @@ def check_biomech_consistency(
             return True, get_angle_conversion_callback_from_tuple((1, 1, 1))
         else:
             # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
-            return True, get_angle_conversion_callback_from_sequence(previous_sequence=joint.euler_sequence,
-                                                                     new_sequence=get_isb_sequence_from_joint_type(
-                                                                            joint_type=joint.joint_type
-                                                                     )
-                                                                     )
+            return True, get_angle_conversion_callback_from_sequence(
+                previous_sequence=joint.euler_sequence,
+                new_sequence=get_isb_sequence_from_joint_type(joint_type=joint.joint_type),
+            )
     elif not parent_isb or not child_isb:
         output = check_coordinates_and_euler_sequence_compatibility(
             parent_segment=parent_segment,

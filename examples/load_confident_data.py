@@ -17,8 +17,8 @@ from shoulder import (
 )
 
 
-def load_confident_data(df: pd.DataFrame, print_warnings: bool = False)-> pd.DataFrame:
-    """ Load the confident data from the dataset """
+def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.DataFrame:
+    """Load the confident data from the dataset"""
 
     tested_segments = [
         ["thorax_x", "thorax_y", "thorax_z", "thorax_origin"],
@@ -49,9 +49,9 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False)-> pd.Dat
             # print(segment)
             # if any of each is nan, skip
             if (
-                    isinstance(row[segment[0]], float)
-                    or isinstance(row[segment[1]], float)
-                    or isinstance(row[segment[2]], float)
+                isinstance(row[segment[0]], float)
+                or isinstance(row[segment[1]], float)
+                or isinstance(row[segment[2]], float)
             ):
                 if np.isnan(row[segment[0]]) or np.isnan(row[segment[1]]) or np.isnan(row[segment[2]]):
                     # print(segment, "is nan")
@@ -104,31 +104,39 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False)-> pd.Dat
         child_columns = get_segment_columns(child_segment)
 
         # check database if nan in one the segment of the joint
-        if not isinstance(row[parent_columns[0]], str) or not isinstance(row[parent_columns[1]], str) or not isinstance(row[parent_columns[2]], str):
+        if (
+            not isinstance(row[parent_columns[0]], str)
+            or not isinstance(row[parent_columns[1]], str)
+            or not isinstance(row[parent_columns[2]], str)
+        ):
             if np.isnan(row[parent_columns[0]]) or np.isnan(row[parent_columns[1]]) or np.isnan(row[parent_columns[2]]):
                 if print_warnings:
                     print("WARNING : nan in parent segment")
                 continue
-        if not isinstance(row[child_columns[0]], str) or not isinstance(row[child_columns[1]], str) or not isinstance(row[child_columns[2]], str):
+        if (
+            not isinstance(row[child_columns[0]], str)
+            or not isinstance(row[child_columns[1]], str)
+            or not isinstance(row[child_columns[2]], str)
+        ):
             if np.isnan(row[child_columns[0]]) or np.isnan(row[child_columns[1]]) or np.isnan(row[child_columns[2]]):
                 if print_warnings:
                     print("WARNING : nan in child segment")
                 continue
 
         parent_biomech_sys = BiomechCoordinateSystem.from_biomech_directions(
-                x=biomech_direction_string_to_enum(row[parent_columns[0]]),
-                y=biomech_direction_string_to_enum(row[parent_columns[1]]),
-                z=biomech_direction_string_to_enum(row[parent_columns[2]]),
-                origin=biomech_origin_string_to_enum(row[parent_columns[3]]),
-                segment=parent_segment,
-            )
+            x=biomech_direction_string_to_enum(row[parent_columns[0]]),
+            y=biomech_direction_string_to_enum(row[parent_columns[1]]),
+            z=biomech_direction_string_to_enum(row[parent_columns[2]]),
+            origin=biomech_origin_string_to_enum(row[parent_columns[3]]),
+            segment=parent_segment,
+        )
         child_biomech_sys = BiomechCoordinateSystem.from_biomech_directions(
-                x=biomech_direction_string_to_enum(row[child_columns[0]]),
-                y=biomech_direction_string_to_enum(row[child_columns[1]]),
-                z=biomech_direction_string_to_enum(row[child_columns[2]]),
-                origin=biomech_origin_string_to_enum(row[child_columns[3]]),
-                segment=child_segment,
-            )
+            x=biomech_direction_string_to_enum(row[child_columns[0]]),
+            y=biomech_direction_string_to_enum(row[child_columns[1]]),
+            z=biomech_direction_string_to_enum(row[child_columns[2]]),
+            origin=biomech_origin_string_to_enum(row[child_columns[3]]),
+            segment=child_segment,
+        )
 
         usable, callback_function = check_biomech_consistency(
             parent_segment=parent_biomech_sys,
