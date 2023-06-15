@@ -41,6 +41,9 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
     # create an empty dataframe
     df_confident = pd.DataFrame(columns=columns)
 
+    # keep article_year == 2008
+    # df = df[df["article_year"] == 2008]
+
     for i, row in df.iterrows():
         # print(row.article_author_year)
 

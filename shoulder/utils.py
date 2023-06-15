@@ -469,6 +469,15 @@ def check_biomech_consistency(
                 new_sequence=get_isb_sequence_from_joint_type(joint_type=joint.joint_type),
             )
     elif not parent_isb or not child_isb:
+        # This should be a two step process
+        # 1. Check if the two segments are oriented in the same direction
+        # 2. Convert the euler angles to get them such that the two segments are ISB oriented
+        # 3. Check if the previous joint angle sequence is compatible with the new ISB sequence
+        # 3.1. If yes, return the conversion factor
+        # 4. If not, change the isb sequence with get_angle_conversion_callback_from_sequence(...)
+        # it may not include the step where we check if the origin is on an isb axis, especially for the scapula, consider kolz conversion
+        # build the rotation matrix from the euler angles and sequence, applied kolz conversion to the rotation matrix
+        # identify again the euler angles from the rotation matrix
         output = check_coordinates_and_euler_sequence_compatibility(
             parent_segment=parent_segment,
             child_segment=child_segment,
