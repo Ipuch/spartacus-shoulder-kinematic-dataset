@@ -267,6 +267,33 @@ def check_coordinates_and_euler_sequence_compatibility(
             print("This is a valid combination, of the ISB sequence YXZ." "y=-y, x=-x, z=z")
             return True, (-1, -1, 1)
 
+        # combined rotations +180 along z and +90 along x
+        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusX
+        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
+        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusY
+        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusX
+        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusZ
+        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusY
+        condition[6] = joint.euler_sequence == EulerSequence.ZXY
+
+        if all(condition):
+            print("This is a valid combination, of the ISB sequence YXZ." "y=z, x=-x, z=y")
+            return True, (1, -1, 1)
+
+        # combined rotations -90 along x and -90 along z
+        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusY
+        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
+        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusX
+        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusY
+        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusZ
+        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusX
+        condition[6] = joint.euler_sequence == EulerSequence.ZYX
+
+        if all(condition):
+            # surprisingly this give the same angles, no sign change
+            print("This is a valid combination, of the ISB sequence YXZ." "y=z, x=y, z=x")
+            return True, (1, 1, 1)
+
         print("This is not a valid combination, of the ISB sequence YXZ.")
         return False, (0, 0, 0)
 
