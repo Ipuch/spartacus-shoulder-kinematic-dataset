@@ -65,6 +65,8 @@ class RowData:
         (we don't mind if it's not a isb segment, we just don't want to have a segment
         that matches the is_isb given)
 
+        Third, we check the frame are direct, det(R) = 1.
+
         Returns
         -------
         bool
@@ -105,6 +107,8 @@ class RowData:
         """
         Check if the joint defined in the dataset is valid.
         We expect the joint to have a valid euler sequence, i.e., no NaN values., three letters and valid letters.
+        If not we expect the joint to have a valid translation, i.e., no NaN values.
+
         We expect the joint to have good parent and child definitions
         We expect the joint to have defined parent and child segments, i.e., no NaN values.
 
