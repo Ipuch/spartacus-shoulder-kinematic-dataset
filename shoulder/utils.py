@@ -98,6 +98,29 @@ class BiomechCoordinateSystem:
         condition_3 = self.medio_lateral_axis is CartesianAxis.plusZ
         return condition_1 and condition_2 and condition_3
 
+    def is_direct(self) -> bool:
+        """ check if the frame is direct (True) or indirect (False) """
+        return np.linalg.det(self.get_rotation_matrix()) > 0
+
+    def get_rotation_matrix(self):
+        """
+        write the rotation matrix from the cartesian axis
+
+        such that a_in_isb = R_to_isb_from_local @ a_in_local
+
+        """
+
+        # # find X axis in the cartesian axis
+        # x_in_global =
+
+        return np.array([
+            # X axis                                    Y axis                                      Z axis ,
+            #  in ISB base
+            [self.anterior_posterior_axis.value[1][0], self.infero_superior_axis.value[1][0], self.medio_lateral_axis.value[1][0]],
+            [self.anterior_posterior_axis.value[1][1], self.infero_superior_axis.value[1][1], self.medio_lateral_axis.value[1][1]],
+            [self.anterior_posterior_axis.value[1][2], self.infero_superior_axis.value[1][2], self.medio_lateral_axis.value[1][2]],
+        ])
+
     def __print__(self):
         print(f"Segment: {self.segment}")
         print(f"Origin: {self.origin}")
@@ -111,17 +134,23 @@ class Joint:
         self,
         joint_type: JointType,
         euler_sequence: EulerSequence,
+        translation_origin: BiomechOrigin,
+        translation_frame: Segment,
     ):
         self.joint_type = joint_type
         self.euler_sequence = euler_sequence
+        self.translation_origin = translation_origin
+        self.translation_frame = translation_frame
 
     def is_joint_sequence_isb(self) -> bool:
         return get_isb_sequence_from_joint_type(self.joint_type) == self.euler_sequence
 
+    # todo: stuff for translations ..?
 
-def check_coordinates_and_euler_sequence_compatibility(
-    parent_segment: BiomechCoordinateSystem,
-    child_segment: BiomechCoordinateSystem,
+
+def get_conversion_from_not_isb_to_isb_oriented(
+    parent: BiomechCoordinateSystem,
+    child: BiomechCoordinateSystem,
     joint: Joint,
 ) -> tuple[bool, tuple[int, int, int]]:
     """
@@ -151,12 +180,12 @@ def check_coordinates_and_euler_sequence_compatibility(
     # all the joints have the same rotation sequence for the ISB YXZ
     if joint.joint_type in (JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR, JointType.SCAPULO_THORACIC):
         # rotation 90° along X for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusY
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusY
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusZ
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusY
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusZ
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusY
         condition[6] = joint.euler_sequence == EulerSequence.ZXY
 
         if all(condition):
@@ -164,12 +193,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, 1, -1)
 
         # rotation 180° along X for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusZ
         condition[6] = joint.euler_sequence == EulerSequence.YXZ
 
         if all(condition):
@@ -177,12 +206,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (-1, 1, -1)
 
         # rotation 270° along X for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusZ
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusY
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusZ
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusY
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusZ
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusY
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusZ
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusY
         condition[6] = joint.euler_sequence == EulerSequence.ZXY
 
         if all(condition):
@@ -190,12 +219,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (-1, 1, 1)
 
         # Rotation -90° along Y for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusZ
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusX
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusZ
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusX
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusZ
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusX
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusZ
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusX
         condition[6] = joint.euler_sequence == EulerSequence.YZX
 
         if all(condition):
@@ -203,12 +232,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, -1, 1)
 
         # Rotation 180° along Y for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusZ
         condition[6] = joint.euler_sequence == EulerSequence.YXZ
 
         if all(condition):
@@ -216,12 +245,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, -1, -1)
 
         # Rotation -270° along Y for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusZ
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusX
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusZ
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusX
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusZ
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusX
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusZ
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusX
         condition[6] = joint.euler_sequence == EulerSequence.YZX
 
         if all(condition):
@@ -229,12 +258,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, 1, -1)
 
         # Rotation 90° along Z for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusY
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusX
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusY
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusX
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusY
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusX
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusY
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusX
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusZ
         condition[6] = joint.euler_sequence == EulerSequence.XYZ
 
         if all(condition):
@@ -242,12 +271,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, -1, 1)
 
         # Rotation -90° along Z for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusY
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusX
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusY
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusX
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusY
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusX
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusY
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusX
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusZ
         condition[6] = joint.euler_sequence == EulerSequence.XYZ
 
         if all(condition):
@@ -255,12 +284,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (-1, 1, 1)
 
         # Rotation 180° along Z for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusZ
         condition[6] = joint.euler_sequence == EulerSequence.XYZ
 
         if all(condition):
@@ -268,12 +297,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (-1, -1, 1)
 
         # combined rotations +180 along z and +90 along x
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusY
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusY
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusZ
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusY
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusZ
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusY
         condition[6] = joint.euler_sequence == EulerSequence.ZXY
 
         if all(condition):
@@ -281,12 +310,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, -1, 1)
 
         # combined rotations -90 along x and -90 along z
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusY
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusX
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusY
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusX
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusY
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusZ
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusX
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusY
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusZ
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusX
         condition[6] = joint.euler_sequence == EulerSequence.ZYX
 
         if all(condition):
@@ -300,12 +329,12 @@ def check_coordinates_and_euler_sequence_compatibility(
     # all the joints have the same rotation sequence for the ISB YXY
     elif joint.joint_type in (JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL):
         # Rotation -90° along X for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusY
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusZ
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusY
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusZ
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusY
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusZ
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusY
         condition[6] = joint.euler_sequence == EulerSequence.ZXZ
 
         if all(condition):
@@ -313,12 +342,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, 1, 1)
 
         # Rotation 90° along X for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusZ
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusY
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusZ
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusY
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusZ
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusY
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusZ
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusY
         condition[6] = joint.euler_sequence == EulerSequence.ZXZ
 
         if all(condition):
@@ -326,12 +355,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (-1, 1, -1)
 
         # Rotation 180° along X for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusZ
         condition[6] = joint.euler_sequence == EulerSequence.YXY
 
         if all(condition):
@@ -339,12 +368,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (-1, 1, -1)
 
         # Rotation -90° along Y for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusZ
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusX
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusZ
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusX
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusZ
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusX
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusZ
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusX
         condition[6] = joint.euler_sequence == EulerSequence.YZY
 
         if all(condition):
@@ -352,12 +381,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, -1, 1)
 
         # Rotation 90° along Y for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusZ
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusX
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusZ
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusX
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusZ
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusX
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusZ
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusX
         condition[6] = joint.euler_sequence == EulerSequence.YZY
 
         if all(condition):
@@ -365,12 +394,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, 1, 1)
 
         # Rotation 180° along Y for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.minusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.minusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.minusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.minusZ
         condition[6] = joint.euler_sequence == EulerSequence.YXY
 
         if all(condition):
@@ -378,12 +407,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, -1, 1)
 
         # Rotation -90° along Z for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.plusY
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusX
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.plusY
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusX
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusY
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusX
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.plusY
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusX
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusZ
         condition[6] = joint.euler_sequence == EulerSequence.XYX
 
         if all(condition):
@@ -391,12 +420,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (-1, 1, -1)
 
         # Rotation 90° along Z for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusY
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.plusX
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusY
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.plusX
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusY
+        condition[1] = parent.infero_superior_axis == CartesianAxis.plusX
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusY
+        condition[4] = child.infero_superior_axis == CartesianAxis.plusX
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusZ
         condition[6] = joint.euler_sequence == EulerSequence.XYX
 
         if all(condition):
@@ -404,12 +433,12 @@ def check_coordinates_and_euler_sequence_compatibility(
             return True, (1, -1, 1)
 
         # Rotation 180° along Z for each segment coordinate system
-        condition[0] = parent_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[1] = parent_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[2] = parent_segment.medio_lateral_axis == CartesianAxis.plusZ
-        condition[3] = child_segment.anterior_posterior_axis == CartesianAxis.minusX
-        condition[4] = child_segment.infero_superior_axis == CartesianAxis.minusY
-        condition[5] = child_segment.medio_lateral_axis == CartesianAxis.plusZ
+        condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusX
+        condition[1] = parent.infero_superior_axis == CartesianAxis.minusY
+        condition[2] = parent.medio_lateral_axis == CartesianAxis.plusZ
+        condition[3] = child.anterior_posterior_axis == CartesianAxis.minusX
+        condition[4] = child.infero_superior_axis == CartesianAxis.minusY
+        condition[5] = child.medio_lateral_axis == CartesianAxis.plusZ
         condition[6] = joint.euler_sequence == EulerSequence.YXY
 
         if all(condition):
@@ -468,8 +497,8 @@ def check_biomech_consistency(
                 previous_sequence=joint.euler_sequence,
                 new_sequence=get_isb_sequence_from_joint_type(joint_type=joint.joint_type),
             )
-    elif not parent_isb or not child_isb:
-        # This should be a two step process
+    elif not parent_isb or not child_isb:  # This is to isb correction !
+        # This should be a two-step process
         # 1. Check if the two segments are oriented in the same direction
         # 2. Convert the euler angles to get them such that the two segments are ISB oriented
         # 3. Check if the previous joint angle sequence is compatible with the new ISB sequence
@@ -478,7 +507,7 @@ def check_biomech_consistency(
         # it may not include the step where we check if the origin is on an isb axis, especially for the scapula, consider kolz conversion
         # build the rotation matrix from the euler angles and sequence, applied kolz conversion to the rotation matrix
         # identify again the euler angles from the rotation matrix
-        output = check_coordinates_and_euler_sequence_compatibility(
+        output = get_conversion_from_not_isb_to_isb_oriented(
             parent_segment=parent_segment,
             child_segment=child_segment,
             joint=joint,
@@ -608,26 +637,10 @@ def euler_sequence_to_enum(sequence: str) -> EulerSequence:
         return EulerSequence.ZXZ
     elif sequence == "zyz":
         return EulerSequence.ZYZ
+    elif sequence == "nan" or sequence == "None" or math.isnan(sequence):
+        return None
     else:
         raise ValueError(f"{sequence} is not a valid euler sequence.")
-
-
-def check_parent_child_joint(joint_type: JointType, parent_name: str, child_name: str) -> bool:
-    parent_segment = segment_str_to_enum(parent_name)
-    child_segment = segment_str_to_enum(child_name)
-
-    if joint_type == JointType.GLENO_HUMERAL:
-        return parent_segment == Segment.SCAPULA and child_segment == Segment.HUMERUS
-    elif joint_type == JointType.ACROMIO_CLAVICULAR:
-        return parent_segment == Segment.CLAVICLE and child_segment == Segment.SCAPULA
-    elif joint_type == JointType.STERNO_CLAVICULAR:
-        return parent_segment == Segment.THORAX and child_segment == Segment.CLAVICLE
-    elif joint_type == JointType.THORACO_HUMERAL:
-        return parent_segment == Segment.THORAX and child_segment == Segment.HUMERUS
-    elif joint_type == JointType.SCAPULO_THORACIC:
-        return parent_segment == Segment.THORAX and child_segment == Segment.SCAPULA
-    else:
-        raise ValueError(f"{joint_type} is not a valid joint type.")
 
 
 def segment_str_to_enum(segment: str) -> Segment:
@@ -652,6 +665,32 @@ def get_segment_columns(segment: Segment) -> list[str]:
         return ["scapula_x", "scapula_y", "scapula_z", "scapula_origin"]
     elif segment == Segment.HUMERUS:
         return ["humerus_x", "humerus_y", "humerus_z", "humerus_origin"]
+    else:
+        raise ValueError(f"{segment} is not a valid segment.")
+
+
+def get_is_isb_column(segment: Segment) -> str:
+    if segment == Segment.THORAX:
+        return "thorax_is_isb"
+    elif segment == Segment.CLAVICLE:
+        return "clavicle_is_isb"
+    elif segment == Segment.SCAPULA:
+        return "scapula_is_isb"
+    elif segment == Segment.HUMERUS:
+        return "humerus_is_isb"
+    else:
+        raise ValueError(f"{segment} is not a valid segment.")
+
+
+def get_correction_column(segment: Segment) -> str:
+    if segment == Segment.THORAX:
+        return "thorax_correction_method"
+    elif segment == Segment.CLAVICLE:
+        return "clavicle_correction_method"
+    elif segment == Segment.SCAPULA:
+        return "scapula_correction_method"
+    elif segment == Segment.HUMERUS:
+        return "humerus_correction_method"
     else:
         raise ValueError(f"{segment} is not a valid segment.")
 

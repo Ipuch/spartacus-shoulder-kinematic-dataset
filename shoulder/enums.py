@@ -1,5 +1,6 @@
 from enum import Enum
 from pathlib import Path
+import numpy as np
 
 
 class DatasetCSV(Enum):
@@ -10,12 +11,12 @@ class DatasetCSV(Enum):
 
 
 class CartesianAxis(Enum):
-    plusX = "x"
-    plusY = "y"
-    plusZ = "z"
-    minusX = "-x"
-    minusY = "-y"
-    minusZ = "-z"
+    plusX = ("x", np.array([1, 0, 0]))
+    plusY = ("y", np.array([0, 1, 0]))
+    plusZ = ("z", np.array([0, 0, 1]))
+    minusX = ("-x", np.array([-1, 0, 0]))
+    minusY = ("-y", np.array([0, -1, 0]))
+    minusZ = ("-z", np.array([0, 0, -1]))
 
 
 class BiomechDirection(Enum):
