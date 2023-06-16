@@ -99,7 +99,7 @@ class BiomechCoordinateSystem:
         return condition_1 and condition_2 and condition_3
 
     def is_direct(self) -> bool:
-        """ check if the frame is direct (True) or indirect (False) """
+        """check if the frame is direct (True) or indirect (False)"""
         return np.linalg.det(self.get_rotation_matrix()) > 0
 
     def get_rotation_matrix(self):
@@ -113,13 +113,27 @@ class BiomechCoordinateSystem:
         # # find X axis in the cartesian axis
         # x_in_global =
 
-        return np.array([
-            # X axis                                    Y axis                                      Z axis ,
-            #  in ISB base
-            [self.anterior_posterior_axis.value[1][0], self.infero_superior_axis.value[1][0], self.medio_lateral_axis.value[1][0]],
-            [self.anterior_posterior_axis.value[1][1], self.infero_superior_axis.value[1][1], self.medio_lateral_axis.value[1][1]],
-            [self.anterior_posterior_axis.value[1][2], self.infero_superior_axis.value[1][2], self.medio_lateral_axis.value[1][2]],
-        ])
+        return np.array(
+            [
+                # X axis                                    Y axis                                      Z axis ,
+                #  in ISB base
+                [
+                    self.anterior_posterior_axis.value[1][0],
+                    self.infero_superior_axis.value[1][0],
+                    self.medio_lateral_axis.value[1][0],
+                ],
+                [
+                    self.anterior_posterior_axis.value[1][1],
+                    self.infero_superior_axis.value[1][1],
+                    self.medio_lateral_axis.value[1][1],
+                ],
+                [
+                    self.anterior_posterior_axis.value[1][2],
+                    self.infero_superior_axis.value[1][2],
+                    self.medio_lateral_axis.value[1][2],
+                ],
+            ]
+        )
 
     def __print__(self):
         print(f"Segment: {self.segment}")

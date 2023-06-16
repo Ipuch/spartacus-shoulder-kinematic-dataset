@@ -88,7 +88,7 @@ class RowData:
                 segment=segment_enum,
             )
             # second check
-            if not check_is_isb_segment(self.row, bsys,  print_warnings=print_warnings):
+            if not check_is_isb_segment(self.row, bsys, print_warnings=print_warnings):
                 output = False
 
             # third check if the segment is direct or not
@@ -199,8 +199,7 @@ class RowData:
         # if both segments are isb, we expect no correction to be filled
         if self.parent_biomech_sys.is_isb() and self.child_biomech_sys.is_isb():
             correction_cell = self.row[parent_correction_column]
-            if isinstance(correction_cell, str) and not (
-                            correction_cell == "nan" or np.isnan(correction_cell)):
+            if isinstance(correction_cell, str) and not (correction_cell == "nan" or np.isnan(correction_cell)):
                 output = False
                 if print_warnings:
                     print(
@@ -209,8 +208,7 @@ class RowData:
                     )
 
             correction_cell = self.row[child_correction_column]
-            if isinstance(correction_cell, str) and not (
-                            correction_cell == "nan" or np.isnan(correction_cell)):
+            if isinstance(correction_cell, str) and not (correction_cell == "nan" or np.isnan(correction_cell)):
                 output = False
                 if print_warnings:
                     print(
@@ -224,12 +222,10 @@ class RowData:
             # else:
             #     self.correction_on_euler_sequence = True
 
-
         # if both segments are not isb, we expect the correction to_isb to be filled
         if not self.parent_biomech_sys.is_isb():
             correction_cell = self.row[parent_correction_column]
-            if not isinstance(correction_cell, str) and (
-                            correction_cell == "nan" or np.isnan(correction_cell)):
+            if not isinstance(correction_cell, str) and (correction_cell == "nan" or np.isnan(correction_cell)):
                 output = False
                 if print_warnings:
                     print(
@@ -240,8 +236,7 @@ class RowData:
         if not self.child_biomech_sys.is_isb():
             correction_cell = self.row[child_correction_column]
             # check if the check is well done.
-            if not isinstance(correction_cell, str) and (
-                            correction_cell == "nan" or np.isnan(correction_cell)):
+            if not isinstance(correction_cell, str) and (correction_cell == "nan" or np.isnan(correction_cell)):
                 output = False
                 if print_warnings:
                     print(
@@ -273,7 +268,6 @@ class RowData:
                 )
 
         elif not parent_isb or not child_isb:  # This is to isb correction !
-
             # 1. Check if the two segments are oriented in the same direction
             if not check_same_orientation(parent=self.parent_biomech_sys, child=self.child_biomech_sys):
                 # todo: i don't know yet if useful

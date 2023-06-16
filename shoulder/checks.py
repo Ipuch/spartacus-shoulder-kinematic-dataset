@@ -141,8 +141,10 @@ def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = Fals
     return True
 
 
-def check_same_orientation(parent: BiomechCoordinateSystem, child: BiomechCoordinateSystem, print_warnings: bool = False) -> bool:
-    """ This function checks if the parent and child segments have the same orientation."""
+def check_same_orientation(
+    parent: BiomechCoordinateSystem, child: BiomechCoordinateSystem, print_warnings: bool = False
+) -> bool:
+    """This function checks if the parent and child segments have the same orientation."""
     condition1 = parent.anterior_posterior_axis == child.anterior_posterior_axis
     condition2 = parent.medio_lateral_axis == child.medio_lateral_axis
     condition3 = parent.infero_superior_axis == child.infero_superior_axis
@@ -151,19 +153,35 @@ def check_same_orientation(parent: BiomechCoordinateSystem, child: BiomechCoordi
     if not condition1 or not condition2 or not condition3:
         if print_warnings:
             print("WARNING : inconsistency in the dataset")
-            print("parent :", parent.segment, parent.anterior_posterior_axis, parent.medio_lateral_axis, parent.infero_superior_axis)
-            print("child :", child.segment, child.anterior_posterior_axis, child.medio_lateral_axis, child.infero_superior_axis)
+            print(
+                "parent :",
+                parent.segment,
+                parent.anterior_posterior_axis,
+                parent.medio_lateral_axis,
+                parent.infero_superior_axis,
+            )
+            print(
+                "child :",
+                child.segment,
+                child.anterior_posterior_axis,
+                child.medio_lateral_axis,
+                child.infero_superior_axis,
+            )
         output = False
 
     return output
 
 
 def check_is_translation_provided(row: pd.Series, print_warnings: bool = False) -> bool:
-    """ This function checks if the translation is provided in the dataset."""
+    """This function checks if the translation is provided in the dataset."""
     # check that the column origin_displacement and displacement_cs (coordinate system) are not nan
 
-    origin_displacement_provided = isinstance(row.origin_displacement, str) and (not row.origin_displacement == "nan" or not np.isnan(row.origin_displacement))
-    displacement_cs_provided = isinstance(row.displacement_cs, str) and (not row.displacement_cs == "nan" or not np.isnan(row.displacement_cs))
+    origin_displacement_provided = isinstance(row.origin_displacement, str) and (
+        not row.origin_displacement == "nan" or not np.isnan(row.origin_displacement)
+    )
+    displacement_cs_provided = isinstance(row.displacement_cs, str) and (
+        not row.displacement_cs == "nan" or not np.isnan(row.displacement_cs)
+    )
 
     if not (origin_displacement_provided and not displacement_cs_provided):
         if print_warnings:
