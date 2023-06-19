@@ -132,7 +132,7 @@ class BiomechCoordinateSystem:
                     self.infero_superior_axis.value[1][2],
                     self.medio_lateral_axis.value[1][2],
                 ],
-            ]
+            ], dtype=np.float64,
         )
 
     def __print__(self):
