@@ -607,8 +607,9 @@ def convert_rotation_matrix_from_one_coordinate_system_to_another(
     signs = np.sign(ratio)
 
     # extra check try to rebuild the rotation matrix from the initial euler angles and the sign factors
-    extra_R_from_initial_euler_and_factors = biorbd.Rotation.fromEulerAngles(rot=euler * signs,
-                                                                             seq=sequence_wanted).to_array()
+    extra_R_from_initial_euler_and_factors = biorbd.Rotation.fromEulerAngles(
+        rot=euler * signs, seq=sequence_wanted
+    ).to_array()
     if not np.allclose(new_R, extra_R_from_initial_euler_and_factors):
         raise RuntimeError("The rebuilt rotation matrix is not the same as the original one")
 
