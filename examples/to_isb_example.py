@@ -67,4 +67,3 @@ signs = np.sign(euler1 / euler)
 print("conversion factors to apply to the euler angles are:")
 print(signs)
 
-

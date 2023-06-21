@@ -298,21 +298,16 @@ class RowData:
             #     joint=self.joint,
             # )
             # New method
-            if self.joint.is_sequence_convertible_through_factors(print_warning=True):
-                # output = get_conversion_from_not_isb_to_isb_oriented_v2(
-                #     parent=self.parent_biomech_sys,
-                #     child=self.child_biomech_sys,
-                #     joint=self.joint,
-                # )
+            is_sequence_convertible_through_factors, sign_factors = convert_rotation_matrix_from_one_coordinate_system_to_another(
+                bsys=self.parent_biomech_sys,
+                initial_sequence=self.joint.euler_sequence,
+                sequence_wanted=self.joint.isb_euler_sequence(),
+            )
+            # Note: an extra check need to be done in the previous function
 
-                self.usable_data = True
-                self.correction_callback = get_angle_conversion_callback_from_tuple(
-                    convert_rotation_matrix_from_one_coordinate_system_to_another(
-                        bsys=self.parent_biomech_sys,
-                        initial_sequence=self.joint.euler_sequence,
-                        sequence_wanted=self.joint.isb_euler_sequence(),
-                    )
-                )
+            if self.joint.is_sequence_convertible_through_factors(print_warning=True) and is_sequence_convertible_through_factors:
+                    self.usable_data = True
+                    self.correction_callback = get_angle_conversion_callback_from_tuple(sign_factors)
             else:
                 self.usable_data = True
                 self.correction_callback = get_angle_conversion_callback_to_isb_with_sequence(

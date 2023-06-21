@@ -45,7 +45,7 @@ def convert_euler_angles_and_frames_to_isb(
     rotation_matrix_object = biorbd.Rotation.fromEulerAngles(np.array([rot1, rot2, rot3]), seq=previous_sequence_str)
     rotation_matrix = rotation_matrix_object.rot().to_array()
 
-    # I'm pretty sure the rotation matrix is R_parent_child(rot1,rot2, rot3)
+    # I'm pretty sure the rotation matrix is R_parent_child(rot1, rot2, rot3)
     converted_rotation_matrix = bsys_parent.get_rotation_matrix() @ rotation_matrix @ bsys_child.get_rotation_matrix().T
 
     new_rotation_matrix_object = mat_2_rotation(converted_rotation_matrix)

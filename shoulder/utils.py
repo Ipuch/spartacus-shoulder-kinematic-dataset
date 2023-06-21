@@ -20,10 +20,18 @@ class BiomechCoordinateSystem:
             raise TypeError("infero_superior_axis should be of type CartesianAxis")
         if not isinstance(medio_lateral_axis, CartesianAxis):
             raise TypeError("medio_lateral_axis should be of type CartesianAxis")
+        # verity they are all different
+        if (
+            antero_posterior_axis == infero_superior_axis
+            or antero_posterior_axis == medio_lateral_axis
+            or infero_superior_axis == medio_lateral_axis
+        ):
+            raise ValueError("antero_posterior_axis, infero_superior_axis, medio_lateral_axis should be different")
 
         self.anterior_posterior_axis = antero_posterior_axis
         self.infero_superior_axis = infero_superior_axis
         self.medio_lateral_axis = medio_lateral_axis
+
         self.origin = origin
         self.segment = segment
 
@@ -369,7 +377,7 @@ def get_conversion_from_not_isb_to_isb_oriented(
             print("This is a valid combination, of the ISB sequence YXZ." "y=z, x=-x, z=y")
             return True, (1, -1, 1)
 
-        # combined rotations -90 along x and -90 along z
+        # combined rotations +90 along x and +90 along y
         condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusY
         condition[1] = parent.infero_superior_axis == CartesianAxis.plusZ
         condition[2] = parent.medio_lateral_axis == CartesianAxis.plusX
@@ -525,7 +533,7 @@ def convert_rotation_matrix_from_one_coordinate_system_to_another(
     bsys: BiomechCoordinateSystem,
     initial_sequence: EulerSequence,
     sequence_wanted: EulerSequence,
-) -> tuple[int, int, int]:
+) -> tuple[bool, tuple[int, int, int]]:
     """
     This function converts the current euler angles into a desired euler sequence.
 
@@ -540,55 +548,74 @@ def convert_rotation_matrix_from_one_coordinate_system_to_another(
 
     Returns
     -------
+    bool
+        Whether the conversion is possible with sign factors
     tuple[int, int, int]
-        The permutation to apply to the euler angles to get the desired sequence
+        The sign factors to apply to the euler angles to get the desired euler sequence
     """
     initial_sequence = initial_sequence.value
-    sequence_wanted = sequence_wanted.value
+    sequence_wanted = sequence_wanted.value  # most of the time, it will be the ISB sequence
 
     R_isb_local = mat_2_rotation(bsys.get_rotation_matrix()).to_array()
 
     # Let's build two rotation matrices R01 and R02, such that a_in_0 = R01 @ a_in_1 and b_in_0 = R02 @ b_in_2
     # to emulate two segments with different orientations
-    R01 = biorbd.Rotation.fromEulerAngles(rot=np.array([0.1, 0.2, 0.3]), seq="zxy").to_array()  # random values
-    R02 = biorbd.Rotation.fromEulerAngles(rot=np.array([-0.09, 0.21, -0.301]), seq="zxy").to_array()  # random values
-
     R01 = biorbd.Rotation.fromEulerAngles(rot=np.array([0.5, -0.8, 1.2]), seq="zxy").to_array()  # random values
     R02 = biorbd.Rotation.fromEulerAngles(rot=np.array([-0.01, 0.02, -0.03]), seq="zxy").to_array()  # ra
 
     # compute the rotation matrix between the two
     R12 = R01.transpose() @ R02
-    print(R12)
+    # print(R12)
 
     # compute the euler angles of the rotation matrix with the sequence zxy
     euler = biorbd.Rotation.toEulerAngles(mat_2_rotation(R12), initial_sequence).to_array()
     # print("euler angles")
     # print(euler)
+    # if we want to change if for scipy
+    # euler_scipy = Rotation.from_matrix(R12).as_euler(bad_sequence.upper())
 
     # applied the rotation matrix R to R1 and R2
-    R01_rotated = R01 @ R_isb_local.transpose()
-    R02_rotated = R02 @ R_isb_local.transpose()
+    #  ---  Deprecated --- not false but less generic
+    # R01_rotated = R01 @ R_isb_local.transpose()
+    # R02_rotated = R02 @ R_isb_local.transpose()
+    # new_R = R01_rotated.transpose() @ R02_rotated
+    #  ---  New way --- more generic
+    new_R = R_isb_local @ R12 @ R_isb_local.transpose()
 
-    new_R = R01_rotated.transpose() @ R02_rotated
     # compute the euler angles of the rotated matrices
-    euler1 = biorbd.Rotation.toEulerAngles(mat_2_rotation(new_R), sequence_wanted).to_array()
+    new_euler = biorbd.Rotation.toEulerAngles(mat_2_rotation(new_R), sequence_wanted).to_array()
     # print("euler angles of new_R rotated")
     # print(euler1)
+    # if we want to change if for scipy
+    # new_euler_scipy = Rotation.from_matrix(new_R).as_euler(isb_sequence.upper())
 
     # check before if ratios are not too far from 1
-    print("ratios")
-    if not np.any(np.abs(euler1 / euler) < 0.999) and not np.any(np.abs(euler1 / euler) > 1.001):
+    ratio = new_euler / euler
+    # check if the ratios with flipped euler angles are not too far from 1
+    new_euler_flipped = flip_rotations(new_euler, sequence_wanted)
+    ratio_flipped = new_euler_flipped / euler
+    if not np.any(np.abs(ratio) < 0.999) and not np.any(np.abs(ratio) > 1.001):
         print("ratios are ok")
+    elif not np.any(np.abs(ratio_flipped) < 0.999) and not np.any(np.abs(ratio_flipped) > 1.001):
+        print("ratios are ok with flipped euler angles")
+        new_euler = new_euler_flipped
     else:
-        raise RuntimeError(f"ratios are too far from 1: {euler1 / euler}")
+        # raise RuntimeError(f"ratios are too far from 1: {ratio}")
+        return False, (0, 0, 0)
 
     # find the signs to apply to the euler angles to get the same result as the previous computation
-    signs = np.sign(euler1 / euler)
+    signs = np.sign(ratio)
 
-    print("conversion factors to apply to the euler angles are:")
-    print(signs)
+    # extra check try to rebuild the rotation matrix from the initial euler angles and the sign factors
+    extra_R_from_initial_euler_and_factors = biorbd.Rotation.fromEulerAngles(rot=euler * signs,
+                                                                             seq=sequence_wanted).to_array()
+    if not np.allclose(new_R, extra_R_from_initial_euler_and_factors):
+        raise RuntimeError("The rebuilt rotation matrix is not the same as the original one")
 
-    return tuple(signs)
+    # print("conversion factors to apply to the euler angles are:")
+    # print(signs)
+
+    return True, tuple(signs)
 
 
 def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
@@ -607,18 +634,45 @@ def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
     -------
     np.ndarray
         The rotation angles flipped
+
+
+    Source
+    ------
+    github.com/felixchenier/kineticstoolkit/blob/24e3dd39a6546d475732b70609c07fcc26dc2ff7/kineticstoolkit/geometry.py#L526-L537
+
+    Notes
+    -----
+    Before flipping, the angles are:
+
+    - First angle belongs to [-180, 180] degrees (both inclusive)
+    - Second angle belongs to:
+
+        - [-90, 90] degrees if all axes are different. e.g., xyz
+        - [0, 180] degrees if first and third axes are the same e.g., zxz
+
+    - Third angle belongs to [-180, 180] degrees (both inclusive)
+
+    If after flipping, the angles are:
+
+    - First angle belongs to [-180, 180] degrees (both inclusive)
+    - Second angle belongs to:
+
+        - [-180, -90], [90, 180] degrees if all axes are different. e.g., xyz
+        - [-180, 0] degrees if first and third axes are the same e.g., zxz
+
+    - Third angle belongs to [-180, 180] degrees (both inclusive)
     """
     offset = np.pi  # only in radians
 
     if seq[0] == seq[2]:  # Euler angles
-        angles[:, 0] = np.mod(angles[:, 0], 2 * offset) - offset
-        angles[:, 1] = -angles[:, 1]
-        angles[:, 2] = np.mod(angles[:, 2], 2 * offset) - offset
+        angles[0] = np.mod(angles[0], 2 * offset) - offset
+        angles[1] = -angles[1]
+        angles[2] = np.mod(angles[2], 2 * offset) - offset
     else:  # Tait-Bryan angles
-        angles[:, 0] = np.mod(angles[:, 0], 2 * offset) - offset
-        angles[:, 1] = offset - angles[:, 1]
-        angles[angles[:, 1] > offset, :] -= 2 * offset
-        angles[:, 2] = np.mod(angles[:, 2], 2 * offset) - offset
+        angles[0] = np.mod(angles[0], 2 * offset) - offset
+        angles[1] = offset - angles[1]
+        angles[angles[1] > offset, :] -= 2 * offset
+        angles[2] = np.mod(angles[2], 2 * offset) - offset
 
     return angles
 
