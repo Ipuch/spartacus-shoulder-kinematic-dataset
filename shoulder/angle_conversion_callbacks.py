@@ -21,7 +21,9 @@ def convert_euler_angles(previous_sequence_str: str, new_sequence_str: str, rot1
     return biorbd.Rotation.toEulerAngles(r, seq=new_sequence_str).to_array()
 
 
-def get_angle_conversion_callback_from_sequence(previous_sequence: EulerSequence, new_sequence: EulerSequence) -> callable:
+def get_angle_conversion_callback_from_sequence(
+    previous_sequence: EulerSequence, new_sequence: EulerSequence
+) -> callable:
     # check if sequences are different
     if previous_sequence == new_sequence:
         raise ValueError("previous_sequence and new_sequence must be different")
@@ -34,11 +36,12 @@ def get_angle_conversion_callback_from_sequence(previous_sequence: EulerSequence
 def convert_euler_angles_and_frames_to_isb(
     previous_sequence_str: str,
     new_sequence_str: str,
-    rot1, rot2, rot3,
+    rot1,
+    rot2,
+    rot3,
     bsys_parent: BiomechCoordinateSystem,
     bsys_child: BiomechCoordinateSystem,
 ):
-
     rotation_matrix_object = biorbd.Rotation.fromEulerAngles(np.array([rot1, rot2, rot3]), seq=previous_sequence_str)
     rotation_matrix = rotation_matrix_object.rot().to_array()
 
@@ -69,7 +72,9 @@ def get_angle_conversion_callback_to_isb_with_sequence(
     return lambda rot1, rot2, rot3: convert_euler_angles_and_frames_to_isb(
         previous_sequence_str,
         new_sequence_str,
-        rot1, rot2, rot3,
+        rot1,
+        rot2,
+        rot3,
         bsys_parent,
         bsys_child,
     )

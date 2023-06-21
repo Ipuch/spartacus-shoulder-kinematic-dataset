@@ -129,7 +129,8 @@ class BiomechCoordinateSystem:
                     self.infero_superior_axis.value[1][2],
                     self.medio_lateral_axis.value[1][2],
                 ],
-            ], dtype=np.float64,
+            ],
+            dtype=np.float64,
         )
 
     def __print__(self):
@@ -138,6 +139,7 @@ class BiomechCoordinateSystem:
         print(f"Anterior Posterior Axis: {self.anterior_posterior_axis}")
         print(f"Medio Lateral Axis: {self.medio_lateral_axis}")
         print(f"Infero Superior Axis: {self.infero_superior_axis}")
+
 
 class Joint:
     def __init__(
@@ -514,16 +516,15 @@ def get_conversion_from_not_isb_to_isb_oriented(
         )
 
 
-
 def mat_2_rotation(R: np.ndarray) -> biorbd.Rotation:
     """Convert a 3x3 matrix to a biorbd.Rotation"""
     return biorbd.Rotation(R[0, 0], R[0, 1], R[0, 2], R[1, 0], R[1, 1], R[1, 2], R[2, 0], R[2, 1], R[2, 2])
 
 
 def convert_rotation_matrix_from_one_coordinate_system_to_another(
-        bsys: BiomechCoordinateSystem,
-        initial_sequence: EulerSequence,
-        sequence_wanted: EulerSequence,
+    bsys: BiomechCoordinateSystem,
+    initial_sequence: EulerSequence,
+    sequence_wanted: EulerSequence,
 ) -> tuple[int, int, int]:
     """
     This function converts the current euler angles into a desired euler sequence.
@@ -621,6 +622,7 @@ def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
 
     return angles
 
+
 def get_conversion_from_not_isb_to_isb_oriented_v2(
     parent: BiomechCoordinateSystem,
     child: BiomechCoordinateSystem,
@@ -679,10 +681,11 @@ def get_conversion_from_not_isb_to_isb_oriented_v2(
     the_tuple = convert_rotation_matrix_from_one_coordinate_system_to_another(
         parent,  # sending only the parent segment since the two segments have the same orientation
         joint.euler_sequence,
-        sequence_wanted
+        sequence_wanted,
     )
 
     return True, the_tuple
+
 
 #
 # def check_biomech_consistency(

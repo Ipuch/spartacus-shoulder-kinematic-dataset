@@ -140,13 +140,15 @@ class RowData:
             return output
 
         print(self.row.displacement_cs)
-        if self.row.displacement_cs == 'nan':
-            print('nan')
+        if self.row.displacement_cs == "nan":
+            print("nan")
 
         self.joint = Joint(
             joint_type=joint_string_to_enum(self.row.joint),
             euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),
-            translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement) if not no_translation else None,
+            translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement)
+            if not no_translation
+            else None,
             translation_frame=segment_str_to_enum(self.row.displacement_cs) if not no_translation else None,
         )
 
