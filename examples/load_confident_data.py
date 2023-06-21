@@ -14,7 +14,6 @@ from shoulder import (
     segment_str_to_enum,
     get_segment_columns,
     # boolean checks
-    check_biomech_consistency,
     check_parent_child_joint,
     check_segment_filled_with_nan,
     check_is_isb_segment,

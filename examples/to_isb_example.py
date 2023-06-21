@@ -4,7 +4,7 @@ The rotation matrix is computed from the axes of the ISB coordinate system.
 The rotation matrix is then converted to Euler angles, and the axes are permuted to match the sequence of the ISB axes.
 Then we try to retrieve the euler angles from the ISB axes, and we compare the results.
 """
-from shoulder import CartesianAxis, Segment, BiomechCoordinateSystem
+from shoulder import CartesianAxis, Segment, BiomechCoordinateSystem, EulerSequence
 import numpy as np
 import biorbd
 
@@ -16,14 +16,14 @@ def mat_2_rotation(R: np.ndarray) -> biorbd.Rotation:
 
 bsys_1 = BiomechCoordinateSystem(
     segment=Segment.HUMERUS,
-    antero_posterior_axis=CartesianAxis.minusX,
-    infero_superior_axis=CartesianAxis.plusZ,
-    medio_lateral_axis=CartesianAxis.plusY,
+    antero_posterior_axis=CartesianAxis.minusZ,
+    infero_superior_axis=CartesianAxis.plusY,
+    medio_lateral_axis=CartesianAxis.plusX,
     # antero_posterior_axis=CartesianAxis.plusX,
     # infero_superior_axis=CartesianAxis.plusY,
     # medio_lateral_axis=CartesianAxis.plusZ,
 )
-initial_sequence = "zxy"
+initial_sequence = "yzx"
 sequence_wanted = "yxz"  # classic for sternoclavicular, acromioclavicular, and scapulothoracic joint
 
 # we compute the rotation matrix from the axes, R_isb_local

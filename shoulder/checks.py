@@ -183,7 +183,7 @@ def check_is_translation_provided(row: pd.Series, print_warnings: bool = False) 
         not row.displacement_cs == "nan" or not np.isnan(row.displacement_cs)
     )
 
-    if not (origin_displacement_provided and not displacement_cs_provided):
+    if not origin_displacement_provided or not displacement_cs_provided:
         if print_warnings:
             print("WARNING : translation is not entirely provided, for joint", row.joint, row.article_author_year)
             print(f"origin_displacement_provided : {origin_displacement_provided}")

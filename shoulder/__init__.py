@@ -1,6 +1,5 @@
 from .enums import CartesianAxis, EulerSequence, JointType, DatasetCSV, BiomechDirection, BiomechOrigin, Segment
 from .utils import (
-    check_biomech_consistency,
     biomech_direction_string_to_enum,
     biomech_origin_string_to_enum,
     biomech_direction_sign,
@@ -10,10 +9,9 @@ from .utils import (
     euler_sequence_to_enum,
     segment_str_to_enum,
     get_segment_columns,
-    get_angle_conversion_callback_from_sequence,
-    get_angle_conversion_callback_from_tuple,
     get_correction_column,
     get_conversion_from_not_isb_to_isb_oriented,
+    convert_rotation_matrix_from_one_coordinate_system_to_another,
 )
 from .checks import (
     check_parent_child_joint,

@@ -1,8 +1,5 @@
 from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment
-from .angle_conversion_callbacks import (
-    get_angle_conversion_callback_from_tuple,
-    get_angle_conversion_callback_from_sequence,
-)
+import biorbd
 import math
 import numpy as np
 
@@ -142,7 +139,6 @@ class BiomechCoordinateSystem:
         print(f"Medio Lateral Axis: {self.medio_lateral_axis}")
         print(f"Infero Superior Axis: {self.infero_superior_axis}")
 
-
 class Joint:
     def __init__(
         self,
@@ -159,7 +155,55 @@ class Joint:
     def is_joint_sequence_isb(self) -> bool:
         return get_isb_sequence_from_joint_type(self.joint_type) == self.euler_sequence
 
+    def isb_euler_sequence(self) -> EulerSequence:
+        return get_isb_sequence_from_joint_type(self.joint_type)
+
     # todo: stuff for translations ..?
+
+    def is_sequence_convertible_through_factors(self, print_warning: bool = False) -> bool:
+        """
+        Check if the euler sequence of the joint can be converted to the ISB sequence with factors 1 or -1
+
+        We expect the euler sequence to have three different letters, if the ISB sequence is YXZ (steroclavicular, acromioclavicular, scapulothoracic)
+        We expect the euler sequence to have two different letters, if the ISB sequence is YXY (glenohumeral, thoracohumeral)
+
+        Return
+        ------
+        bool
+            True if the sequence can be converted with factors 1 or -1, False otherwise
+        """
+        if self.joint_type in (JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR, JointType.SCAPULO_THORACIC):
+            sequence_wanted = EulerSequence.YXZ
+            # check that we have three different letters in the sequence
+            if len(set(self.euler_sequence.value)) != 3:
+                if print_warning:
+                    print(
+                        "The euler sequence of the joint must have three different letters to be able to convert with factors 1"
+                        f"or -1 to the ISB sequence {sequence_wanted.value}, but the sequence of the joint is"
+                        f" {self.euler_sequence.value}"
+                    )
+                return False
+
+        elif self.joint_type in (JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL):
+            sequence_wanted = EulerSequence.YXY
+            # check that the sequence in joint.euler_sequence as the same two letters for the first and third rotations
+            if self.euler_sequence.value[0] != self.euler_sequence.value[2]:
+                if print_warning:
+                    print(
+                        "The euler sequence of the joint must have the same two letters for the first and third rotations"
+                        f"to be able to convert with factors 1 or -1 to the ISB sequence {sequence_wanted.value},"
+                        f" but the sequence of the joint is {self.euler_sequence.value}"
+                    )
+                return False
+        else:
+            if print_warning:
+                print(
+                    "The joint type must be JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR,"
+                    "JointType.SCAPULO_THORACIC, JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL"
+                )
+            return False
+
+        return True
 
 
 def get_conversion_from_not_isb_to_isb_oriented(
@@ -193,7 +237,7 @@ def get_conversion_from_not_isb_to_isb_oriented(
     condition = [None] * 7
     # all the joints have the same rotation sequence for the ISB YXZ
     if joint.joint_type in (JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR, JointType.SCAPULO_THORACIC):
-        # rotation 90° along X for each segment coordinate system
+        # rotation -90° along X for each segment coordinate system
         condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
         condition[1] = parent.infero_superior_axis == CartesianAxis.plusZ
         condition[2] = parent.medio_lateral_axis == CartesianAxis.minusY
@@ -204,7 +248,7 @@ def get_conversion_from_not_isb_to_isb_oriented(
 
         if all(condition):
             print("This is a valid combination, of the ISB sequence YXZ." "y=z, x=x, z=-y")
-            return True, (1, 1, -1)
+            return True, (-1, 1, 1)
 
         # rotation 180° along X for each segment coordinate system
         condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
@@ -219,7 +263,7 @@ def get_conversion_from_not_isb_to_isb_oriented(
             print("This is a valid combination, of the ISB sequence YXZ." "y=-y, x=x, z=-z")
             return True, (-1, 1, -1)
 
-        # rotation 270° along X for each segment coordinate system
+        # rotation -270° along X for each segment coordinate system
         condition[0] = parent.anterior_posterior_axis == CartesianAxis.plusX
         condition[1] = parent.infero_superior_axis == CartesianAxis.minusZ
         condition[2] = parent.medio_lateral_axis == CartesianAxis.plusY
@@ -230,7 +274,7 @@ def get_conversion_from_not_isb_to_isb_oriented(
 
         if all(condition):
             print("This is a valid combination, of the ISB sequence YXZ." "y=-z, x=x, z=y")
-            return True, (-1, 1, 1)
+            return True, (1, 1, -1)
 
         # Rotation -90° along Y for each segment coordinate system
         condition[0] = parent.anterior_posterior_axis == CartesianAxis.minusZ
@@ -470,20 +514,127 @@ def get_conversion_from_not_isb_to_isb_oriented(
         )
 
 
-def check_biomech_consistency(
-    parent_segment: BiomechCoordinateSystem,
-    child_segment: BiomechCoordinateSystem,
-    joint: Joint,
-) -> tuple[bool, callable]:
+
+def mat_2_rotation(R: np.ndarray) -> biorbd.Rotation:
+    """Convert a 3x3 matrix to a biorbd.Rotation"""
+    return biorbd.Rotation(R[0, 0], R[0, 1], R[0, 2], R[1, 0], R[1, 1], R[1, 2], R[2, 0], R[2, 1], R[2, 2])
+
+
+def convert_rotation_matrix_from_one_coordinate_system_to_another(
+        bsys: BiomechCoordinateSystem,
+        initial_sequence: EulerSequence,
+        sequence_wanted: EulerSequence,
+) -> tuple[int, int, int]:
     """
-    Check if the biomechanical coordinate system of the parent and child segment
-    are compatible with the joint type and ISB sequences
+    This function converts the current euler angles into a desired euler sequence.
 
     Parameters
     ----------
-    parent_segment : BiomechCoordinateSystem
+    bsys: BiomechCoordinateSystem
+        The biomechanical coordinate system of the segment
+    initial_sequence: EulerSequence
+        The euler sequence of the rotation matrix
+    sequence_wanted: EulerSequence
+        The euler sequence of the rotation matrix wanted, e.g. ISB sequence
+
+    Returns
+    -------
+    tuple[int, int, int]
+        The permutation to apply to the euler angles to get the desired sequence
+    """
+    initial_sequence = initial_sequence.value
+    sequence_wanted = sequence_wanted.value
+
+    R_isb_local = mat_2_rotation(bsys.get_rotation_matrix()).to_array()
+
+    # Let's build two rotation matrices R01 and R02, such that a_in_0 = R01 @ a_in_1 and b_in_0 = R02 @ b_in_2
+    # to emulate two segments with different orientations
+    R01 = biorbd.Rotation.fromEulerAngles(rot=np.array([0.1, 0.2, 0.3]), seq="zxy").to_array()  # random values
+    R02 = biorbd.Rotation.fromEulerAngles(rot=np.array([-0.09, 0.21, -0.301]), seq="zxy").to_array()  # random values
+
+    R01 = biorbd.Rotation.fromEulerAngles(rot=np.array([0.5, -0.8, 1.2]), seq="zxy").to_array()  # random values
+    R02 = biorbd.Rotation.fromEulerAngles(rot=np.array([-0.01, 0.02, -0.03]), seq="zxy").to_array()  # ra
+
+    # compute the rotation matrix between the two
+    R12 = R01.transpose() @ R02
+    print(R12)
+
+    # compute the euler angles of the rotation matrix with the sequence zxy
+    euler = biorbd.Rotation.toEulerAngles(mat_2_rotation(R12), initial_sequence).to_array()
+    # print("euler angles")
+    # print(euler)
+
+    # applied the rotation matrix R to R1 and R2
+    R01_rotated = R01 @ R_isb_local.transpose()
+    R02_rotated = R02 @ R_isb_local.transpose()
+
+    new_R = R01_rotated.transpose() @ R02_rotated
+    # compute the euler angles of the rotated matrices
+    euler1 = biorbd.Rotation.toEulerAngles(mat_2_rotation(new_R), sequence_wanted).to_array()
+    # print("euler angles of new_R rotated")
+    # print(euler1)
+
+    # check before if ratios are not too far from 1
+    print("ratios")
+    if not np.any(np.abs(euler1 / euler) < 0.999) and not np.any(np.abs(euler1 / euler) > 1.001):
+        print("ratios are ok")
+    else:
+        raise RuntimeError(f"ratios are too far from 1: {euler1 / euler}")
+
+    # find the signs to apply to the euler angles to get the same result as the previous computation
+    signs = np.sign(euler1 / euler)
+
+    print("conversion factors to apply to the euler angles are:")
+    print(signs)
+
+    return tuple(signs)
+
+
+def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
+    """
+    Return an alternate sequence with the second angle inverted, but that
+        leads to the same rotation matrices. See below for more information.
+
+    Parameters
+    ----------
+    angles: np.ndarray
+        The rotation angles
+    seq: str
+        The sequence of the rotation angles
+
+    Returns
+    -------
+    np.ndarray
+        The rotation angles flipped
+    """
+    offset = np.pi  # only in radians
+
+    if seq[0] == seq[2]:  # Euler angles
+        angles[:, 0] = np.mod(angles[:, 0], 2 * offset) - offset
+        angles[:, 1] = -angles[:, 1]
+        angles[:, 2] = np.mod(angles[:, 2], 2 * offset) - offset
+    else:  # Tait-Bryan angles
+        angles[:, 0] = np.mod(angles[:, 0], 2 * offset) - offset
+        angles[:, 1] = offset - angles[:, 1]
+        angles[angles[:, 1] > offset, :] -= 2 * offset
+        angles[:, 2] = np.mod(angles[:, 2], 2 * offset) - offset
+
+    return angles
+
+def get_conversion_from_not_isb_to_isb_oriented_v2(
+    parent: BiomechCoordinateSystem,
+    child: BiomechCoordinateSystem,
+    joint: Joint,
+) -> tuple[bool, callable]:
+    """
+    Get the conversion factor to convert the rotation matrix from the parent segment
+    to the child segment to the ISB sequence
+
+    Parameters
+    ----------
+    parent : BiomechCoordinateSystem
         The parent segment coordinate system
-    child_segment : BiomechCoordinateSystem
+    child : BiomechCoordinateSystem
         The child segment coordinate system
     joint : Joint
         The joint type
@@ -496,43 +647,107 @@ def check_biomech_consistency(
         tuple
             The conversion factor for dof1, dof2, dof3 of euler angles
 
-
     """
 
-    parent_isb = parent_segment.is_isb_oriented()
-    child_isb = child_segment.is_isb_oriented()
+    # check again the biomechanical coordinate system are the same
+    # check_same_orientation(parent, child, print_warning=True)  # todo: may not be necessary
 
-    if parent_isb and child_isb:
-        if joint.is_joint_sequence_isb():
-            return True, get_angle_conversion_callback_from_tuple((1, 1, 1))
-        else:
-            # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
-            return True, get_angle_conversion_callback_from_sequence(
-                previous_sequence=joint.euler_sequence,
-                new_sequence=get_isb_sequence_from_joint_type(joint_type=joint.joint_type),
+    if joint.joint_type in (JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR, JointType.SCAPULO_THORACIC):
+        sequence_wanted = EulerSequence.YXZ
+        # check that we have three different letters in the sequence
+        if len(set(joint.euler_sequence.value)) != 3:
+            raise RuntimeError(
+                "The euler sequence of the joint must have three different letters to be able to convert with factors 1"
+                f"or -1 to the ISB sequence {sequence_wanted.value}, but the sequence of the joint is"
+                f" {joint.euler_sequence.value}"
             )
-    elif not parent_isb or not child_isb:  # This is to isb correction !
-        # This should be a two-step process
-        # 1. Check if the two segments are oriented in the same direction
-        # 2. Convert the euler angles to get them such that the two segments are ISB oriented
-        # 3. Check if the previous joint angle sequence is compatible with the new ISB sequence
-        # 3.1. If yes, return the conversion factor
-        # 4. If not, change the isb sequence with get_angle_conversion_callback_from_sequence(...)
-        # it may not include the step where we check if the origin is on an isb axis, especially for the scapula, consider kolz conversion
-        # build the rotation matrix from the euler angles and sequence, applied kolz conversion to the rotation matrix
-        # identify again the euler angles from the rotation matrix
-        output = get_conversion_from_not_isb_to_isb_oriented(
-            parent_segment=parent_segment,
-            child_segment=child_segment,
-            joint=joint,
-        )
-        if output[0]:
-            return output[0], get_angle_conversion_callback_from_tuple(output[1])
-        else:
-            # return print("NotImplementedError: Check conversion not implemented yet")
-            return output[0], lambda rot1, rot2, rot3: (np.nan, np.nan, np.nan)
+    elif joint.joint_type in (JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL):
+        sequence_wanted = EulerSequence.YXY
+        # check that the sequence in joint.euler_sequence as the same two letters for the first and third rotations
+        if joint.euler_sequence.value[0] != joint.euler_sequence.value[2]:
+            raise RuntimeError(
+                "The euler sequence of the joint must have the same two letters for the first and third rotations"
+                f"to be able to convert with factors 1 or -1 to the ISB sequence {sequence_wanted.value},"
+                f" but the sequence of the joint is {joint.euler_sequence.value}"
+            )
     else:
-        raise NotImplementedError("Check conversion not implemented yet")
+        raise RuntimeError(
+            "The joint type must be JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR,"
+            "JointType.SCAPULO_THORACIC, JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL"
+        )
+
+    the_tuple = convert_rotation_matrix_from_one_coordinate_system_to_another(
+        parent,  # sending only the parent segment since the two segments have the same orientation
+        joint.euler_sequence,
+        sequence_wanted
+    )
+
+    return True, the_tuple
+
+#
+# def check_biomech_consistency(
+#     parent_segment: BiomechCoordinateSystem,
+#     child_segment: BiomechCoordinateSystem,
+#     joint: Joint,
+# ) -> tuple[bool, callable]:
+#     """
+#     Check if the biomechanical coordinate system of the parent and child segment
+#     are compatible with the joint type and ISB sequences
+#
+#     Parameters
+#     ----------
+#     parent_segment : BiomechCoordinateSystem
+#         The parent segment coordinate system
+#     child_segment : BiomechCoordinateSystem
+#         The child segment coordinate system
+#     joint : Joint
+#         The joint type
+#
+#     Returns
+#     -------
+#     tuple(bool, callable)
+#         bool
+#             True if the biomechanical coordinate system is compatible with ISB
+#         tuple
+#             The conversion factor for dof1, dof2, dof3 of euler angles
+#
+#
+#     """
+#
+#     parent_isb = parent_segment.is_isb_oriented()
+#     child_isb = child_segment.is_isb_oriented()
+#
+#     if parent_isb and child_isb:
+#         if joint.is_joint_sequence_isb():
+#             return True, get_angle_conversion_callback_from_tuple((1, 1, 1))
+#         else:
+#             # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
+#             return True, get_angle_conversion_callback_from_sequence(
+#                 previous_sequence=joint.euler_sequence,
+#                 new_sequence=get_isb_sequence_from_joint_type(joint_type=joint.joint_type),
+#             )
+#     elif not parent_isb or not child_isb:  # This is to isb correction !
+#         # This should be a two-step process
+#         # 1. Check if the two segments are oriented in the same direction
+#         # 2. Convert the euler angles to get them such that the two segments are ISB oriented
+#         # 3. Check if the previous joint angle sequence is compatible with the new ISB sequence
+#         # 3.1. If yes, return the conversion factor
+#         # 4. If not, change the isb sequence with get_angle_conversion_callback_from_sequence(...)
+#         # it may not include the step where we check if the origin is on an isb axis, especially for the scapula, consider kolz conversion
+#         # build the rotation matrix from the euler angles and sequence, applied kolz conversion to the rotation matrix
+#         # identify again the euler angles from the rotation matrix
+#         output = get_conversion_from_not_isb_to_isb_oriented(
+#             parent_segment=parent_segment,
+#             child_segment=child_segment,
+#             joint=joint,
+#         )
+#         if output[0]:
+#             return output[0], get_angle_conversion_callback_from_tuple(output[1])
+#         else:
+#             # return print("NotImplementedError: Check conversion not implemented yet")
+#             return output[0], lambda rot1, rot2, rot3: (np.nan, np.nan, np.nan)
+#     else:
+#         raise NotImplementedError("Check conversion not implemented yet")
 
 
 def biomech_direction_string_to_enum(biomech_direction: str) -> BiomechDirection:

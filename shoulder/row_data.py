@@ -12,11 +12,18 @@ from .utils import (
     joint_string_to_enum,
     segment_str_to_enum,
     euler_sequence_to_enum,
-    get_angle_conversion_callback_from_tuple,
-    get_angle_conversion_callback_from_sequence,
     get_isb_sequence_from_joint_type,
     get_conversion_from_not_isb_to_isb_oriented,
+    get_conversion_from_not_isb_to_isb_oriented_v2,
+    convert_rotation_matrix_from_one_coordinate_system_to_another,
 )
+
+from .angle_conversion_callbacks import (
+    get_angle_conversion_callback_from_tuple,
+    get_angle_conversion_callback_from_sequence,
+    get_angle_conversion_callback_to_isb_with_sequence,
+)
+
 from .checks import (
     check_segment_filled_with_nan,
     check_is_isb_segment,
@@ -132,11 +139,15 @@ class RowData:
                 )
             return output
 
+        print(self.row.displacement_cs)
+        if self.row.displacement_cs == 'nan':
+            print('nan')
+
         self.joint = Joint(
             joint_type=joint_string_to_enum(self.row.joint),
             euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),
-            translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement),
-            translation_frame=segment_str_to_enum(self.row.displacement_cs),
+            translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement) if not no_translation else None,
+            translation_frame=segment_str_to_enum(self.row.displacement_cs) if not no_translation else None,
         )
 
         if not check_parent_child_joint(self.joint, row=self.row, print_warnings=print_warnings):
@@ -264,7 +275,7 @@ class RowData:
                 self.usable_data = True
                 self.correction_callback = get_angle_conversion_callback_from_sequence(
                     previous_sequence=self.joint.euler_sequence,
-                    new_sequence=get_isb_sequence_from_joint_type(joint_type=self.joint.joint_type),
+                    new_sequence=self.joint.isb_euler_sequence(),
                 )
 
         elif not parent_isb or not child_isb:  # This is to isb correction !
@@ -278,21 +289,37 @@ class RowData:
             # 2.If they are the same orientation,
             # convert the euler angles to get them such that the two segments are ISB oriented
             # NOTE: we don't actually convert the coordinate systems, we just convert the euler angles
-            output = get_conversion_from_not_isb_to_isb_oriented(
-                parent=self.parent_biomech_sys,
-                child=self.child_biomech_sys,
-                joint=self.joint,
-            )
-            if output[0]:
-                self.usable_data = True
-                self.correction_callback = output[1]
-            else:
-                self.usable_data = False
-                self.correction_callback = output[0], lambda rot1, rot2, rot3: (np.nan, np.nan, np.nan)
+            # Deprecated
+            # output = get_conversion_from_not_isb_to_isb_oriented(
+            #     parent=self.parent_biomech_sys,
+            #     child=self.child_biomech_sys,
+            #     joint=self.joint,
+            # )
+            # New method
+            if self.joint.is_sequence_convertible_through_factors(print_warning=True):
+                # output = get_conversion_from_not_isb_to_isb_oriented_v2(
+                #     parent=self.parent_biomech_sys,
+                #     child=self.child_biomech_sys,
+                #     joint=self.joint,
+                # )
 
-            # 3. Check if the previous joint angle sequence is compatible with the new ISB sequence
-            # 3.1. If yes, return the conversion factor
-            # 4. If not, change the isb sequence with get_angle_conversion_callback_from_sequence(...)
+                self.usable_data = True
+                self.correction_callback = get_angle_conversion_callback_from_tuple(
+                    convert_rotation_matrix_from_one_coordinate_system_to_another(
+                        bsys=self.parent_biomech_sys,
+                        initial_sequence=self.joint.euler_sequence,
+                        sequence_wanted=self.joint.isb_euler_sequence(),
+                    )
+                )
+            else:
+                self.usable_data = True
+                self.correction_callback = get_angle_conversion_callback_to_isb_with_sequence(
+                    previous_sequence=self.joint.euler_sequence,
+                    new_sequence=self.joint.isb_euler_sequence(),
+                    bsys_child=self.child_biomech_sys,
+                    bsys_parent=self.parent_biomech_sys,
+                )
+
             # it may not include the step where we check if the origin is on an isb axis, especially for the scapula, consider kolz conversion
             # build the rotation matrix from the euler angles and sequence, applied kolz conversion to the rotation matrix
             # identify again the euler angles from the rotation matrix
