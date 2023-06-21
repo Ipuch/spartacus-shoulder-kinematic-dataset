@@ -705,10 +705,6 @@ def get_conversion_from_not_isb_to_isb_oriented_v2(
             The conversion factor for dof1, dof2, dof3 of euler angles
 
     """
-
-    # check again the biomechanical coordinate system are the same
-    # check_same_orientation(parent, child, print_warning=True)  # todo: may not be necessary
-
     if joint.joint_type in (JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR, JointType.SCAPULO_THORACIC):
         sequence_wanted = EulerSequence.YXZ
         # check that we have three different letters in the sequence

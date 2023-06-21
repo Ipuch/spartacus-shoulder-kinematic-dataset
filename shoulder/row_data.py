@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .enums import JointType, Segment
+from .enums import Segment
 from .utils import (
     get_segment_columns,
     get_correction_column,
@@ -12,9 +12,6 @@ from .utils import (
     joint_string_to_enum,
     segment_str_to_enum,
     euler_sequence_to_enum,
-    get_isb_sequence_from_joint_type,
-    get_conversion_from_not_isb_to_isb_oriented,
-    get_conversion_from_not_isb_to_isb_oriented_v2,
     convert_rotation_matrix_from_one_coordinate_system_to_another,
 )
 
@@ -59,7 +56,7 @@ class RowData:
         self.child_columns = get_segment_columns(self.child_segment)
         self.child_biomech_sys = None
 
-        self.correction_callback = None
+        self.rotation_correction_callback = None
         self.usable_data = None
 
     def check_all_segments_validity(self, print_warnings: bool = False) -> bool:
@@ -125,6 +122,8 @@ class RowData:
             True if the joint is valid, False otherwise.
         """
         output = True
+
+        # todo: separate as much as possible the rotations checks and the translations checks
 
         no_euler_sequence = not check_is_euler_sequence_provided(self.row, print_warnings=print_warnings)
         no_translation = not check_is_translation_provided(self.row, print_warnings=print_warnings)
@@ -194,7 +193,7 @@ class RowData:
             segment=self.child_segment,
         )
 
-    def check_correction_validity(self, print_warnings: bool = False) -> bool:
+    def check_segment_correction_validity(self, print_warnings: bool = False) -> bool:
         """
         We expect the correction columns to be filled with valid values.
         ex: if both segment are not isb, we expect the correction to_isb to be filled
@@ -229,13 +228,8 @@ class RowData:
                         f"it should be empty !!!, because the segment is isb. Current value: {correction_cell}"
                     )
 
-            # # todo: not sure if it's relevant to save.
-            # if self.joint.is_joint_sequence_isb():
-            #     self.correction_on_euler_sequence = False
-            # else:
-            #     self.correction_on_euler_sequence = True
-
-        # if both segments are not isb, we expect the correction to_isb to be filled
+        # todo: I need a function to properly extract the corrections from the cell
+        # if segments are not isb, we expect the correction to_isb to be filled
         if not self.parent_biomech_sys.is_isb():
             correction_cell = self.row[parent_correction_column]
             if not isinstance(correction_cell, str) and (correction_cell == "nan" or np.isnan(correction_cell)):
@@ -259,10 +253,9 @@ class RowData:
 
         return output
 
-    def set_correction_callback(self):
+    def set_rotation_correction_callback(self):
         """
-        Set the correction callback of the joint.
-
+        Set the rotation correction callback, for the joint.
         """
         parent_isb = self.parent_biomech_sys.is_isb_oriented()
         child_isb = self.child_biomech_sys.is_isb_oriented()
@@ -270,12 +263,12 @@ class RowData:
         if parent_isb and child_isb:
             if self.joint.is_joint_sequence_isb():
                 self.usable_data = True
-                self.correction_callback = get_angle_conversion_callback_from_tuple((1, 1, 1))
+                self.rotation_correction_callback = get_angle_conversion_callback_from_tuple((1, 1, 1))
             else:
                 # -- TO ISB SEQUENCE --
                 # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
                 self.usable_data = True
-                self.correction_callback = get_angle_conversion_callback_from_sequence(
+                self.rotation_correction_callback = get_angle_conversion_callback_from_sequence(
                     previous_sequence=self.joint.euler_sequence,
                     new_sequence=self.joint.isb_euler_sequence(),
                 )
@@ -285,7 +278,7 @@ class RowData:
             if not check_same_orientation(parent=self.parent_biomech_sys, child=self.child_biomech_sys):
                 # todo: i don't know yet if useful
                 self.usable_data = False
-                self.correction_callback = None
+                self.rotation_correction_callback = None
                 raise NotImplementedError("Not implemented yet, I don't know what to do yet.")
 
             # 2.If they are the same orientation,
@@ -313,10 +306,10 @@ class RowData:
                 and is_sequence_convertible_through_factors
             ):
                 self.usable_data = True
-                self.correction_callback = get_angle_conversion_callback_from_tuple(sign_factors)
+                self.rotation_correction_callback = get_angle_conversion_callback_from_tuple(sign_factors)
             else:
                 self.usable_data = True
-                self.correction_callback = get_angle_conversion_callback_to_isb_with_sequence(
+                self.rotation_correction_callback = get_angle_conversion_callback_to_isb_with_sequence(
                     previous_sequence=self.joint.euler_sequence,
                     new_sequence=self.joint.isb_euler_sequence(),
                     bsys_child=self.child_biomech_sys,

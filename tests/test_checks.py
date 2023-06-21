@@ -67,7 +67,6 @@ def test_checks():
         child_segment=clavicle,
         joint=sterno_clav,
     )
-    # todo: test this output
 
     # A not standard example of the sterno-clavicular joint, not in ISB, but compatible with ISB
     print(" -- Sterno-clavicular joint -- not ISB but compatible")

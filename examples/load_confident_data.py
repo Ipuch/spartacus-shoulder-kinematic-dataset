@@ -50,10 +50,10 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
         if not row_data.check_joint_validity(print_warnings=print_warnings):
             continue
         row_data.set_segments()
-        if not row_data.check_correction_validity(print_warnings=print_warnings):
+        if not row_data.check_segment_correction_validity(print_warnings=print_warnings):
             continue
 
-        row_data.set_correction_callback()
+        row_data.set_rotation_correction_callback()
 
         if not row_data.usable_data:
             if print_warnings:
@@ -65,10 +65,10 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
                 print("detected child segment :", row.child)
                 row_data.child_biomech_sys.__print__()
                 print("detected joint coordinate system :", row_data.joint.euler_sequence)
-                print("callback function :", row_data.correction_callback)
+                print("callback function :", row_data.rotation_correction_callback)
             continue
         # add the callback function to the dataframe
-        row.callback_function = row_data.correction_callback
+        row.callback_function = row_data.rotation_correction_callback
 
         # add the row to the dataframe
         df_confident = pd.concat([df_confident, row.to_frame().T], ignore_index=True)
