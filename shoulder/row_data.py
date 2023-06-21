@@ -57,7 +57,9 @@ class RowData:
         self.child_biomech_sys = None
 
         self.rotation_correction_callback = None
-        self.usable_data = None
+        self.translation_correction_callback = None
+        self.usable_rotation_data = None
+        self.usable_translation_data = None
 
     def check_all_segments_validity(self, print_warnings: bool = False) -> bool:
         """
@@ -262,12 +264,12 @@ class RowData:
 
         if parent_isb and child_isb:
             if self.joint.is_joint_sequence_isb():
-                self.usable_data = True
+                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_from_tuple((1, 1, 1))
             else:
                 # -- TO ISB SEQUENCE --
                 # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
-                self.usable_data = True
+                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_from_sequence(
                     previous_sequence=self.joint.euler_sequence,
                     new_sequence=self.joint.isb_euler_sequence(),
@@ -277,7 +279,7 @@ class RowData:
             # 1. Check if the two segments are oriented in the same direction
             if not check_same_orientation(parent=self.parent_biomech_sys, child=self.child_biomech_sys):
                 # todo: i don't know yet if useful
-                self.usable_data = False
+                self.usable_rotation_data = False
                 self.rotation_correction_callback = None
                 raise NotImplementedError("Not implemented yet, I don't know what to do yet.")
 
@@ -305,10 +307,10 @@ class RowData:
                 self.joint.is_sequence_convertible_through_factors(print_warning=True)
                 and is_sequence_convertible_through_factors
             ):
-                self.usable_data = True
+                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_from_tuple(sign_factors)
             else:
-                self.usable_data = True
+                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_to_isb_with_sequence(
                     previous_sequence=self.joint.euler_sequence,
                     new_sequence=self.joint.isb_euler_sequence(),

@@ -55,7 +55,7 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
 
         row_data.set_rotation_correction_callback()
 
-        if not row_data.usable_data:
+        if not row_data.usable_rotation_data:
             if print_warnings:
                 print("WARNING : inconsistency in the dataset")
                 print(row.joint, row.article_author_year)
