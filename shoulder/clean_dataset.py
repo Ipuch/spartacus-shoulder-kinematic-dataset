@@ -14,10 +14,10 @@ df = df.replace({"true": True, "false": False})
 # remove extra spaces in the columns with false and true
 df = df.replace({"true ": True, "false ": False})
 # make column type to bool
-df['thorax_is_isb'].astype(bool)
-df['humerus_is_isb'].astype(bool)
-df['scapula_is_isb'].astype(bool)
-df['clavicle_is_isb'].astype(bool)
+df["thorax_is_isb"].astype(bool)
+df["humerus_is_isb"].astype(bool)
+df["scapula_is_isb"].astype(bool)
+df["clavicle_is_isb"].astype(bool)
 # save the cleaned dataset
 df.to_csv(DatasetCSV.CLEAN.value, index=False)
 
