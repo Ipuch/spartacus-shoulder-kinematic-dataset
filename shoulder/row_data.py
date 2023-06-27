@@ -12,6 +12,7 @@ from .utils import (
     joint_string_to_enum,
     segment_str_to_enum,
     euler_sequence_to_enum,
+    correction_str_to_enum,
     convert_rotation_matrix_from_one_coordinate_system_to_another,
 )
 
@@ -56,6 +57,9 @@ class RowData:
         self.child_columns = get_segment_columns(self.child_segment)
         self.child_biomech_sys = None
 
+        self.has_rotation_data = None
+        self.has_translation_data = None
+
         self.rotation_correction_callback = None
         self.translation_correction_callback = None
         self.usable_rotation_data = None
@@ -71,7 +75,7 @@ class RowData:
         (we don't mind if it's not a isb segment, we just don't want to have a segment
         that matches the is_isb given)
 
-        Third, we check the frame are direct, det(R) = 1.
+        Third, we check the frame are direct, det(R) = 1. We want to have a direct frame.
 
         Returns
         -------
@@ -130,6 +134,9 @@ class RowData:
         no_euler_sequence = not check_is_euler_sequence_provided(self.row, print_warnings=print_warnings)
         no_translation = not check_is_translation_provided(self.row, print_warnings=print_warnings)
 
+        self.has_rotation_data = not no_euler_sequence
+        self.has_translation_data = not no_translation
+
         if no_euler_sequence and no_translation:
             output = False
             if print_warnings:
@@ -140,18 +147,29 @@ class RowData:
                 )
             return output
 
-        print(self.row.displacement_cs)
-        if self.row.displacement_cs == "nan":
-            print("nan")
+        if no_euler_sequence:  # Only translation is provided
+            self.joint = Joint(
+                joint_type=joint_string_to_enum(self.row.joint),
+                euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),  # throw a None
+                translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement),
+                translation_frame=segment_str_to_enum(self.row.displacement_cs),
+            )
 
-        self.joint = Joint(
-            joint_type=joint_string_to_enum(self.row.joint),
-            euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),
-            translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement)
-            if not no_translation
-            else None,
-            translation_frame=segment_str_to_enum(self.row.displacement_cs) if not no_translation else None,
-        )
+        elif no_translation:  # Only rotation is provided
+            self.joint = Joint(
+                joint_type=joint_string_to_enum(self.row.joint),
+                euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),
+                translation_origin=None,
+                translation_frame=None,
+            )
+
+        else:  # translation and rotation are both provided
+            self.joint = Joint(
+                joint_type=joint_string_to_enum(self.row.joint),
+                euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),
+                translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement),
+                translation_frame=segment_str_to_enum(self.row.displacement_cs),
+            )
 
         if not check_parent_child_joint(self.joint, row=self.row, print_warnings=print_warnings):
             output = False
@@ -195,6 +213,27 @@ class RowData:
             segment=self.child_segment,
         )
 
+    def extract_corrections(self, segment: Segment) -> str:
+        """
+        Extract the correction cell of the correction column.
+        ex: if the correction column is parent_to_isb, we extract the correction cell parent_to_isb
+        """
+        correction_column = get_correction_column(segment)
+        correction_cell = self.row[correction_column]
+
+        if correction_cell == "nan":
+            correction_cell = None
+        if not isinstance(correction_cell, str):
+            if np.isnan(correction_cell):
+                correction_cell = None
+        else:
+            # separate strings with a comma in several element of list
+            correction_cell = correction_cell.split(",")
+            for i, correction in enumerate(correction_cell):
+                correction_cell[i] = correction_str_to_enum(correction)
+
+        return correction_cell
+
     def check_segment_correction_validity(self, print_warnings: bool = False) -> bool:
         """
         We expect the correction columns to be filled with valid values.
@@ -210,6 +249,7 @@ class RowData:
         parent_correction_column = get_correction_column(self.parent_segment)
         child_correction_column = get_correction_column(self.child_segment)
 
+        self.extract_corrections(self.parent_segment)
         # if both segments are isb, we expect no correction to be filled
         if self.parent_biomech_sys.is_isb() and self.child_biomech_sys.is_isb():
             correction_cell = self.row[parent_correction_column]
@@ -229,7 +269,7 @@ class RowData:
                         f"Joint {self.row.joint} has a correction value in the child segment {self.row.child}, "
                         f"it should be empty !!!, because the segment is isb. Current value: {correction_cell}"
                     )
-
+        # todo: extensive check of corrections validity
         # todo: I need a function to properly extract the corrections from the cell
         # if segments are not isb, we expect the correction to_isb to be filled
         if not self.parent_biomech_sys.is_isb():

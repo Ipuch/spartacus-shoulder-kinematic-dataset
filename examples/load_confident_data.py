@@ -4,20 +4,6 @@ import numpy as np
 from shoulder import (
     DatasetCSV,
     RowData,
-    Joint,
-    BiomechCoordinateSystem,
-    Segment,
-    joint_string_to_enum,
-    euler_sequence_to_enum,
-    biomech_direction_string_to_enum,
-    biomech_origin_string_to_enum,
-    segment_str_to_enum,
-    get_segment_columns,
-    # boolean checks
-    check_parent_child_joint,
-    check_segment_filled_with_nan,
-    check_is_isb_segment,
-    check_is_euler_sequence_provided,
 )
 
 

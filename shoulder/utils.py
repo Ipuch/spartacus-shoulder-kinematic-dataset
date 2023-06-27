@@ -1,4 +1,4 @@
-from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment
+from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment, Correction
 import biorbd
 import math
 import numpy as np
@@ -976,6 +976,23 @@ def get_correction_column(segment: Segment) -> str:
         return "humerus_correction_method"
     else:
         raise ValueError(f"{segment} is not a valid segment.")
+
+
+def correction_str_to_enum(correction: str) -> str:
+    if correction == "to_isb":
+        return Correction.TO_ISB_ROTATION
+    elif correction == "to_isb_like":
+        return Correction.TO_ISB_LIKE_ROTATION
+    elif correction == "kolz_AC_to_PA":
+        return Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION
+    elif correction == "glenoid_to_isb_cs":
+        return Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION
+    elif correction == "Sulkar et al. 2021":
+        return Correction.HUMERUS_SULKAR_ROTATION
+    elif correction == "Lagace 2012":
+        return Correction.SCAPULA_LAGACE_DISPLACEMENT
+    else:
+        raise ValueError(f"{correction} is not a valid correction method.")
 
 
 def get_isb_sequence_from_joint_type(joint_type: JointType):
