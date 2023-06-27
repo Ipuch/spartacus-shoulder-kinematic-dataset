@@ -100,6 +100,8 @@ class Correction(Enum):
     TO_ISB_LIKE_ROTATION = "to_isb_like"  # But despite this reorientation, the axis won't be exactly the same as ISB
 
     SCAPULA_KOLZ_AC_TO_PA_ROTATION = "kolz_AC_to_PA"  # from acromion center of rotation to acromion posterior aspect
-    SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION = "glenoid_to_isb_cs"  # from glenoid center of rotation to acromion posterior aspect
+    SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION = (
+        "glenoid_to_isb_cs"  # from glenoid center of rotation to acromion posterior aspect
+    )
     HUMERUS_SULKAR_ROTATION = "Sulkar et al. 2021"  # todo: idk what it is
     SCAPULA_LAGACE_DISPLACEMENT = "Lagace 2012"  # todo: idk what it is
