@@ -9,6 +9,7 @@ but in fact it restored it for me" Pierre Puchaud.
 
 """
 import numpy as np
+
 # We can either do it with scipy or with biorbd
 # Let's choose scipy as this is a more common toolbox
 from scipy.spatial.transform import Rotation
@@ -41,27 +42,27 @@ def compute_rotation_matrix_from_axes(
         v_isb = R_isb_local @ v_local
     """
     return np.array(
-                [
-                    # X axis                                    Y axis                                      Z axis ,
-                    #  in ISB base
-                    [
-                        anterior_posterior_axis[0, 0],
-                        infero_superior_axis[0, 0],
-                        medio_lateral_axis[0, 0],
-                    ],
-                    [
-                        anterior_posterior_axis[1, 0],
-                        infero_superior_axis[1, 0],
-                        medio_lateral_axis[1, 0],
-                    ],
-                    [
-                        anterior_posterior_axis[2, 0],
-                        infero_superior_axis[2, 0],
-                        medio_lateral_axis[2, 0],
-                    ],
-                ],
-                dtype=np.float64,
-            ).T   # where the transpose was missing in the original code
+        [
+            # X axis                                    Y axis                                      Z axis ,
+            #  in ISB base
+            [
+                anterior_posterior_axis[0, 0],
+                infero_superior_axis[0, 0],
+                medio_lateral_axis[0, 0],
+            ],
+            [
+                anterior_posterior_axis[1, 0],
+                infero_superior_axis[1, 0],
+                medio_lateral_axis[1, 0],
+            ],
+            [
+                anterior_posterior_axis[2, 0],
+                infero_superior_axis[2, 0],
+                medio_lateral_axis[2, 0],
+            ],
+        ],
+        dtype=np.float64,
+    ).T  # where the transpose was missing in the original code
 
 
 def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
@@ -124,9 +125,9 @@ def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
 
 
 # simplification for matlabists
-X = np.array([1, 0, 0])[: , np.newaxis]  # (3 x 1)
-Y = np.array([0, 1, 0])[: , np.newaxis]  # (3 x 1)
-Z = np.array([0, 0, 1])[: , np.newaxis]  # (3 x 1)
+X = np.array([1, 0, 0])[:, np.newaxis]  # (3 x 1)
+Y = np.array([0, 1, 0])[:, np.newaxis]  # (3 x 1)
+Z = np.array([0, 0, 1])[:, np.newaxis]  # (3 x 1)
 
 R_isb_isb = compute_rotation_matrix_from_axes(
     anterior_posterior_axis=X,

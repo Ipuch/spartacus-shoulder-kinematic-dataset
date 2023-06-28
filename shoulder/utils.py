@@ -101,7 +101,7 @@ class BiomechCoordinateSystem:
         NOTE
         ----
         The true definition would be, the origin is part of the process to build an ISB axis.
-        
+
         """
         if self.is_isb_origin():
             return True
@@ -137,7 +137,6 @@ class BiomechCoordinateSystem:
                 return True
             else:
                 return False
-
 
     def is_isb(self) -> bool:
         return self.is_isb_oriented() and self.is_isb_origin()

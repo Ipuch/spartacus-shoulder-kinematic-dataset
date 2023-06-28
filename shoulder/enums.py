@@ -57,7 +57,7 @@ class BiomechOrigin:
 
     class Humerus(Enum):
         GLENOHUMERAL_HEAD = "GH"
-        MIDPOINT_EPICONDYLES = "midpoint epicondyles" # middle of Medial and Lateral epicondyles
+        MIDPOINT_EPICONDYLES = "midpoint epicondyles"  # middle of Medial and Lateral epicondyles
 
     class Any(Enum):
         NAN = "nan"

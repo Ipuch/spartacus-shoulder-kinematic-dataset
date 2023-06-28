@@ -36,10 +36,13 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
         if not row_data.check_joint_validity(print_warnings=print_warnings):
             continue
         row_data.set_segments()
-        if not row_data.check_segment_correction_validity(print_warnings=print_warnings):
+        rotation_validity, translation_validity = row_data.check_segments_correction_validity(print_warnings=print_warnings)
+        if not rotation_validity and not translation_validity:
+            print("WARNING : No usable data for this row, in both rotation and translation...")
             continue
 
-        row_data.set_rotation_correction_callback()
+        # if rotation_validity:
+        #     row_data.set_rotation_correction_callback()
 
         if not row_data.usable_rotation_data:
             if print_warnings:
