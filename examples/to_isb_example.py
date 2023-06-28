@@ -7,6 +7,7 @@ Then we try to retrieve the euler angles from the ISB axes, and we compare the r
 from shoulder import CartesianAxis, Segment, BiomechCoordinateSystem, EulerSequence
 import numpy as np
 import biorbd
+from scipy.spatial.transform import Rotation
 
 
 def mat_2_rotation(R: np.ndarray) -> biorbd.Rotation:
@@ -16,27 +17,24 @@ def mat_2_rotation(R: np.ndarray) -> biorbd.Rotation:
 
 bsys_1 = BiomechCoordinateSystem(
     segment=Segment.HUMERUS,
-    antero_posterior_axis=CartesianAxis.minusZ,
-    infero_superior_axis=CartesianAxis.plusY,
+    antero_posterior_axis=CartesianAxis.plusY,
+    infero_superior_axis=CartesianAxis.plusZ,
     medio_lateral_axis=CartesianAxis.plusX,
-    # antero_posterior_axis=CartesianAxis.plusX,
-    # infero_superior_axis=CartesianAxis.plusY,
-    # medio_lateral_axis=CartesianAxis.plusZ,
 )
-initial_sequence = "yzx"
+initial_sequence = "zyx"
 sequence_wanted = "yxz"  # classic for sternoclavicular, acromioclavicular, and scapulothoracic joint
 
 # we compute the rotation matrix from the axes, R_isb_local
-R_isb_local = mat_2_rotation(bsys_1.get_rotation_matrix())
-print(biorbd.Rotation.toEulerAngles(R_isb_local, "zxy").to_array())
+R_isb_local = mat_2_rotation(bsys_1.get_rotation_matrix()).to_array()
+print(biorbd.Rotation.toEulerAngles(mat_2_rotation(R_isb_local), "zxy").to_array())
 
 # Let's build two rotation matrices R01 and R02, such that a_in_0 = R01 @ a_in_1 and b_in_0 = R02 @ b_in_2
 # to emulate two segments with different orientations
-R01 = biorbd.Rotation.fromEulerAngles(rot=np.array([0.1, 0.2, 0.3]), seq="zxy")
-R02 = biorbd.Rotation.fromEulerAngles(rot=np.array([-0.09, -0.21, -0.301]), seq="zxy")
+R01 = biorbd.Rotation.fromEulerAngles(rot=np.array([0.1, 0.2, 0.3]), seq="zxy").to_array()
+R02 = biorbd.Rotation.fromEulerAngles(rot=np.array([-0.09, -0.21, -0.301]), seq="zxy").to_array()
 
 # compute the rotation matrix between the two
-R12 = R01.to_array().transpose() @ R02.to_array()
+R12 = R01.transpose() @ R02
 print(R12)
 
 # compute the euler angles of the rotation matrix with the sequence zxy
@@ -45,11 +43,16 @@ print("euler angles")
 print(euler)
 
 # applied the rotation matrix R to R1 and R2
-R01_rotated = R01.to_array() @ R_isb_local.to_array().transpose()
-R02_rotated = R02.to_array() @ R_isb_local.to_array().transpose()
+new_R = R_isb_local @ R12 @ R_isb_local.transpose()
+#  new_R = R1'2'  ' stands for isb coordinate systems
+# R_isb_local = R1'1   ' stands for isb
+# R_isb_local = R2'2   ' stands for isb
 
-new_R = R01_rotated.transpose() @ R02_rotated
 # compute the euler angles of the rotated matrices
+new_euler_scipy = Rotation.from_matrix(new_R).as_euler(sequence_wanted.upper())
+print("Scipy euler angles of new_R rotated:")
+print(new_euler_scipy)
+
 euler1 = biorbd.Rotation.toEulerAngles(mat_2_rotation(new_R), sequence_wanted).to_array()
 print("euler angles of new_R rotated")
 print(euler1)

@@ -184,7 +184,7 @@ class BiomechCoordinateSystem:
                 ],
             ],
             dtype=np.float64,
-        )
+        ).T
 
     def __print__(self):
         print(f"Segment: {self.segment}")
