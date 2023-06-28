@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .enums import Segment
+from .enums import Segment, Correction
 from .utils import (
     get_segment_columns,
     get_correction_column,
@@ -246,51 +246,178 @@ class RowData:
         """
         output = True
 
-        parent_correction_column = get_correction_column(self.parent_segment)
-        child_correction_column = get_correction_column(self.child_segment)
+        parent_correction = self.extract_corrections(self.parent_segment)
+        child_correction = self.extract_corrections(self.child_segment)
 
-        self.extract_corrections(self.parent_segment)
         # if both segments are isb, we expect no correction to be filled
         if self.parent_biomech_sys.is_isb() and self.child_biomech_sys.is_isb():
-            correction_cell = self.row[parent_correction_column]
-            if isinstance(correction_cell, str) and not (correction_cell == "nan" or np.isnan(correction_cell)):
+            if parent_correction is not None and child_correction is not None:
                 output = False
                 if print_warnings:
                     print(
                         f"Joint {self.row.joint} has a correction value in the parent segment {self.row.parent}, "
-                        f"it should be empty !!!, because the segment is isb. Current value: {correction_cell}"
+                        f" and in the child segment {self.row.child}, "
+                        f"they should be empty !!!, because the segment is isb. "
+                        f"Parent correction: {parent_correction}"
+                        f"Child correction: {child_correction}"
                     )
 
-            correction_cell = self.row[child_correction_column]
-            if isinstance(correction_cell, str) and not (correction_cell == "nan" or np.isnan(correction_cell)):
+            if parent_correction is not None:
                 output = False
                 if print_warnings:
                     print(
-                        f"Joint {self.row.joint} has a correction value in the child segment {self.row.child}, "
-                        f"it should be empty !!!, because the segment is isb. Current value: {correction_cell}"
+                        f"Joint {self.row.joint} has a correction value in the child segment {self.row.parent}, "
+                        f"it should be empty !!!, because the segment is isb. "
+                        f"Parent correction: {parent_correction}"
                     )
-        # todo: extensive check of corrections validity
-        # todo: I need a function to properly extract the corrections from the cell
+
+            if child_correction is not None:
+                output = False
+                if print_warnings:
+                    print(
+                        f"Joint {self.row.joint} has a correction value in the parent segment {self.row.child}, "
+                        f"it should be empty !!!, because the segment is isb. "
+                        f"Child correction: {child_correction}"
+                    )
+
+        # if both segments are isb oriented, but origin is on an isb axis, we expect no correction be filled
+        # so that we can consider rotation data as isb
+        if self.parent_biomech_sys.is_isb_oriented():
+            if self.parent_biomech_sys.is_origin_on_an_isb_axis():
+                if parent_correction is not None:
+                    output = False
+                    if print_warnings:
+                        print(
+                            f"Joint {self.row.joint} has a correction value in the parent segment {self.row.parent}, "
+                            f"it should be empty !!!, because the segment is isb oriented and origin is on an isb axis. "
+                            f"Parent correction: {parent_correction}"
+                        )
+
+        if self.child_biomech_sys.is_isb_oriented():
+            if self.child_biomech_sys.is_origin_on_an_isb_axis():
+                if child_correction is not None:
+                    output = False
+                    if print_warnings:
+                        print(
+                            f"Joint {self.row.joint} has a correction value in the child segment {self.row.parent}, "
+                            f"it should be empty !!!, because the segment is isb oriented and origin is on an isb axis. "
+                            f"Child correction: {child_correction}"
+                        )
+
+        # if both segments are isb oriented, but origin is not on an isb axis, we expect a correction to be filled
+        # for scapula
+        if self.parent_biomech_sys.is_isb_oriented():
+            if not self.parent_biomech_sys.is_origin_on_an_isb_axis():
+                is_scapula = self.parent_segment == Segment.SCAPULA
+                condition_scapula = Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION in parent_correction \
+                                    or Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION in parent_correction
+                if not condition_scapula and is_scapula:
+                    output = False
+                    if print_warnings:
+                        print(
+                            f"Joint {self.row.joint} has no correction value in the parent segment {self.row.parent}, "
+                            f"it should be filled with a {Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION} or a "
+                            f"{Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION} correction, because the segment "
+                            f"origin is not on an isb axis. "
+                            f"Current value: {parent_correction}"
+                        )
+
+        if self.child_biomech_sys.is_isb_oriented():
+            if not self.child_biomech_sys.is_origin_on_an_isb_axis():
+                condition_scapula = Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION in child_correction \
+                                    or Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION in child_correction
+                if not condition_scapula:
+                    output = False
+                    if print_warnings:
+                        print(
+                            f"Joint {self.row.joint} has no correction value in the child segment {self.row.parent}, "
+                            f"it should be filled with a {Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION} or a "
+                            f"{Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION} correction, because the segment "
+                            f"origin is not on an isb axis. "
+                            f"Current value: {child_correction}"
+                        )
+
         # if segments are not isb, we expect the correction to_isb to be filled
-        if not self.parent_biomech_sys.is_isb():
-            correction_cell = self.row[parent_correction_column]
-            if not isinstance(correction_cell, str) and (correction_cell == "nan" or np.isnan(correction_cell)):
+        if not self.parent_biomech_sys.is_isb_oriented():
+            if self.parent_biomech_sys.is_origin_on_an_isb_axis():
+                if not (Correction.TO_ISB_ROTATION in parent_correction
+                        or Correction.TO_ISB_LIKE_ROTATION in parent_correction):
+                    output = False
+                    if print_warnings:
+                        print(
+                            f"Joint {self.row.joint} has no correction value in the parent segment {self.row.parent}, "
+                            f"it should be filled with a {Correction.TO_ISB_ROTATION} or a "
+                            f"{Correction.TO_ISB_LIKE_ROTATION} correction, because the segment is not isb. "
+                            f"Current value: {parent_correction}"
+
+                        )
+            else:  # not self.parent_biomech_sys.is_origin_on_an_isb_axis()
+                if self.parent_biomech_sys.segment == Segment.SCAPULA:
+                    # we expect both correction to_isb/to_isb_like and scapula corrections to be filled
+                    condition_isb = Correction.TO_ISB_ROTATION in parent_correction or Correction.TO_ISB_LIKE_ROTATION in parent_correction
+                    condition_scapula = Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION in parent_correction or Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION in parent_correction
+
+                    if not (condition_isb and condition_scapula):
+                        output = False
+                        if print_warnings:
+                            print(
+                                f"Joint {self.row.joint} has no correction value in the parent segment {self.row.parent}, "
+                                f"it should be filled with a {Correction.TO_ISB_ROTATION} or a "
+                                f"{Correction.TO_ISB_LIKE_ROTATION} correction, because the segment is not isb. "
+                                f"Current value: {parent_correction}"
+                            )
+
+
+        # pour que la rotation soit bonne a utiliser
+        if not self.parent_biomech_sys.is_isb_oriented():
+            # il faut que l'origine soit compatible avec les axes isb, pour la rotation soit corrigeable
+            # todo: continue here
+            if self.parent_biomech_sys.is_origin_on_an_isb_axis():
+               print("ok, for rotations only")
+            if not self.parent_biomech_sys.is_origin_on_an_isb_axis() \
+                    and self.parent_biomech_sys.segment != Segment.SCAPULA\
+                    and self.parent_biomech_sys.segment != Segment.HUMERUS:
+                if child_correction is not None:
+                    output = False
+                    if print_warnings:
+                        print(
+                            f"Joint {self.row.joint} has a correction value in the child segment {self.row.child}, "
+                            f"it should be empty !!!, because the segment is not isb and not compatible with any correction."
+                            f"Current value: {child_correction}"
+                        )
+            if not self.parent_biomech_sys.is_origin_on_an_isb_axis() and self.parent_biomech_sys.segment == Segment.HUMERUS:
+                if parent_correction == Correction.HUMERUS_SULKAR_ROTATION:
+                    print("ok, for rotations only")
+                elif parent_correction is not None:
+                    output = False
+                    if print_warnings:
+                        print(
+                            f"Joint {self.row.joint} has a correction value in the parent segment {self.row.parent}, "
+                            f"it should be empty !!!, because the segment is not isb and not compatible with any correction."
+                            f"Current value: {parent_correction}"
+                        )
+            if not self.parent_biomech_sys.is_origin_on_an_isb_axis() and self.parent_biomech_sys.segment == Segment.SCAPULA:
+                if parent_correction in (Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION,
+                    Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION):
+                    print("ok, for rotations only")
+
+
+            elif self.parent_biomech_sys.is_origin_on_an_isb_axis() and self.parent_biomech_sys.segment == Segment.SCAPULA:
                 output = False
                 if print_warnings:
                     print(
-                        f"Joint {self.row.joint} has no correction value in the parent segment {self.row.parent}, "
-                        f"it should be filled !!!, because the segment is not isb. Current value: {correction_cell}"
+                        f"Joint {self.row.joint} has a correction value in the parent segment {self.row.parent}, "
+                        f"it should be empty !!!, because the segment is not isb. Current value: {parent_correction}"
                     )
+            # sinon il faut que ce soit la scapula et qu'on applique les transformations de Kolz
 
-        if not self.child_biomech_sys.is_isb():
-            correction_cell = self.row[child_correction_column]
-            # check if the check is well done.
-            if not isinstance(correction_cell, str) and (correction_cell == "nan" or np.isnan(correction_cell)):
+        if not self.child_biomech_sys.is_isb_oriented():
+            if Correction.TO_ISB_ROTATION in child_correction or Correction.TO_ISB_LIKE_ROTATION in child_correction:
                 output = False
                 if print_warnings:
                     print(
                         f"Joint {self.row.joint} has no correction value in the child segment {self.row.child}, "
-                        f"it should be filled !!!, because the segment is not isb. Current value: {correction_cell}"
+                        f"it should be filled !!!, because the segment is not isb. Current value: {child_correction}"
                     )
 
         return output

@@ -38,21 +38,26 @@ class BiomechOrigin:
         T7 = "T7"
         IJ = "IJ"
         T1_ANTERIOR_FACE = "T1 anterior face"
+        C7 = "C7"
+        T8 = "T8"
+        PX = "PX"  # processus xiphoide
 
     class Clavicle(Enum):
         STERNOCLAVICULAR_JOINT_CENTER = "SCJC"
         MIDTHIRD = "MTC"
         CUSTOM = "CUSTOM"
+        ACROMIOCLAVICULAR_JOINT_CENTER = "ACJC"
 
     class Scapula(Enum):
         ANGULAR_ACROMIALIS = "AA"
         GLENOID_CENTER = "GC"
         ACROMIOCLAVICULAR_JOINT_CENTER = "ACJC"
         TRIGNONUM_SPINAE = "TS"
+        ANGULUS_INFERIOR = "AI"
 
     class Humerus(Enum):
         GLENOHUMERAL_HEAD = "GH"
-        MIDPOINT_CONDYLES = "MHC"
+        MIDPOINT_EPICONDYLES = "midpoint epicondyles" # middle of Medial and Lateral epicondyles
 
     class Any(Enum):
         NAN = "nan"

@@ -94,6 +94,51 @@ class BiomechCoordinateSystem:
         else:
             return False
 
+    def is_origin_on_an_isb_axis(self) -> bool:
+        """
+        Return True if the origin is on an ISB axis, False otherwise
+
+        NOTE
+        ----
+        The true definition would be, the origin is part of the process to build an ISB axis.
+        
+        """
+        if self.is_isb_origin():
+            return True
+
+        if self.segment == Segment.THORAX:
+            if self.origin == BiomechOrigin.Thorax.C7:
+                return True
+            elif self.origin == BiomechOrigin.Thorax.T8:
+                return True
+            elif self.origin == BiomechOrigin.Thorax.PX:
+                return True
+            else:
+                return False
+
+        if self.segment == Segment.CLAVICLE:
+            if self.origin == BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER:
+                return True
+            elif self.origin == BiomechOrigin.Clavicle.ACROMIOCLAVICULAR_JOINT_CENTER:
+                return True
+            else:
+                return False
+
+        if self.segment == Segment.SCAPULA:
+            if self.origin == BiomechOrigin.Scapula.TRIGNONUM_SPINAE:
+                return True
+            elif self.origin == BiomechOrigin.Scapula.ANGULUS_INFERIOR:
+                return True
+            else:
+                return False
+
+        if self.segment == Segment.HUMERUS:
+            if self.origin == BiomechOrigin.Humerus.MIDPOINT_EPICONDYLES:
+                return True
+            else:
+                return False
+
+
     def is_isb(self) -> bool:
         return self.is_isb_oriented() and self.is_isb_origin()
 
@@ -836,7 +881,7 @@ def biomech_origin_string_to_enum(biomech_origin: str) -> BiomechOrigin:
     elif biomech_origin == "GH":
         return BiomechOrigin.Humerus.GLENOHUMERAL_HEAD
     elif biomech_origin == "midpoint EM EL":
-        return BiomechOrigin.Humerus.MIDPOINT_CONDYLES
+        return BiomechOrigin.Humerus.MIDPOINT_EPICONDYLES
     elif biomech_origin == "SC":
         return BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER
     elif biomech_origin == "volume centroid of a cylinder mapped to the midthird of the clavicle":
