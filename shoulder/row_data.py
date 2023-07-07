@@ -406,6 +406,9 @@ class RowData:
             self.parent_segment_usable_for_rotation_data = parent_output
             self.parent_segment_usable_for_translation_data = False
             self.parent_definition_risk = True
+            # todo: please implement the following risks
+            # self.parent_definition_risk = Risk.LOW  # known and corrected from the literature
+            # self.parent_definition_risk = Risk.HIGH  # unknown and uncorrected from the literature
 
         if not self.child_biomech_sys.is_isb_oriented() and not self.child_biomech_sys.is_origin_on_an_isb_axis():
             child_output = self._check_segment_has_to_isb_like_correction(
@@ -424,6 +427,10 @@ class RowData:
         self.usable_translation_data = (
             self.child_segment_usable_for_translation_data and self.parent_segment_usable_for_translation_data
         )
+
+        # todo: risk level implementation
+        # self.rotation_risk = Risk.LOW
+        # self.translation_risk = Risk.HIGH
 
         return self.usable_rotation_data, self.usable_translation_data
 
