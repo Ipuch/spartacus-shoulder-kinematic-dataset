@@ -43,8 +43,8 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
             print("WARNING : No usable data for this row, in both rotation and translation...")
             continue
 
-        # if rotation_validity:
-        #     row_data.set_rotation_correction_callback()
+        if rotation_validity:
+            row_data.set_rotation_correction_callback()
 
         if not row_data.usable_rotation_data:
             if print_warnings:
@@ -67,8 +67,10 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
     return df_confident
 
 
-# open the file only_dataset_raw.csv
-df = pd.read_csv(DatasetCSV.CLEAN.value)
-print(df.shape)
-df = load_confident_data(df, print_warnings=True)
-print(df.shape)
+if __name__ == "__main__":
+    # open the file only_dataset_raw.csv
+    df = pd.read_csv(DatasetCSV.CLEAN.value)
+    print(df.shape)
+    df = load_confident_data(df, print_warnings=False)
+    # df = load_confident_data(df, print_warnings=True)
+    print(df.shape)

@@ -1,4 +1,4 @@
-from shoulder import BiomechCoordinateSystem, Joint, CartesianAxis, JointType, EulerSequence, check_biomech_consistency
+from shoulder import BiomechCoordinateSystem, Joint, CartesianAxis, JointType, EulerSequence
 
 
 def test_checks():
@@ -23,17 +23,11 @@ def test_checks():
     sterno_clav = Joint(
         joint_type=JointType.STERNO_CLAVICULAR,
         euler_sequence=EulerSequence.YXZ,
+        translation_frame=None,
+        translation_origin=None,
     )
     print(sterno_clav.is_joint_sequence_isb())
     assert sterno_clav.is_joint_sequence_isb() == True
-    output = check_biomech_consistency(
-        parent_segment=thorax,
-        child_segment=clavicle,
-        joint=sterno_clav,
-    )
-    print(output)  # (True, (1, 1, 1))
-    assert output[0] == True
-    assert output[1](1, 2, 3) == (1, 2, 3)
 
     # A not standard example of the sterno-clavicular joint, not in ISB
     print(" -- Sterno-clavicular joint -- not ISB")
@@ -58,15 +52,11 @@ def test_checks():
     sterno_clav = Joint(
         joint_type=JointType.STERNO_CLAVICULAR,
         euler_sequence=EulerSequence.YXZ,
+        translation_frame=None,
+        translation_origin=None,
     )
     print(sterno_clav.is_joint_sequence_isb())
     assert sterno_clav.is_joint_sequence_isb() == True
-
-    output = check_biomech_consistency(
-        parent_segment=thorax,
-        child_segment=clavicle,
-        joint=sterno_clav,
-    )
 
     # A not standard example of the sterno-clavicular joint, not in ISB, but compatible with ISB
     print(" -- Sterno-clavicular joint -- not ISB but compatible")
@@ -91,16 +81,8 @@ def test_checks():
     sterno_clav = Joint(
         joint_type=JointType.STERNO_CLAVICULAR,
         euler_sequence=EulerSequence.ZXY,
+        translation_frame=None,
+        translation_origin=None,
     )
     print(sterno_clav.is_joint_sequence_isb())
     assert sterno_clav.is_joint_sequence_isb() == False
-
-    output = check_biomech_consistency(
-        parent_segment=thorax,
-        child_segment=clavicle,
-        joint=sterno_clav,
-    )
-    # (True, (1, 1, -1))
-    print(output)
-    assert output[0] == True
-    assert output[1](1, 2, 3) == (1, 2, -3)

@@ -1,4 +1,4 @@
-from shoulder import (
+from shoulder.angle_conversion_callbacks import (
     get_angle_conversion_callback_from_sequence,
     get_angle_conversion_callback_from_tuple,
     EulerSequence,
