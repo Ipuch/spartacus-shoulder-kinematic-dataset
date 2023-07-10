@@ -372,8 +372,10 @@ class RowData:
                         parent_correction, print_warnings=print_warnings
                     )
                 else:
-                    print("The correction of thorax should be filled with a boolean value, "
-                          "as it is a global coordinate system.")
+                    print(
+                        "The correction of thorax should be filled with a boolean value, "
+                        "as it is a global coordinate system."
+                    )
 
                 self.parent_segment_usable_for_rotation_data = parent_output
                 self.parent_segment_usable_for_translation_data = False
@@ -383,7 +385,11 @@ class RowData:
 
         # if both segments are isb oriented, but origin is on an isb axis, we expect no correction be filled
         # so that we can consider rotation data as isb
-        if self.parent_biomech_sys.is_isb_oriented() and self.parent_biomech_sys.is_origin_on_an_isb_axis() and not parent_is_thorax_global:
+        if (
+            self.parent_biomech_sys.is_isb_oriented()
+            and self.parent_biomech_sys.is_origin_on_an_isb_axis()
+            and not parent_is_thorax_global
+        ):
             parent_output = self._check_segment_has_no_correction(parent_correction, print_warnings=print_warnings)
             self.parent_segment_usable_for_rotation_data = parent_output
             self.parent_segment_usable_for_translation_data = False
@@ -393,7 +399,11 @@ class RowData:
             self.child_segment_usable_for_rotation_data = child_output
             self.child_segment_usable_for_translation_data = False
 
-        if self.parent_biomech_sys.is_isb_oriented() and not self.parent_biomech_sys.is_origin_on_an_isb_axis() and not parent_is_thorax_global:
+        if (
+            self.parent_biomech_sys.is_isb_oriented()
+            and not self.parent_biomech_sys.is_origin_on_an_isb_axis()
+            and not parent_is_thorax_global
+        ):
             if self.parent_segment == Segment.SCAPULA:
                 parent_output = self._check_segment_has_kolz_correction(
                     parent_correction, print_warnings=print_warnings
@@ -412,7 +422,11 @@ class RowData:
             self.child_segment_usable_for_translation_data = False
 
         # if segments are not isb, we expect the correction to_isb to be filled
-        if not self.parent_biomech_sys.is_isb_oriented() and self.parent_biomech_sys.is_origin_on_an_isb_axis() and not parent_is_thorax_global:
+        if (
+            not self.parent_biomech_sys.is_isb_oriented()
+            and self.parent_biomech_sys.is_origin_on_an_isb_axis()
+            and not parent_is_thorax_global
+        ):
             parent_output = self._check_segment_has_to_isb_correction(parent_correction, print_warnings=print_warnings)
             if self.parent_segment == Segment.SCAPULA:
                 parent_output = self._check_segment_has_kolz_correction(
@@ -428,14 +442,15 @@ class RowData:
             self.child_segment_usable_for_rotation_data = child_output
             self.child_segment_usable_for_translation_data = False
 
-        if not self.parent_biomech_sys.is_isb_oriented() and not self.parent_biomech_sys.is_origin_on_an_isb_axis() and not parent_is_thorax_global:
-
+        if (
+            not self.parent_biomech_sys.is_isb_oriented()
+            and not self.parent_biomech_sys.is_origin_on_an_isb_axis()
+            and not parent_is_thorax_global
+        ):
             if self.parent_segment == Segment.SCAPULA:
                 parent_output = self._check_segment_has_to_isb_correction(
                     parent_correction, print_warnings=print_warnings
-                ) and self._check_segment_has_kolz_correction(
-                    parent_correction, print_warnings=print_warnings
-                )
+                ) and self._check_segment_has_kolz_correction(parent_correction, print_warnings=print_warnings)
                 self.parent_segment_usable_for_rotation_data = parent_output
                 self.parent_segment_usable_for_translation_data = False
                 self.parent_definition_risk = True  # should be a less high risk. because known from the literature
@@ -445,9 +460,13 @@ class RowData:
                 )
 
                 if not parent_is_correctable:
-                    parent_output = self._check_segment_has_no_correction(parent_correction, print_warnings=print_warnings)
+                    parent_output = self._check_segment_has_no_correction(
+                        parent_correction, print_warnings=print_warnings
+                    )
                 else:
-                    print(f"The column is_correctable should not be filled with a True for {self.parent_segment} segment.")
+                    print(
+                        f"The column is_correctable should not be filled with a True for {self.parent_segment} segment."
+                    )
 
                 self.parent_segment_usable_for_rotation_data = parent_output
                 self.parent_segment_usable_for_translation_data = False
@@ -461,9 +480,7 @@ class RowData:
             if self.child_segment == Segment.SCAPULA:
                 child_output = self._check_segment_has_to_isb_correction(
                     child_correction, print_warnings=print_warnings
-                ) and self._check_segment_has_kolz_correction(
-                    child_correction, print_warnings=print_warnings
-                )
+                ) and self._check_segment_has_kolz_correction(child_correction, print_warnings=print_warnings)
                 self.child_segment_usable_for_rotation_data = child_output
                 self.child_segment_usable_for_translation_data = False
                 self.child_definition_risk = True  # should be a less high risk. because known from the literature
@@ -473,11 +490,13 @@ class RowData:
                 )
 
                 if not parent_is_correctable:
-                    child_output = self._check_segment_has_no_correction(child_correction,
-                                                                          print_warnings=print_warnings)
+                    child_output = self._check_segment_has_no_correction(
+                        child_correction, print_warnings=print_warnings
+                    )
                 else:
                     print(
-                        f"The column is_correctable should not be filled with a True for {self.child_segment} segment.")
+                        f"The column is_correctable should not be filled with a True for {self.child_segment} segment."
+                    )
 
                 self.parent_segment_usable_for_rotation_data = child_output
                 self.parent_segment_usable_for_translation_data = False
