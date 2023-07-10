@@ -1,5 +1,0 @@
-Valeurs en ordonnées en %
-    - X % Antero-post width of the glenoid
-    - Y % supero-inferior height of the glenoid
-    - Z % medio-lat radius of the humeral head
-Trouver taille moyenne de la glène pour reporter des valeurs absolues et non relatives = https://pubmed.ncbi.nlm.nih.gov/1583043/
