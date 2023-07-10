@@ -523,24 +523,26 @@ class RowData:
         parent_isb = self.parent_biomech_sys.is_isb_oriented()
         child_isb = self.child_biomech_sys.is_isb_oriented()
 
-        if parent_isb and child_isb:
+        parent_correction = self.extract_corrections(self.parent_segment)
+        child_correction = self.extract_corrections(self.child_segment)
+
+        if parent_correction is None or child_correction is None:
             if self.joint.is_joint_sequence_isb():
-                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_from_tuple((1, 1, 1))
             else:
                 # -- TO ISB SEQUENCE --
                 # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
-                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_from_sequence(
                     previous_sequence=self.joint.euler_sequence,
                     new_sequence=self.joint.isb_euler_sequence(),
                 )
 
-        elif not parent_isb or not child_isb:  # This is to isb correction !
+        elif parent_correction is not None or child_correction is not None:  # This is to isb correction !
             # 1. Check if the two segments are oriented in the same direction
+            print("parent correction", parent_correction)
+            print("child correction", child_correction)
             if not check_same_orientation(parent=self.parent_biomech_sys, child=self.child_biomech_sys):
                 # todo: i don't know yet if useful
-                self.usable_rotation_data = False
                 self.rotation_correction_callback = None
                 raise NotImplementedError("Not implemented yet, I don't know what to do yet.")
 
@@ -558,20 +560,21 @@ class RowData:
                 is_sequence_convertible_through_factors,
                 sign_factors,
             ) = convert_rotation_matrix_from_one_coordinate_system_to_another(
-                bsys=self.parent_biomech_sys,
+                bsys=self.parent_biomech_sys,  # assuming they are oriented the same way
                 initial_sequence=self.joint.euler_sequence,
                 sequence_wanted=self.joint.isb_euler_sequence(),
+                apply_kolz_on_child=False,
+                apply_kolz_on_parent=False,
             )
             # Note: an extra check need to be done in the previous function
-
+            print("is_sequence_convertible_through_factors, sign_factors")
+            print(is_sequence_convertible_through_factors, sign_factors)
             if (
                 self.joint.is_sequence_convertible_through_factors(print_warning=True)
                 and is_sequence_convertible_through_factors
             ):
-                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_from_tuple(sign_factors)
             else:
-                self.usable_rotation_data = True
                 self.rotation_correction_callback = get_angle_conversion_callback_to_isb_with_sequence(
                     previous_sequence=self.joint.euler_sequence,
                     new_sequence=self.joint.isb_euler_sequence(),
