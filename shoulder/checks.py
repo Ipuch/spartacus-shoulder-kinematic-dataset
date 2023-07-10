@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from .enums import JointType, Segment
-from .utils import segment_str_to_enum, Joint, BiomechCoordinateSystem, get_is_isb_column
+from .utils import segment_str_to_enum, Joint, BiomechCoordinateSystem, get_is_isb_column, get_is_correctable_column
 
 
 def check_parent_child_joint(bjoint: Joint, row: pd.Series, print_warnings: bool = False):
@@ -101,8 +101,11 @@ def check_is_isb_segment(row: pd.Series, bsys: BiomechCoordinateSystem, print_wa
         True if the segment is ISB oriented and if it is well specified in the dataset, False otherwise.
     """
     is_isb = get_is_isb_column(bsys.segment)
+    is_correctable_col = get_is_correctable_column(bsys.segment)
 
-    if not bsys.is_isb() == row[is_isb]:
+    if not bsys.is_isb() == row[is_isb] and np.isnan(row[is_correctable_col]):
+        # if expected and detected are different for isb, and the correctable is set to nan, then there is an inconsistency
+        # False means we know we cannot correct it, True means we know we can correct it
         if print_warnings:
             print("WARNING : inconsistency in the dataset")
             print("-- ", row.article_author_year, " --")
