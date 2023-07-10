@@ -1022,6 +1022,19 @@ def get_correction_column(segment: Segment) -> str:
         raise ValueError(f"{segment} is not a valid segment.")
 
 
+def get_is_correctable_column(segment: Segment) -> str:
+    if segment == Segment.THORAX:
+        return "thorax_is_isb_correctable"
+    elif segment == Segment.CLAVICLE:
+        return "clavicle_is_isb_correctable"
+    elif segment == Segment.SCAPULA:
+        return "scapula_is_isb_correctable"
+    elif segment == Segment.HUMERUS:
+        return "humerus_is_isb_correctable"
+    else:
+        raise ValueError(f"{segment} is not a valid segment.")
+
+
 def correction_str_to_enum(correction: str) -> str:
     if correction == "to_isb":
         return Correction.TO_ISB_ROTATION
