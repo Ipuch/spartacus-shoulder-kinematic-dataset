@@ -2,7 +2,14 @@ import numpy as np
 import pandas as pd
 
 from .enums import JointType, Segment
-from .utils import segment_str_to_enum, Joint, BiomechCoordinateSystem, get_is_isb_column, get_is_correctable_column, get_correction_column
+from .utils import (
+    segment_str_to_enum,
+    Joint,
+    BiomechCoordinateSystem,
+    get_is_isb_column,
+    get_is_correctable_column,
+    get_correction_column,
+)
 
 
 def check_parent_child_joint(bjoint: Joint, row: pd.Series, print_warnings: bool = False):

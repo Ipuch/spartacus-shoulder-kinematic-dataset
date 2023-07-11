@@ -30,11 +30,7 @@ def get_kolz_rotation_matrix(correction: Correction, orthonormalize: bool = True
         # a' = R * a
         # where a' is the vector expressed in the PA coordinate system
         R = np.array(
-            [
-                [0.965, 0.010, -0.263],
-                [-0.057, 0.984, 0.171],
-                [0.257, 0.180, 0.950]
-            ],
+            [[0.965, 0.010, -0.263], [-0.057, 0.984, 0.171], [0.257, 0.180, 0.950]],
         ).T
 
     elif correction == Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION:
@@ -50,15 +46,16 @@ def get_kolz_rotation_matrix(correction: Correction, orthonormalize: bool = True
         ).T
 
     else:
-        raise ValueError(f"{correction} is not a valid correction. Only {Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION} "
-                         f"and {Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION} are valid corrections.")
+        raise ValueError(
+            f"{correction} is not a valid correction. Only {Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION} "
+            f"and {Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION} are valid corrections."
+        )
 
     return orthonormalize_matrix(R) if orthonormalize else R
 
 
 # normalize a matrix with svd and return the normalized matrix
 def orthonormalize_matrix(matrix):
-
     # normalize the matrix
     u, s, vh = np.linalg.svd(matrix, full_matrices=True)
     normalized_matrix = u @ vh
@@ -77,5 +74,3 @@ def orthonormalize_matrix(matrix):
     # print(matrix - normalized_matrix)
 
     return normalized_matrix
-
-
