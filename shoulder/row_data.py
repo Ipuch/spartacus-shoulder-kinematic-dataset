@@ -545,8 +545,8 @@ class RowData:
 
             # get the kolz correction for the parent and child
             kolz_corrections = (Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION, Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION)
-            parent_kolz_correction = [correction for correction in self.parent_corrections if correction in kolz_corrections][0]
-            child_kolz_correction = [correction for correction in self.child_corrections if correction in kolz_corrections][0]
+            parent_kolz_correction = [correction for correction in self.parent_corrections if correction in kolz_corrections]
+            child_kolz_correction = [correction for correction in self.child_corrections if correction in kolz_corrections]
 
             # 2.If they are the same orientation,
             # convert the euler angles to get them such that the two segments are ISB oriented
@@ -565,8 +565,8 @@ class RowData:
                 bsys=self.parent_biomech_sys,  # assuming they are oriented the same way
                 initial_sequence=self.joint.euler_sequence,
                 sequence_wanted=self.joint.isb_euler_sequence(),
-                child_extra_correction=child_kolz_correction,
-                parent_extra_correction=parent_kolz_correction,
+                child_extra_correction=child_kolz_correction[0] if child_kolz_correction else None,
+                parent_extra_correction=parent_kolz_correction[0] if parent_kolz_correction else None,
             )
             # Note: an extra check need to be done in the previous function
             print("is_sequence_convertible_through_factors, sign_factors")
