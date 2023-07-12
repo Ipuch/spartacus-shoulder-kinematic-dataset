@@ -144,6 +144,10 @@ The method used to correct the segment coordinates system to follow the ISB reco
 - to be completed ...
 
 Note: two methods can be combined, to get back to the ISB recommendations, might be a list of strings at the end of the day
+Note: 
+- If XXX_is_isb is true -> XXX_is_isb_correctable=nan and XXX_correction_method=nan
+- If XXX_is_isb is false -> XXX_is_isb_correctable=true and XXX_correction_method=not nan
+- If XXX_is_isb is false -> XXX_is_isb_correctable=false and XXX_correction_method=nan, it means we are already in a ISB-like configuration with offset,we cannot master.
 
 ### XXX_origin
 variable type: string
