@@ -7,7 +7,7 @@ from enums import DatasetCSV
 df = pd.read_csv(DatasetCSV.RAW.value, delimiter=",")
 print(df.iloc[0, 0])
 assert df.iloc[0, 0] == "Bourne"
-assert len(df.iloc[0, :]) == 66
+assert len(df.iloc[0, :]) == 65
 # rename all the columns with only lower cases
 df.columns = [col.lower() for col in df.columns]
 # clean lines with only NaN
