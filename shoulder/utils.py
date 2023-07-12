@@ -578,8 +578,8 @@ def convert_rotation_matrix_from_one_coordinate_system_to_another(
     bsys: BiomechCoordinateSystem,
     initial_sequence: EulerSequence,
     sequence_wanted: EulerSequence,
-    child_extra_correction: Correction= None,
-    parent_extra_correction: Correction= None,
+    child_extra_correction: Correction = None,
+    parent_extra_correction: Correction = None,
 ) -> tuple[bool, tuple[int, int, int]]:
     """
     This function converts the current euler angles into a desired euler sequence.

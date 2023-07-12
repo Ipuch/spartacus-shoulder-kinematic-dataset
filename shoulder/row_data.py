@@ -544,9 +544,16 @@ class RowData:
                 raise NotImplementedError("Not implemented yet, I don't know what to do yet.")
 
             # get the kolz correction for the parent and child
-            kolz_corrections = (Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION, Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION)
-            parent_kolz_correction = [correction for correction in self.parent_corrections if correction in kolz_corrections]
-            child_kolz_correction = [correction for correction in self.child_corrections if correction in kolz_corrections]
+            kolz_corrections = (
+                Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION,
+                Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION,
+            )
+            parent_kolz_correction = [
+                correction for correction in self.parent_corrections if correction in kolz_corrections
+            ]
+            child_kolz_correction = [
+                correction for correction in self.child_corrections if correction in kolz_corrections
+            ]
 
             # 2.If they are the same orientation,
             # convert the euler angles to get them such that the two segments are ISB oriented
