@@ -1,4 +1,5 @@
 from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment, Correction
+from .kolz_matrices import get_kolz_rotation_matrix
 import biorbd
 import math
 import numpy as np
@@ -577,6 +578,8 @@ def convert_rotation_matrix_from_one_coordinate_system_to_another(
     bsys: BiomechCoordinateSystem,
     initial_sequence: EulerSequence,
     sequence_wanted: EulerSequence,
+    child_extra_correction: Correction= None,
+    parent_extra_correction: Correction= None,
 ) -> tuple[bool, tuple[int, int, int]]:
     """
     This function converts the current euler angles into a desired euler sequence.
@@ -589,6 +592,10 @@ def convert_rotation_matrix_from_one_coordinate_system_to_another(
         The euler sequence of the rotation matrix
     sequence_wanted: EulerSequence
         The euler sequence of the rotation matrix wanted, e.g. ISB sequence
+    child_extra_correction: Correction
+        The correction to apply to the child segment
+    parent_extra_correction: Correction
+        The correction to apply to the parent segment
 
     Returns
     -------
@@ -624,7 +631,20 @@ def convert_rotation_matrix_from_one_coordinate_system_to_another(
     # R02_rotated = R02 @ R_isb_local.transpose()
     # new_R = R01_rotated.transpose() @ R02_rotated
     #  ---  New way --- more generic
+    # 1 : parent
+    # 2 : child
     new_R = R_isb_local @ R12 @ R_isb_local.transpose()
+
+    # extra corrections - Kolz
+    if child_extra_correction is not None:
+        print(f"I applied a correction of {child_extra_correction} to the child segment")
+        R_child_correction = get_kolz_rotation_matrix(child_extra_correction, orthonormalize=True).T
+        new_R = new_R @ R_child_correction
+
+    if parent_extra_correction is not None:
+        print(f"I applied a correction of {parent_extra_correction} to the parent segment")
+        R_parent_correction = get_kolz_rotation_matrix(parent_extra_correction, orthonormalize=True)
+        new_R = R_parent_correction @ new_R
 
     # compute the euler angles of the rotated matrices
     new_euler = biorbd.Rotation.toEulerAngles(mat_2_rotation(new_R), sequence_wanted).to_array()

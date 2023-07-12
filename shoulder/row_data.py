@@ -45,7 +45,6 @@ class RowData:
         row : pandas.Series
             The row of the dataset to store.
         """
-
         self.row = row
 
         self.joint = None
@@ -53,10 +52,12 @@ class RowData:
         self.parent_segment = segment_str_to_enum(self.row.parent)
         self.parent_columns = get_segment_columns(self.parent_segment)
         self.parent_biomech_sys = None
+        self.parent_corrections = None
 
         self.child_segment = segment_str_to_enum(self.row.child)
         self.child_columns = get_segment_columns(self.child_segment)
         self.child_biomech_sys = None
+        self.child_corrections = None
 
         self.has_rotation_data = None
         self.has_translation_data = None
@@ -353,10 +354,12 @@ class RowData:
         child_output = True
 
         parent_correction = self.extract_corrections(self.parent_segment)
+        self.parent_corrections = self.extract_corrections(self.parent_segment)
         parent_is_correctable = self.extract_is_correctable(self.parent_segment)
         parent_is_thorax_global = False
 
         child_correction = self.extract_corrections(self.child_segment)
+        self.child_corrections = self.extract_corrections(self.child_segment)
         child_is_correctable = self.extract_is_correctable(self.child_segment)
 
         # Thorax is global check
@@ -518,15 +521,9 @@ class RowData:
 
     def set_rotation_correction_callback(self):
         """
-        Set the rotation correction callback, for the joint.
+        Set the rotation correction callback, for the joint. We rely on the corrections set in the table.
         """
-        parent_isb = self.parent_biomech_sys.is_isb_oriented()
-        child_isb = self.child_biomech_sys.is_isb_oriented()
-
-        parent_correction = self.extract_corrections(self.parent_segment)
-        child_correction = self.extract_corrections(self.child_segment)
-
-        if parent_correction is None or child_correction is None:
+        if self.parent_corrections is None or self.child_corrections is None:
             if self.joint.is_joint_sequence_isb():
                 self.rotation_correction_callback = get_angle_conversion_callback_from_tuple((1, 1, 1))
             else:
@@ -537,14 +534,19 @@ class RowData:
                     new_sequence=self.joint.isb_euler_sequence(),
                 )
 
-        elif parent_correction is not None or child_correction is not None:  # This is to isb correction !
+        elif self.parent_corrections is not None or self.child_corrections is not None:  # This is to isb correction !
             # 1. Check if the two segments are oriented in the same direction
-            print("parent correction", parent_correction)
-            print("child correction", child_correction)
+            print("parent correction", self.parent_corrections)
+            print("child correction", self.child_corrections)
             if not check_same_orientation(parent=self.parent_biomech_sys, child=self.child_biomech_sys):
                 # todo: i don't know yet if useful
                 self.rotation_correction_callback = None
                 raise NotImplementedError("Not implemented yet, I don't know what to do yet.")
+
+            # get the kolz correction for the parent and child
+            kolz_corrections = (Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION, Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION)
+            parent_kolz_correction = [correction for correction in self.parent_corrections if correction in kolz_corrections][0]
+            child_kolz_correction = [correction for correction in self.child_corrections if correction in kolz_corrections][0]
 
             # 2.If they are the same orientation,
             # convert the euler angles to get them such that the two segments are ISB oriented
@@ -563,8 +565,8 @@ class RowData:
                 bsys=self.parent_biomech_sys,  # assuming they are oriented the same way
                 initial_sequence=self.joint.euler_sequence,
                 sequence_wanted=self.joint.isb_euler_sequence(),
-                apply_kolz_on_child=False,
-                apply_kolz_on_parent=False,
+                child_extra_correction=child_kolz_correction,
+                parent_extra_correction=parent_kolz_correction,
             )
             # Note: an extra check need to be done in the previous function
             print("is_sequence_convertible_through_factors, sign_factors")
