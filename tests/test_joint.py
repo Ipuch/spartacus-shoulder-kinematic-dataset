@@ -6,6 +6,8 @@ def test_joint():
     sterno_clav = Joint(
         joint_type=JointType.STERNO_CLAVICULAR,
         euler_sequence=EulerSequence.YXZ,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert sterno_clav.is_joint_sequence_isb() == True
 
@@ -13,6 +15,8 @@ def test_joint():
     sterno_clav = Joint(
         joint_type=JointType.STERNO_CLAVICULAR,
         euler_sequence=EulerSequence.XYZ,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert sterno_clav.is_joint_sequence_isb() == False
 
@@ -20,6 +24,8 @@ def test_joint():
     gleno_hum = Joint(
         joint_type=JointType.GLENO_HUMERAL,
         euler_sequence=EulerSequence.YXY,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert gleno_hum.is_joint_sequence_isb() == True
 
@@ -27,6 +33,8 @@ def test_joint():
     gleno_hum = Joint(
         joint_type=JointType.GLENO_HUMERAL,
         euler_sequence=EulerSequence.XYZ,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert gleno_hum.is_joint_sequence_isb() == False
 
@@ -34,6 +42,8 @@ def test_joint():
     scapulo_thor = Joint(
         joint_type=JointType.SCAPULO_THORACIC,
         euler_sequence=EulerSequence.YXZ,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert scapulo_thor.is_joint_sequence_isb() == True
 
@@ -41,12 +51,16 @@ def test_joint():
     scapulo_thor = Joint(
         joint_type=JointType.SCAPULO_THORACIC,
         euler_sequence=EulerSequence.XYZ,
+        translation_origin=None,
+        translation_frame=None,
     )
 
     print(" -- Acromio-clavicular joint -- ISB")
     acromio_clav = Joint(
         joint_type=JointType.ACROMIO_CLAVICULAR,
         euler_sequence=EulerSequence.YXZ,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert acromio_clav.is_joint_sequence_isb() == True
 
@@ -54,6 +68,8 @@ def test_joint():
     acromio_clav = Joint(
         joint_type=JointType.ACROMIO_CLAVICULAR,
         euler_sequence=EulerSequence.XYZ,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert acromio_clav.is_joint_sequence_isb() == False
 
@@ -61,6 +77,8 @@ def test_joint():
     thoraco_hum = Joint(
         joint_type=JointType.THORACO_HUMERAL,
         euler_sequence=EulerSequence.YXY,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert thoraco_hum.is_joint_sequence_isb() == True
 
@@ -68,5 +86,7 @@ def test_joint():
     thoraco_hum = Joint(
         joint_type=JointType.THORACO_HUMERAL,
         euler_sequence=EulerSequence.XYZ,
+        translation_origin=None,
+        translation_frame=None,
     )
     assert thoraco_hum.is_joint_sequence_isb() == False

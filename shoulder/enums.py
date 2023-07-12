@@ -1,5 +1,6 @@
 from enum import Enum
 from pathlib import Path
+import numpy as np
 
 
 class DatasetCSV(Enum):
@@ -10,12 +11,12 @@ class DatasetCSV(Enum):
 
 
 class CartesianAxis(Enum):
-    plusX = "x"
-    plusY = "y"
-    plusZ = "z"
-    minusX = "-x"
-    minusY = "-y"
-    minusZ = "-z"
+    plusX = ("x", np.array([1, 0, 0]))
+    plusY = ("y", np.array([0, 1, 0]))
+    plusZ = ("z", np.array([0, 0, 1]))
+    minusX = ("-x", np.array([-1, 0, 0]))
+    minusY = ("-y", np.array([0, -1, 0]))
+    minusZ = ("-z", np.array([0, 0, -1]))
 
 
 class BiomechDirection(Enum):
@@ -37,21 +38,26 @@ class BiomechOrigin:
         T7 = "T7"
         IJ = "IJ"
         T1_ANTERIOR_FACE = "T1 anterior face"
+        C7 = "C7"
+        T8 = "T8"
+        PX = "PX"  # processus xiphoide
 
     class Clavicle(Enum):
         STERNOCLAVICULAR_JOINT_CENTER = "SCJC"
         MIDTHIRD = "MTC"
         CUSTOM = "CUSTOM"
+        ACROMIOCLAVICULAR_JOINT_CENTER = "ACJC"
 
     class Scapula(Enum):
         ANGULAR_ACROMIALIS = "AA"
         GLENOID_CENTER = "GC"
         ACROMIOCLAVICULAR_JOINT_CENTER = "ACJC"
         TRIGNONUM_SPINAE = "TS"
+        ANGULUS_INFERIOR = "AI"
 
     class Humerus(Enum):
         GLENOHUMERAL_HEAD = "GH"
-        MIDPOINT_CONDYLES = "MHC"
+        MIDPOINT_EPICONDYLES = "midpoint epicondyles"  # middle of Medial and Lateral epicondyles
 
     class Any(Enum):
         NAN = "nan"
@@ -89,3 +95,18 @@ class Segment(Enum):
     HUMERUS = "humerus"
     SCAPULA = "scapula"
     CLAVICLE = "clavicle"
+
+
+class Correction(Enum):
+    """Enum for the segment coordinate system corrections"""
+
+    # orientation of axis are not orientated as ISB X: anterior, Y: superior, Z: lateral
+    TO_ISB_ROTATION = "to_isb"
+    TO_ISB_LIKE_ROTATION = "to_isb_like"  # But despite this reorientation, the axis won't be exactly the same as ISB
+
+    SCAPULA_KOLZ_AC_TO_PA_ROTATION = "kolz_AC_to_PA"  # from acromion center of rotation to acromion posterior aspect
+    SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION = (
+        "glenoid_to_isb_cs"  # from glenoid center of rotation to acromion posterior aspect
+    )
+    HUMERUS_SULKAR_ROTATION = "Sulkar et al. 2021"  # todo: idk what it is
+    SCAPULA_LAGACE_DISPLACEMENT = "Lagace 2012"  # todo: idk what it is

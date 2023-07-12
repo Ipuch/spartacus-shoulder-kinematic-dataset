@@ -22,6 +22,9 @@ df["thorax_is_isb"].astype(bool)
 df["humerus_is_isb"].astype(bool)
 df["scapula_is_isb"].astype(bool)
 df["clavicle_is_isb"].astype(bool)
+# all "nan" to np.nan
+df = df.replace({"nan": None})
+
 # save the cleaned dataset
 df.to_csv(DatasetCSV.CLEAN.value, index=False)
 

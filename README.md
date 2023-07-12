@@ -6,13 +6,6 @@ We will try to keep it updated as much as possible. If you have any suggestions,
 
 We assume the continuity of the data between articles. For example, if the same data is used in two articles, and some information is missing in the last one, we pick the information in the previous article.
 
-# todo
-- write a script that is able to recognize isb joint sequences from segment coordinates systems and euler sequence. For example: the two segment coordinates system are not isb, and nor the sequence, but when segment coordinates system is flipped to isb, the joint sequence is isb.
-- Withdraw the red into comments
-- Yoshida, maybe a mix of sagittal and scapular elevation
-- Dal Maso to thoraco-humeral rythm.
-- Interrelationship between columns has to detailed to test the database.
-
 # Table of Contents
 [The dataset columns](#The-dataset-columns)
  - [Metadata](##Metadata)
@@ -335,7 +328,6 @@ The translation along the z axis of the joint, in mm (to be confirmed)
 
 ### Exceptions, too exotic
 Sahara et al 2006 : The scapula coordinate system is the clavicle coordinate system at abduction zero degree. The scapua frame is very exotic and not convertable to ISB standards.
-
 
 ### Risks evocated
 - Gutierez et al. 2017: X-clavicule not built with x thoracic in reference posture but it is very close.
