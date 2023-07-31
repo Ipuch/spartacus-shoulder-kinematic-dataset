@@ -58,9 +58,9 @@ x, y, z = rotation_matrix_2_xyz(rotation_matrix_pa_to_ac.T)
 # x, y, z = rotation_matrix_2_xyz(rotation_matrix_ac_to_pa)
 ax = plot_frame(ax, x, y, z, linestyle="dashdot")
 
-ax.plot([0,0],[0,0],[0,0], color="k", linestyle="solid", label="acromioclavicular")
-ax.plot([0,0],[0,0],[0,0], color="k", linestyle="dashed", label="glenohumeral")
-ax.plot([0,0],[0,0],[0,0], color="k", linestyle="dashdot", label="posterior aspect")
+ax.plot([0, 0], [0, 0], [0, 0], color="k", linestyle="solid", label="acromioclavicular")
+ax.plot([0, 0], [0, 0], [0, 0], color="k", linestyle="dashed", label="glenohumeral")
+ax.plot([0, 0], [0, 0], [0, 0], color="k", linestyle="dashdot", label="posterior aspect")
 
 plt.legend()
 
@@ -81,9 +81,9 @@ ax = plot_frame(ax, x, y, z, linestyle="solid")
 x, y, z = rotation_matrix_2_xyz(rotation_matrix_pa_to_gc.T)
 ax = plot_frame(ax, x, y, z, linestyle="dashdot")
 
-ax.plot([0,0],[0,0],[0,0], color="r", linestyle="solid", label="x")
-ax.plot([0,0],[0,0],[0,0], color="g", linestyle="solid", label="y")
-ax.plot([0,0],[0,0],[0,0], color="b", linestyle="solid", label="z")
+ax.plot([0, 0], [0, 0], [0, 0], color="r", linestyle="solid", label="x")
+ax.plot([0, 0], [0, 0], [0, 0], color="g", linestyle="solid", label="y")
+ax.plot([0, 0], [0, 0], [0, 0], color="b", linestyle="solid", label="z")
 
 plt.legend()
 # grid off
@@ -101,6 +101,3 @@ ax = plot_frame(ax, x, y, z, linestyle="solid")
 ax.grid(False)
 
 plt.show()
-
-
-

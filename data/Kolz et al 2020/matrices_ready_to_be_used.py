@@ -35,4 +35,3 @@ R_pa_gc = R_gc_pa.T
 np.testing.assert_allclose(np.linalg.det(R_gc_ac), 1)
 np.testing.assert_allclose(np.linalg.det(R_pa_ac), 1)
 np.testing.assert_allclose(np.linalg.det(R_gc_pa), 1)
-
