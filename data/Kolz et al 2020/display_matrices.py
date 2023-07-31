@@ -1,3 +1,8 @@
+"""
+This script explores the different rotation matrices of Kolz et al. article in order to make sure we understand their
+rotation matrix convention.
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 
