@@ -13,19 +13,20 @@ import random
 # TODO : article mis sur le coté
 # TODO : Add a curve directly from the app running
 # TODO : be able to switch from format artcile et format 16/9 (écran)
+# TODO : Everything in minuscule
 def create_random_data(
-    name_article, name_joint, name_dof, Angle_or_Translation, name_movement, nb_frame, initialize=False
+    name_article, name_joint, name_dof, angle_or_translation, name_movement, nb_frame, initialize=False
 ):
     if initialize:
         df = pd.DataFrame(
             {
-                "Article": [],
-                "Joint": [],
-                "Angle_Translation": [],
-                "DoF": [],
-                "Mvt": [],
-                "Humerothoracic_angle": [],
-                "Value": [],
+                "article": [],
+                "joint": [],
+                "angle_translation": [],
+                "degree_of_freedom": [],
+                "mouvement": [],
+                "humerothoracic_angle": [],
+                "value": [],
             }
         )
     else:
@@ -33,13 +34,13 @@ def create_random_data(
         random_y0 = np.random.randn(nb_frame) + 5
         df = pd.DataFrame(
             {
-                "Article": [name_article] * nb_frame,
-                "Joint": [name_joint] * nb_frame,
-                "Angle_Translation": [Angle_or_Translation] * nb_frame,
-                "DoF": [name_dof] * nb_frame,
-                "Mvt": [name_movement] * nb_frame,
-                "Humerothoracic_angle": random_x,
-                "Value": random_y0,
+                "article": [name_article] * nb_frame,
+                "joint": [name_joint] * nb_frame,
+                "angle_translation": [angle_or_translation] * nb_frame,
+                "degree_of_freedom": [name_dof] * nb_frame,
+                "mouvement": [name_movement] * nb_frame,
+                "humerothoracic_angle": random_x,
+                "value": random_y0,
             }
         )
 
@@ -52,10 +53,10 @@ def Generation_Full_Article(nb_article):
     nb_dof_by_joint_translation = [0, 1, 2, 3]
     nb_movement_by_article = [1, 2, 3, 4]
 
-    name_joints = ["Humerothocracic angle", "Acromioclaviculaire", "Glenohumeral angle", "Scapulothoracic angle"]
+    name_joints = ["Humerothoracic", "Acromioclavicular", "Glenohumeral", "Scapulothoracic"]
     name_movements = ["Mouvement_1", "Mouvement_2", "Mouvement_3", "Mouvement_4"]
-    DoF_translation = ["X", "Y", "Z"]
-    DoF_angle = ["Flexion", "Abduction", "External rotation"]
+    dof_translation = ["X", "Y", "Z"]
+    dof_angle = ["Flexion", "Abduction", "External_rotation"]
     nb_frame = [6, 20, 30]
     df = create_random_data("", "", "", "", "", 6, initialize=True)
     for i in range(nb_article):
@@ -65,10 +66,10 @@ def Generation_Full_Article(nb_article):
         final_list_joint = random.sample(name_joints, final_nb_joint)
 
         final_number_dof_angle = random.choice(nb_dof_by_joint_angle)
-        final_dof_angle = random.sample(DoF_angle, final_number_dof_angle)
+        final_dof_angle = random.sample(dof_angle, final_number_dof_angle)
 
         final_number_dof_translation = random.choice(nb_dof_by_joint_translation)
-        final_dof_angle_translation = random.sample(DoF_translation, final_number_dof_translation)
+        final_dof_angle_translation = random.sample(dof_translation, final_number_dof_translation)
 
         final_number_movement = random.choice(nb_movement_by_article)
         final_list_movement = random.sample(name_movements, final_number_movement)
@@ -90,9 +91,8 @@ def Generation_Full_Article(nb_article):
 
 
 toto = Generation_Full_Article(30)
-import pdb
 
-pdb.set_trace()
+
 app = Dash(__name__)
 
 app.layout = html.Div(
