@@ -24,7 +24,7 @@ def create_random_data(
                 "joint": [],
                 "angle_translation": [],
                 "degree_of_freedom": [],
-                "mouvement": [],
+                "movement": [],
                 "humerothoracic_angle": [],
                 "value": [],
             }
@@ -38,7 +38,7 @@ def create_random_data(
                 "joint": [name_joint] * nb_frame,
                 "angle_translation": [angle_or_translation] * nb_frame,
                 "degree_of_freedom": [name_dof] * nb_frame,
-                "mouvement": [name_movement] * nb_frame,
+                "movement": [name_movement] * nb_frame,
                 "humerothoracic_angle": random_x,
                 "value": random_y0,
             }
@@ -54,7 +54,7 @@ def Generation_Full_Article(nb_article):
     nb_movement_by_article = [1, 2, 3, 4]
 
     name_joints = ["Humerothoracic", "Acromioclavicular", "Glenohumeral", "Scapulothoracic"]
-    name_movements = ["Mouvement_1", "Mouvement_2", "Mouvement_3", "Mouvement_4"]
+    name_movements = ["Movement_1", "Movement_2", "Movement_3", "Movement_4"]
     dof_translation = ["X", "Y", "Z"]
     dof_angle = ["Flexion", "Abduction", "External_rotation"]
     nb_frame = [6, 20, 30]
@@ -96,13 +96,15 @@ toto = Generation_Full_Article(30)
 app = Dash(__name__)
 
 app.layout = html.Div(
-    [
+    [   # Global Title of the graph
         html.H4("Kinematics of the shoulder joint"),
+        # Plot the graph
         dcc.Graph(id="graph"),
+        # Show the different options in different collumn
         dcc.Dropdown(
-            id="mouvement",
-            options=sorted([i for i in toto.mouvement.unique()]),
-            value=sorted([i for i in toto.mouvement.unique()])[0],
+            id="movement",
+            options=sorted([i for i in toto.movement.unique()]),
+            value=sorted([i for i in toto.movement.unique()])[0],
         ),
         dcc.Checklist(
             id="joint",
@@ -115,24 +117,30 @@ app.layout = html.Div(
             value=sorted([i for i in toto.angle_translation.unique()])[0],
             id="angle_translation",
         ),
-    ]
-)
+    ])
+
 
 
 # Add a common X Axis and Title
 @app.callback(
-    Output("graph", "figure"), Input("mouvement", "value"), Input("joint", "value"), Input("angle_translation", "value")
+    Output("graph", "figure"), Input("movement", "value"), Input("joint", "value"), Input("angle_translation", "value")
 )
-def update_line_chart(mouvement, joint, angle_translation):
+def update_line_chart(movement, joint, angle_translation):
     df = toto  # replace with your own data source
     mask_joint = df.joint.isin(joint)
-    mask_mvt = df.mouvement.isin([mouvement])
+    mask_mvt = df.movement.isin([movement])
     # We have to put Angle translation in a list because it is a string
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
-    list_joint_graph = ["Humerothoracic", "Glenohumeral", "Scapulothoracic", "Acromioclavicular"]
+    list_joint_graph_base_in_order = ["Humerothoracic", "Glenohumeral", "Scapulothoracic", "Acromioclavicular"]
+    # Adapt the list to the number of degree of freedom selectionned by the user.
+    list_to_plot_in_order = []
+    for name_joint in list_joint_graph_base_in_order:
+        if name_joint in joint:
+            list_to_plot_in_order.append(name_joint)
+
     if angle_translation == "Angle":
-        list_orga = ["Flexion", "Abduction", "External rotation"]
+        list_orga = ["Flexion", "Abduction", "External_rotation"]
     elif angle_translation == "Translation":
         list_orga = ["X", "Y", "Z"]
     fig = px.line(
@@ -142,10 +150,11 @@ def update_line_chart(mouvement, joint, angle_translation):
         color="article",
         facet_row="joint",
         facet_col="degree_of_freedom",
-        category_orders={"degree_of_freedom": list_orga, "joint": list_joint_graph},
+        category_orders={"degree_of_freedom": list_orga, "joint": list_to_plot_in_order},
     )
     # Allow to remove the "Mvt=" in the legend
     fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+    # here to switch between different layout
 
     fig.update_layout(
         height=800,
@@ -154,19 +163,18 @@ def update_line_chart(mouvement, joint, angle_translation):
         plot_bgcolor="rgba(255,255,255,1)",
         legend=dict(
             title_font_family="Times New Roman",
-            font=dict(family="Times New Roman", color="black", size=11),
-            orientation="h",
-            xanchor="center",
-            x=0.5,
-            y=-0.05,
+            font=dict(family="Times New Roman", color="black", size=16),
+            orientation="v",
+            x=1,
+            y=1,
         ),
         font=dict(
-            size=12,
+            size=16,
             family="Times New Roman",
         ),
         yaxis=dict(color="black"),
         template="simple_white",
-        boxgap=0.2,
+        boxgap=0.5,
     )
     return fig
 
