@@ -1,4 +1,8 @@
 
+<p align="center" width="100%">
+<img src="docs/logo.png" alt="Spartacus" style="width: 50%; min-width: 300px; display: block; margin: auto;">
+</p>
+
 # Introduction
 Gathering all the literature on shoulder kinematics, and scapulo-humeral rhythm
 With this repository, We aim to gather all the literature on shoulder kinematics, and scapulo-humeral rhythm.

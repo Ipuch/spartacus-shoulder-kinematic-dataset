@@ -143,6 +143,8 @@ dmypy.json
 
 *.dig
 
-*.png
+data/*.png
+figures/*.png
+figures/Bourne et al 2004/*.png
 
 *.pdf
