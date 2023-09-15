@@ -1,10 +1,11 @@
 # test
-from dash import Dash, dcc, html, Input, Output , State, callback
+from dash import Dash, dcc, html, Input, Output, State, callback
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import io
 import base64
+
 # Create random data with numpy
 import numpy as np
 import random
@@ -18,13 +19,14 @@ import random
 
 # Question à aborder sur la forme des données.
 
+
 def create_random_data(
     name_article, name_joint, name_dof, angle_or_translation, name_movement, nb_frame, initialize=False
 ):
     if initialize:
         df = pd.DataFrame(
             {
-                "article": [],# Article name should be the comination of the article and the subejct name (id_subject)
+                "article": [],  # Article name should be the comination of the article and the subejct name (id_subject)
                 "joint": [],
                 "angle_translation": [],
                 "degree_of_freedom": [],
@@ -93,12 +95,13 @@ def Generation_Full_Article(nb_article):
 
     return df
 
+
 toto = Generation_Full_Article(30)
 
 app = Dash(__name__)
 
 app.layout = html.Div(
-    [   # Global Title of the graph
+    [  # Global Title of the graph
         html.H4("Kinematics of the shoulder joint"),
         html.Button("Download CSV", id="btn_csv"),
         dcc.Download(id="download-dataframe-csv"),
@@ -122,55 +125,57 @@ app.layout = html.Div(
             id="angle_translation",
         ),
         dcc.Upload(
-            id='upload-data',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select Files')
-            ]),
+            id="upload-data",
+            children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
             style={
-                'width': '100%',
-                'height': '60px',
-                'lineHeight': '60px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px'
+                "width": "100%",
+                "height": "60px",
+                "lineHeight": "60px",
+                "borderWidth": "1px",
+                "borderStyle": "dashed",
+                "borderRadius": "5px",
+                "textAlign": "center",
+                "margin": "10px",
             },
             # Allow multiple files to be uploaded
-            multiple=True
+            multiple=True,
         ),
-        html.Div(id='output')
-    ])
+        html.Div(id="output"),
+    ]
+)
+
 
 # Import data
-@callback(Output('output', 'children'),
-          Input('upload-data', 'contents'),)
+@callback(
+    Output("output", "children"),
+    Input("upload-data", "contents"),
+)
 def update_output(contents):
     global toto
 
     if contents is not None:
-        content_type, content_string = contents[0].split(',')
+        content_type, content_string = contents[0].split(",")
 
         decoded = base64.b64decode(content_string)
-        df = pd.read_csv(
-            io.StringIO(decoded.decode('utf-8')))
+        df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
 
         frames = [toto, df]
 
         toto = pd.concat(frames)
         print(toto.size)
     return toto.size
+
+
 # Export data
 @callback(
-Output("download-dataframe-csv", "data"),
+    Output("download-dataframe-csv", "data"),
     State("movement", "value"),
     State("joint", "value"),
     State("angle_translation", "value"),
     Input("btn_csv", "n_clicks"),
-    prevent_initial_call = True,)
-
-def export_data(movement,joint,angle_translation,n_clicks):
+    prevent_initial_call=True,
+)
+def export_data(movement, joint, angle_translation, n_clicks):
     df = toto  # replace with your own data source
     mask_joint = df.joint.isin(joint)
     mask_mvt = df.movement.isin([movement])
@@ -181,6 +186,7 @@ def export_data(movement,joint,angle_translation,n_clicks):
 
     data_to_export = df[mask_mvt & mask_joint & mask_angle_translation]
     return dcc.send_data_frame(data_to_export.to_csv, "mydf.csv")
+
 
 @app.callback(
     Output("graph", "figure"),
@@ -223,7 +229,7 @@ def update_line_chart(movement, joint, angle_translation):
         # If we fix only the height the width will be adapted to the size of the screen
         # However not fixing the height AND the width make the graph not readable
         height=800,
-        #width=1500,
+        # width=1500,
         paper_bgcolor="rgba(255,255,255,1)",
         plot_bgcolor="rgba(255,255,255,1)",
         legend=dict(
@@ -242,6 +248,7 @@ def update_line_chart(movement, joint, angle_translation):
         boxgap=0.5,
     )
     return fig
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
