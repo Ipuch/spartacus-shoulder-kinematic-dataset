@@ -1,9 +1,10 @@
 # test
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, dcc, html, Input, Output , State, callback
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-
+import io
+import base64
 # Create random data with numpy
 import numpy as np
 import random
@@ -94,7 +95,6 @@ def Generation_Full_Article(nb_article):
 
 toto = Generation_Full_Article(30)
 
-
 app = Dash(__name__)
 
 app.layout = html.Div(
@@ -121,15 +121,52 @@ app.layout = html.Div(
             value=sorted([i for i in toto.angle_translation.unique()])[0],
             id="angle_translation",
         ),
+        dcc.Upload(
+            id='upload-data',
+            children=html.Div([
+                'Drag and Drop or ',
+                html.A('Select Files')
+            ]),
+            style={
+                'width': '100%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px'
+            },
+            # Allow multiple files to be uploaded
+            multiple=True
+        ),
+        html.Div(id='output')
     ])
 
+# Import data
+@callback(Output('output', 'children'),
+          Input('upload-data', 'contents'),)
+def update_output(contents):
+    global toto
 
+    if contents is not None:
+        content_type, content_string = contents[0].split(',')
 
-@app.callback(
+        decoded = base64.b64decode(content_string)
+        df = pd.read_csv(
+            io.StringIO(decoded.decode('utf-8')))
+
+        frames = [toto, df]
+
+        toto = pd.concat(frames)
+        print(toto.size)
+    return toto.size
+# Export data
+@callback(
 Output("download-dataframe-csv", "data"),
-    Input("movement", "value"),
-    Input("joint", "value"),
-    Input("angle_translation", "value"),
+    State("movement", "value"),
+    State("joint", "value"),
+    State("angle_translation", "value"),
     Input("btn_csv", "n_clicks"),
     prevent_initial_call = True,)
 
@@ -141,11 +178,6 @@ def export_data(movement,joint,angle_translation,n_clicks):
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
     list_joint_graph_base_in_order = ["Humerothoracic", "Glenohumeral", "Scapulothoracic", "Acromioclavicular"]
-    # Adapt the list to the number of degree of freedom selectionned by the user.
-    list_to_plot_in_order = []
-    for name_joint in list_joint_graph_base_in_order:
-        if name_joint in joint:
-            list_to_plot_in_order.append(name_joint)
 
     data_to_export = df[mask_mvt & mask_joint & mask_angle_translation]
     return dcc.send_data_frame(data_to_export.to_csv, "mydf.csv")
