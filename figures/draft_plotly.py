@@ -53,20 +53,20 @@ def create_random_data(
     return df
 
 
-def Generation_Full_Article(nb_article):
+def generation_full_article(nb_article):
     nb_joint_by_article = [1, 2, 3]
     nb_dof_by_joint_angle = [0, 1, 2, 3]
     nb_dof_by_joint_translation = [0, 1, 2, 3]
     nb_movement_by_article = [1, 2, 3, 4]
 
-    name_joints = ["Humerothoracic", "Acromioclavicular", "Glenohumeral", "Scapulothoracic"]
-    name_movements = ["Movement_1", "Movement_2", "Movement_3", "Movement_4"]
+    name_joints = ["humerothoracic", "acromioclavicular", "glenohumeral", "scapulothoracic"]
+    name_movements = ["movement_1", "movement_2", "movement_3", "movement_4"]
     dof_translation = ["X", "Y", "Z"]
-    dof_angle = ["Flexion", "Abduction", "External_rotation"]
+    dof_angle = ["flexion", "abduction", "external_rotation"]
     nb_frame = [6, 20, 30]
     df = create_random_data("", "", "", "", "", 6, initialize=True)
     for i in range(nb_article):
-        name_article = "Article_" + str(i)
+        name_article = "article_" + str(i)
         final_nb_frame = random.choice(nb_frame)
         final_nb_joint = random.choice(nb_joint_by_article)
         final_list_joint = random.sample(name_joints, final_nb_joint)
@@ -84,19 +84,19 @@ def Generation_Full_Article(nb_article):
             for name_movement in final_list_movement:
                 for name_dof in final_dof_angle:
                     df_temp = create_random_data(
-                        name_article, name_joint, name_dof, "Angle", name_movement, final_nb_frame
+                        name_article, name_joint, name_dof, "angle", name_movement, final_nb_frame
                     )
                     df = pd.concat([df, df_temp])
                 for name_dof in final_dof_angle_translation:
                     df_temp = create_random_data(
-                        name_article, name_joint, name_dof, "Translation", name_movement, final_nb_frame
+                        name_article, name_joint, name_dof, "translation", name_movement, final_nb_frame
                     )
                     df = pd.concat([df, df_temp])
 
     return df
 
 
-toto = Generation_Full_Article(30)
+toto = generation_full_article(30)
 
 app = Dash(__name__)
 
@@ -182,7 +182,7 @@ def export_data(movement, joint, angle_translation, n_clicks):
     # We have to put Angle translation in a list because it is a string
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
-    list_joint_graph_base_in_order = ["Humerothoracic", "Glenohumeral", "Scapulothoracic", "Acromioclavicular"]
+    list_joint_graph_base_in_order = ["humerothoracic", "glenohumeral", "scapulothoracic", "acromioclavicular"]
 
     data_to_export = df[mask_mvt & mask_joint & mask_angle_translation]
     return dcc.send_data_frame(data_to_export.to_csv, "mydf.csv")
@@ -201,16 +201,16 @@ def update_line_chart(movement, joint, angle_translation):
     # We have to put Angle translation in a list because it is a string
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
-    list_joint_graph_base_in_order = ["Humerothoracic", "Glenohumeral", "Scapulothoracic", "Acromioclavicular"]
+    list_joint_graph_base_in_order = ["humerothoracic", "glenohumeral", "scapulothoracic", "acromioclavicular"]
     # Adapt the list to the number of degree of freedom selectionned by the user.
     list_to_plot_in_order = []
     for name_joint in list_joint_graph_base_in_order:
         if name_joint in joint:
             list_to_plot_in_order.append(name_joint)
 
-    if angle_translation == "Angle":
-        list_orga = ["Flexion", "Abduction", "External_rotation"]
-    elif angle_translation == "Translation":
+    if angle_translation == "angle":
+        list_orga = ["flexion", "abduction", "external_rotation"]
+    elif angle_translation == "translation":
         list_orga = ["X", "Y", "Z"]
     fig = px.line(
         df[mask_mvt & mask_joint & mask_angle_translation],
