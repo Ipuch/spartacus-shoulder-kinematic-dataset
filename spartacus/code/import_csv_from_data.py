@@ -30,7 +30,7 @@ def copy_folder_with_csv(src_folder: str, dst_folder: str):
 
 
 # Example usage
-source_folder = "/home/puchaud/Documents/spartacus/new_data"
-destination_folder = "/home/puchaud/Documents/spartacus/new_data_csv_only"
+source_folder = "/home/puchaud/Documents/spartacus3/new_data"
+destination_folder = "/home/puchaud/Documents/spartacus3/new_data_csv_only"
 
 copy_folder_with_csv(source_folder, destination_folder)

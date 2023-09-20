@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from enums import DatasetCSV
+from .enums import DatasetCSV
 
 # open clean dataset
 df = pd.read_csv(DatasetCSV.CLEAN.value)
