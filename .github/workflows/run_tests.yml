@@ -31,14 +31,6 @@ jobs:
           mamba config --show
           mamba info
           mamba list
-          
-
-      - name: Test installed version of spartacus
-        run: |
-            pip install -e . --no-deps
-            mamba list
-            cd
-            python -c "import spartacus"
 
       - name: Install extra dependencies
         run: mamba install pytest-cov black pytest pytest-cov codecov -cconda-forge
@@ -49,3 +41,10 @@ jobs:
       - name: Upload coverage to Codecov
         run: codecov
         if: matrix.label == 'linux-64'
+
+      - name: Test installed version of spartacus
+        run: |
+          pip install -e . --no-deps
+          mamba list
+          cd
+          python -c "import spartacus"
