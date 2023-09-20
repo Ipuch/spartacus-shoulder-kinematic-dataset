@@ -48,5 +48,5 @@ jobs:
           mamba list
 #           for now one I can't find the package installed in the mamba env ...
 #           what should I do ?
-#          cd
-#          python -c "import spartacus"
+          cd
+          python -c "import spartacus"
