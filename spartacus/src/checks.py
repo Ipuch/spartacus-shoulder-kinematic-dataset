@@ -3,7 +3,6 @@ import pandas as pd
 
 from .enums import JointType, Segment
 from .utils import (
-    segment_str_to_enum,
     Joint,
     BiomechCoordinateSystem,
     get_is_isb_column,
@@ -41,8 +40,8 @@ def check_parent_child_joint(bjoint: Joint, row: pd.Series, print_warnings: bool
 
 
 def _check_parent_child_joint(joint_type: JointType, parent_name: str, child_name: str) -> bool:
-    parent_segment = segment_str_to_enum(parent_name)
-    child_segment = segment_str_to_enum(child_name)
+    parent_segment = Segment.from_string(parent_name)
+    child_segment = Segment.from_string(child_name)
 
     if joint_type == JointType.GLENO_HUMERAL:
         # Scapula is the parent segment of the humerus

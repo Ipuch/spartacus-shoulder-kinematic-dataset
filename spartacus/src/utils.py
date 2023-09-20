@@ -57,7 +57,7 @@ class BiomechCoordinateSystem:
         negative_enums_axis = [CartesianAxis.minusX, CartesianAxis.minusY, CartesianAxis.minusZ]
 
         for axis, positive_enum, negative_enum in zip(actual_axes, positive_enums_axis, negative_enums_axis):
-            if biomech_direction_sign(axis) == 1:
+            if axis.sign == 1:
                 if axis == BiomechDirection.PlusAnteroPosterior:
                     my_arg["antero_posterior_axis"] = positive_enum
                     continue
@@ -67,7 +67,7 @@ class BiomechCoordinateSystem:
                 elif axis == BiomechDirection.PlusInferoSuperior:
                     my_arg["infero_superior_axis"] = positive_enum
                     continue
-            elif biomech_direction_sign(axis) == -1:
+            elif axis.sign == -1:
                 if axis == BiomechDirection.MinusAnteroPosterior:
                     my_arg["antero_posterior_axis"] = negative_enum
                     continue
@@ -208,10 +208,10 @@ class Joint:
         self.translation_frame = translation_frame
 
     def is_joint_sequence_isb(self) -> bool:
-        return get_isb_sequence_from_joint_type(self.joint_type) == self.euler_sequence
+        return EulerSequence.isb_from_joint_type(self.joint_type) == self.euler_sequence
 
     def isb_euler_sequence(self) -> EulerSequence:
-        return get_isb_sequence_from_joint_type(self.joint_type)
+        return EulerSequence.isb_from_joint_type(self.joint_type)
 
     # todo: stuff for translations ..?
 
@@ -868,143 +868,6 @@ def get_conversion_from_not_isb_to_isb_oriented_v2(
 #         raise NotImplementedError("Check conversion not implemented yet")
 
 
-def biomech_direction_string_to_enum(biomech_direction: str) -> BiomechDirection:
-    if biomech_direction == "+mediolateral":
-        return BiomechDirection.PlusMedioLateral
-    elif biomech_direction == "+anteroposterior":
-        return BiomechDirection.PlusAnteroPosterior
-    elif biomech_direction == "+inferosuperior":
-        return BiomechDirection.PlusInferoSuperior
-    elif biomech_direction == "-mediolateral":
-        return BiomechDirection.MinusMedioLateral
-    elif biomech_direction == "-anteroposterior":
-        return BiomechDirection.MinusAnteroPosterior
-    elif biomech_direction == "-inferosuperior":
-        return BiomechDirection.MinusInferoSuperior
-    else:
-        raise ValueError(
-            f"{biomech_direction} is not a valid biomech_direction."
-            "biomech_direction must be one of the following: "
-            "+mediolateral, +anteroposterior, +inferosuperior, "
-            "-mediolateral, -anteroposterior, -inferosuperior"
-        )
-
-
-def biomech_origin_string_to_enum(biomech_origin: str) -> BiomechOrigin:
-    if biomech_origin == "T7":
-        return BiomechOrigin.Thorax.T7
-    elif biomech_origin == "IJ":
-        return BiomechOrigin.Thorax.IJ
-    elif biomech_origin == "T1 anterior face":
-        return BiomechOrigin.Thorax.T1_ANTERIOR_FACE
-    elif biomech_origin == "GH":
-        return BiomechOrigin.Humerus.GLENOHUMERAL_HEAD
-    elif biomech_origin == "midpoint EM EL":
-        return BiomechOrigin.Humerus.MIDPOINT_EPICONDYLES
-    elif biomech_origin == "SC":
-        return BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER
-    elif biomech_origin == "volume centroid of a cylinder mapped to the midthird of the clavicle":
-        return BiomechOrigin.Clavicle.MIDTHIRD
-    elif biomech_origin == "point of intersection between the mesh model and the Zc axis":
-        return BiomechOrigin.Clavicle.CUSTOM
-    elif biomech_origin == "AC":
-        return BiomechOrigin.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER
-    elif biomech_origin == "AA":
-        return BiomechOrigin.Scapula.ANGULAR_ACROMIALIS
-    elif biomech_origin == "glenoid center":
-        return BiomechOrigin.Scapula.GLENOID_CENTER
-    elif biomech_origin == "TS":
-        return BiomechOrigin.Scapula.TRIGNONUM_SPINAE
-    elif biomech_origin == "clavicle origin":
-        return BiomechOrigin.Clavicle.CUSTOM
-    elif biomech_origin is None:
-        return None
-    elif biomech_origin == "nan" or biomech_origin == "None" or math.isnan(biomech_origin):
-        return None
-    else:
-        raise ValueError(
-            f"{biomech_origin} is not a valid biomech_origin."
-            "biomech_origin must be one of the following: "
-            "joint, parent, child"
-        )
-
-
-def biomech_direction_sign(direction: BiomechDirection) -> int:
-    if direction in (
-        BiomechDirection.PlusMedioLateral,
-        BiomechDirection.PlusAnteroPosterior,
-        BiomechDirection.PlusInferoSuperior,
-    ):
-        return 1
-    elif direction in (
-        BiomechDirection.MinusMedioLateral,
-        BiomechDirection.MinusAnteroPosterior,
-        BiomechDirection.MinusInferoSuperior,
-    ):
-        return -1
-    else:
-        raise ValueError(f"{direction} is not a valid BiomechDirection.")
-
-
-def joint_string_to_enum(joint: str) -> JointType:
-    if joint == "glenohumeral":
-        return JointType.GLENO_HUMERAL
-    elif joint == "acromioclavicular":
-        return JointType.ACROMIO_CLAVICULAR
-    elif joint == "sternoclavicular":
-        return JointType.STERNO_CLAVICULAR
-    elif joint == "thoracohumeral":
-        return JointType.THORACO_HUMERAL
-    elif joint == "scapulothoracic":
-        return JointType.SCAPULO_THORACIC
-    else:
-        raise ValueError(f"{joint} is not a valid joint.")
-
-
-def euler_sequence_to_enum(sequence: str) -> EulerSequence:
-    if sequence == "xyz":
-        return EulerSequence.XYZ
-    elif sequence == "xzy":
-        return EulerSequence.XZY
-    elif sequence == "xyx":
-        return EulerSequence.XYX
-    elif sequence == "xzx":
-        return EulerSequence.XZX
-    elif sequence == "yzx":
-        return EulerSequence.YZX
-    elif sequence == "yxz":
-        return EulerSequence.YXZ
-    elif sequence == "yxy":
-        return EulerSequence.YXY
-    elif sequence == "yzy":
-        return EulerSequence.YZY
-    elif sequence == "zxy":
-        return EulerSequence.ZXY
-    elif sequence == "zyx":
-        return EulerSequence.ZYX
-    elif sequence == "zxz":
-        return EulerSequence.ZXZ
-    elif sequence == "zyz":
-        return EulerSequence.ZYZ
-    elif sequence == "nan" or sequence == "None" or math.isnan(sequence):
-        return None
-    else:
-        raise ValueError(f"{sequence} is not a valid euler sequence.")
-
-
-def segment_str_to_enum(segment: str) -> Segment:
-    if segment == "clavicle":
-        return Segment.CLAVICLE
-    elif segment == "humerus":
-        return Segment.HUMERUS
-    elif segment == "scapula":
-        return Segment.SCAPULA
-    elif segment == "thorax":
-        return Segment.THORAX
-    else:
-        raise ValueError(f"{segment} is not a valid segment.")
-
-
 def get_segment_columns(segment: Segment) -> list[str]:
     if segment == Segment.THORAX:
         return ["thorax_x", "thorax_y", "thorax_z", "thorax_origin"]
@@ -1056,34 +919,3 @@ def get_is_correctable_column(segment: Segment) -> str:
     else:
         raise ValueError(f"{segment} is not a valid segment.")
 
-
-def correction_str_to_enum(correction: str) -> str:
-    if correction == "to_isb":
-        return Correction.TO_ISB_ROTATION
-    elif correction == "to_isb_like":
-        return Correction.TO_ISB_LIKE_ROTATION
-    elif correction == "kolz_AC_to_PA":
-        return Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION
-    elif correction == "glenoid_to_isb_cs":
-        return Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION
-    elif correction == "Sulkar et al. 2021":
-        return Correction.HUMERUS_SULKAR_ROTATION
-    elif correction == "Lagace 2012":
-        return Correction.SCAPULA_LAGACE_DISPLACEMENT
-    else:
-        raise ValueError(f"{correction} is not a valid correction method.")
-
-
-def get_isb_sequence_from_joint_type(joint_type: JointType):
-    if joint_type == JointType.GLENO_HUMERAL:
-        return EulerSequence.YXY
-    elif joint_type == JointType.SCAPULO_THORACIC:
-        return EulerSequence.YXZ
-    elif joint_type == JointType.ACROMIO_CLAVICULAR:
-        return EulerSequence.YXZ
-    elif joint_type == JointType.STERNO_CLAVICULAR:
-        return EulerSequence.YXZ
-    elif joint_type == JointType.THORACO_HUMERAL:
-        return EulerSequence.YXY
-    else:
-        raise ValueError("JointType not recognized")

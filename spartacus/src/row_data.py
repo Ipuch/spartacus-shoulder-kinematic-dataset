@@ -3,19 +3,13 @@ import os
 import numpy as np
 import pandas as pd
 
-from .enums import Segment, Correction, DataFolder
+from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType
 from .utils import (
     get_segment_columns,
     get_correction_column,
     get_is_correctable_column,
     BiomechCoordinateSystem,
-    biomech_direction_string_to_enum,
-    biomech_origin_string_to_enum,
     Joint,
-    joint_string_to_enum,
-    segment_str_to_enum,
-    euler_sequence_to_enum,
-    correction_str_to_enum,
     convert_rotation_matrix_from_one_coordinate_system_to_another,
 )
 
@@ -51,12 +45,12 @@ class RowData:
 
         self.joint = None
 
-        self.parent_segment = segment_str_to_enum(self.row.parent)
+        self.parent_segment = Segment.from_string(self.row.parent)
         self.parent_columns = get_segment_columns(self.parent_segment)
         self.parent_biomech_sys = None
         self.parent_corrections = None
 
-        self.child_segment = segment_str_to_enum(self.row.child)
+        self.child_segment = Segment.from_string(self.row.child)
         self.child_columns = get_segment_columns(self.child_segment)
         self.child_biomech_sys = None
         self.child_corrections = None
@@ -108,10 +102,10 @@ class RowData:
 
             # build the coordinate system
             bsys = BiomechCoordinateSystem.from_biomech_directions(
-                x=biomech_direction_string_to_enum(self.row[segment_cols[0]]),
-                y=biomech_direction_string_to_enum(self.row[segment_cols[1]]),
-                z=biomech_direction_string_to_enum(self.row[segment_cols[2]]),
-                origin=biomech_origin_string_to_enum(self.row[segment_cols[3]]),
+                x=BiomechDirection.from_string(self.row[segment_cols[0]]),
+                y=BiomechDirection.from_string(self.row[segment_cols[1]]),
+                z=BiomechDirection.from_string(self.row[segment_cols[2]]),
+                origin=BiomechOrigin.from_string(self.row[segment_cols[3]]),
                 segment=segment_enum,
             )
             # second check
@@ -166,26 +160,26 @@ class RowData:
 
         if no_euler_sequence:  # Only translation is provided
             self.joint = Joint(
-                joint_type=joint_string_to_enum(self.row.joint),
-                euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),  # throw a None
-                translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement),
-                translation_frame=segment_str_to_enum(self.row.displacement_cs),
+                joint_type=JointType.from_string(self.row.joint),
+                euler_sequence=EulerSequence.from_string(self.row.euler_sequence),  # throw a None
+                translation_origin=BiomechOrigin.from_string(self.row.origin_displacement),
+                translation_frame=Segment.from_string(self.row.displacement_cs),
             )
 
         elif no_translation:  # Only rotation is provided
             self.joint = Joint(
-                joint_type=joint_string_to_enum(self.row.joint),
-                euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),
+                joint_type=JointType.from_string(self.row.joint),
+                euler_sequence=EulerSequence.from_string(self.row.euler_sequence),
                 translation_origin=None,
                 translation_frame=None,
             )
 
         else:  # translation and rotation are both provided
             self.joint = Joint(
-                joint_type=joint_string_to_enum(self.row.joint),
-                euler_sequence=euler_sequence_to_enum(self.row.euler_sequence),
-                translation_origin=biomech_origin_string_to_enum(self.row.origin_displacement),
-                translation_frame=segment_str_to_enum(self.row.displacement_cs),
+                joint_type=JointType.from_string(self.row.joint),
+                euler_sequence=EulerSequence.from_string(self.row.euler_sequence),
+                translation_origin=BiomechOrigin.from_string(self.row.origin_displacement),
+                translation_frame=Segment.from_string(self.row.displacement_cs),
             )
 
         if not check_parent_child_joint(self.joint, row=self.row, print_warnings=print_warnings):
@@ -216,17 +210,17 @@ class RowData:
         """
 
         self.parent_biomech_sys = BiomechCoordinateSystem.from_biomech_directions(
-            x=biomech_direction_string_to_enum(self.row[self.parent_columns[0]]),
-            y=biomech_direction_string_to_enum(self.row[self.parent_columns[1]]),
-            z=biomech_direction_string_to_enum(self.row[self.parent_columns[2]]),
-            origin=biomech_origin_string_to_enum(self.row[self.parent_columns[3]]),
+            x=BiomechDirection.from_string(self.row[self.parent_columns[0]]),
+            y=BiomechDirection.from_string(self.row[self.parent_columns[1]]),
+            z=BiomechDirection.from_string(self.row[self.parent_columns[2]]),
+            origin=BiomechOrigin.from_string(self.row[self.parent_columns[3]]),
             segment=self.parent_segment,
         )
         self.child_biomech_sys = BiomechCoordinateSystem.from_biomech_directions(
-            x=biomech_direction_string_to_enum(self.row[self.child_columns[0]]),
-            y=biomech_direction_string_to_enum(self.row[self.child_columns[1]]),
-            z=biomech_direction_string_to_enum(self.row[self.child_columns[2]]),
-            origin=biomech_origin_string_to_enum(self.row[self.child_columns[3]]),
+            x=BiomechDirection.from_string(self.row[self.child_columns[0]]),
+            y=BiomechDirection.from_string(self.row[self.child_columns[1]]),
+            z=BiomechDirection.from_string(self.row[self.child_columns[2]]),
+            origin=BiomechOrigin.from_string(self.row[self.child_columns[3]]),
             segment=self.child_segment,
         )
 
@@ -248,7 +242,7 @@ class RowData:
             # separate strings with a comma in several element of list
             correction_cell = correction_cell.replace(" ", "").split(",")
             for i, correction in enumerate(correction_cell):
-                correction_cell[i] = correction_str_to_enum(correction)
+                correction_cell[i] = Correction.from_string(correction)
 
         return correction_cell
 

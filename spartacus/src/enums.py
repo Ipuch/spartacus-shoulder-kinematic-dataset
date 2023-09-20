@@ -1,5 +1,7 @@
 from enum import Enum
 from pathlib import Path
+import math
+
 import numpy as np
 
 
@@ -93,6 +95,38 @@ class BiomechDirection(Enum):
     MinusInferoSuperior = "MinusInfero-Superior"
     MinusMedioLateral = "MinusMedio-Lateral"
 
+    @classmethod
+    def from_string(cls, biomech_direction: str):
+        biomech_direction_to_enum = {
+            "+mediolateral": cls.PlusMedioLateral,
+            "+anteroposterior": cls.PlusAnteroPosterior,
+            "+inferosuperior": cls.PlusInferoSuperior,
+            "-mediolateral": cls.MinusMedioLateral,
+            "-anteroposterior": cls.MinusAnteroPosterior,
+            "-inferosuperior": cls.MinusInferoSuperior,
+        }
+
+        the_enum = biomech_direction_to_enum.get(biomech_direction)
+
+        if the_enum is None:
+            raise ValueError(
+                f"{biomech_direction} is not a valid biomech_direction."
+                "biomech_direction must be one of the following: "
+                "+mediolateral, +anteroposterior, +inferosuperior, "
+                "-mediolateral, -anteroposterior, -inferosuperior"
+            )
+
+        return the_enum
+
+    @property
+    def sign(self):
+        if self == self.PlusAnteroPosterior or self == self.PlusMedioLateral or self == self.PlusInferoSuperior:
+            return 1
+        elif self == self.MinusAnteroPosterior or self == self.MinusMedioLateral or self == self.MinusInferoSuperior:
+            return -1
+        else:
+            raise ValueError("Unknown biomech direction")
+
 
 class BiomechOrigin:
     """Enum for the biomechanical origins of the segment"""
@@ -126,6 +160,64 @@ class BiomechOrigin:
     class Any(Enum):
         NAN = "nan"
 
+    @classmethod
+    def from_string(cls, biomech_origin: str):
+        if biomech_origin is None:
+            return None
+
+        biomech_origin_to_enum = {
+            "T7": cls.Thorax.T7,
+            "IJ": cls.Thorax.IJ,
+            "T1 anterior face": cls.Thorax.T1_ANTERIOR_FACE,
+            "GH": cls.Humerus.GLENOHUMERAL_HEAD,
+            "midpoint EM EL": cls.Humerus.MIDPOINT_EPICONDYLES,
+            "SC": cls.Clavicle.STERNOCLAVICULAR_JOINT_CENTER,
+            "volume centroid of a cylinder mapped to the midthird of the clavicle": cls.Clavicle.MIDTHIRD,
+            "point of intersection between the mesh model and the Zc axis": cls.Clavicle.CUSTOM,
+            "AC": cls.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER,
+            "AA": cls.Scapula.ANGULAR_ACROMIALIS,
+            "glenoid center": cls.Scapula.GLENOID_CENTER,
+            "TS": cls.Scapula.TRIGNONUM_SPINAE,
+            "clavicle origin": cls.Clavicle.CUSTOM,
+        }
+
+        the_enum = biomech_origin_to_enum.get(biomech_origin)
+        if the_enum is None:
+            raise ValueError(
+                f"{biomech_origin} is not a valid biomech_origin."
+                "biomech_origin must be one of the following: "
+                "joint, parent, child"
+            )
+
+        return the_enum
+
+
+class JointType(Enum):
+    """Enum for the joint"""
+
+    GLENO_HUMERAL = "GH"
+    SCAPULO_THORACIC = "ST"
+    ACROMIO_CLAVICULAR = "AC"
+    STERNO_CLAVICULAR = "SC"
+    THORACO_HUMERAL = "TH"
+
+    @classmethod
+    def from_string(cls, joint: str):
+
+        dico = {
+            "glenohumeral": cls.GLENO_HUMERAL,
+            "scapulothoracic": cls.SCAPULO_THORACIC,
+            "acromioclavicular": cls.ACROMIO_CLAVICULAR,
+            "sternoclavicular": cls.STERNO_CLAVICULAR,
+            "thoracohumeral": cls.THORACO_HUMERAL,
+        }
+
+        the_enum = dico.get(joint)
+        if the_enum is None:
+            raise ValueError(f"{joint} is not a valid joint.")
+
+        return the_enum
+
 
 class EulerSequence(Enum):
     XYX = "xyx"
@@ -141,15 +233,47 @@ class EulerSequence(Enum):
     ZYZ = "zyz"
     ZYX = "zyx"
 
+    @classmethod
+    def isb_from_joint_type(cls, joint_type: JointType):
+        if joint_type == JointType.GLENO_HUMERAL:
+            return EulerSequence.YXY
+        elif joint_type == JointType.SCAPULO_THORACIC:
+            return EulerSequence.YXZ
+        elif joint_type == JointType.ACROMIO_CLAVICULAR:
+            return EulerSequence.YXZ
+        elif joint_type == JointType.STERNO_CLAVICULAR:
+            return EulerSequence.YXZ
+        elif joint_type == JointType.THORACO_HUMERAL:
+            return EulerSequence.YXY
+        else:
+            raise ValueError("JointType not recognized")
 
-class JointType(Enum):
-    """Enum for the joint"""
+    @classmethod
+    def from_string(cls, sequence: str):
 
-    GLENO_HUMERAL = "GH"
-    SCAPULO_THORACIC = "ST"
-    ACROMIO_CLAVICULAR = "AC"
-    STERNO_CLAVICULAR = "SC"
-    THORACO_HUMERAL = "TH"
+        if sequence is None:
+            return None
+
+        sequence_name_to_enum = {
+            "xyx": cls.XYX,
+            "xzx": cls.XZX,
+            "xyz": cls.XYZ,
+            "xzy": cls.XZY,
+            "yxy": cls.YXY,
+            "yzx": cls.YZX,
+            "yxz": cls.YXZ,
+            "yzy": cls.YZY,
+            "zxz": cls.ZXZ,
+            "zxy": cls.ZXY,
+            "zyz": cls.ZYZ,
+            "zyx": cls.ZYX,
+        }
+
+        the_enum = sequence_name_to_enum.get(sequence)
+        if the_enum is None:
+            raise ValueError(f"{sequence} is not a valid euler sequence.")
+
+        return the_enum
 
 
 class Segment(Enum):
@@ -159,6 +283,21 @@ class Segment(Enum):
     HUMERUS = "humerus"
     SCAPULA = "scapula"
     CLAVICLE = "clavicle"
+
+    @classmethod
+    def from_string(cls, segment: str):
+        segment_name_to_enum = {
+            "thorax": cls.THORAX,
+            "humerus": cls.HUMERUS,
+            "scapula": cls.SCAPULA,
+            "clavicle": cls.CLAVICLE,
+        }
+
+        the_enum = segment_name_to_enum.get(segment)
+        if the_enum is None:
+            raise ValueError(f"{segment} is not a valid segment.")
+
+        return the_enum
 
 
 class Correction(Enum):
@@ -174,3 +313,20 @@ class Correction(Enum):
     )
     HUMERUS_SULKAR_ROTATION = "Sulkar et al. 2021"  # todo: idk what it is
     SCAPULA_LAGACE_DISPLACEMENT = "Lagace 2012"  # todo: idk what it is
+
+    @classmethod
+    def from_string(cls, correction: str):
+        correction_name_to_enum = {
+            "to_isb": cls.TO_ISB_ROTATION,
+            "to_isb_like": cls.TO_ISB_LIKE_ROTATION,
+            "kolz_AC_to_PA": cls.SCAPULA_KOLZ_AC_TO_PA_ROTATION,
+            "glenoid_to_isb_cs": cls.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION,
+            "Sulkar et al. 2021": cls.HUMERUS_SULKAR_ROTATION,
+            "Lagace 2012": cls.SCAPULA_LAGACE_DISPLACEMENT,
+        }
+
+        the_enum = correction_name_to_enum.get(correction)
+        if the_enum is None:
+            raise ValueError(f"{correction} is not a valid correction method.")
+
+        return the_enum
