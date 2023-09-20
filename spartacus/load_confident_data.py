@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from shoulder import (
+from . import (
     DatasetCSV,
     RowData,
 )
