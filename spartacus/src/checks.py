@@ -141,6 +141,11 @@ def check_is_isb_segment(row: pd.Series, bsys: BiomechCoordinateSystem, print_wa
 
 def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = False) -> bool:
     """This function checks if the euler sequence is provided in the dataset."""
+    if row.euler_sequence is None:
+        if print_warnings:
+            print("WARNING : euler sequence is not provided, for joint", row.joint, row.article_author_year)
+        return False
+    #todo: check nan should disappear
     if not isinstance(row.euler_sequence, str) and (row.euler_sequence == "nan" or np.isnan(row.euler_sequence)):
         if print_warnings:
             print("WARNING : euler sequence is nan, for joint", row.joint, row.article_author_year)

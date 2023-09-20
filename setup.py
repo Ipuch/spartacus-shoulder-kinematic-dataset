@@ -11,7 +11,7 @@ setup(
     author_email="",
     description="Shoulder dataset treatment",
     long_description=long_description,
-    packages=[".", "spartacus", "examples", "spartacus/dataset"],
+    packages=["spartacus", "examples"],
     python_requires=">=3.10",
     zip_safe=False,
     include_package_data=True,

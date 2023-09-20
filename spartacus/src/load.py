@@ -31,11 +31,12 @@ class Spartacus:
         # Todo: remove this function ultimately
         # remove lines I know they are not ready for analysis
         # drop line with "Charbonnier et al." in dataset_authors
-        dataset_authors = "Charbonnier et al."
-        self.dataframe.drop(
-            self.dataframe[self.dataframe["dataset_authors"].str.contains("Charbonnier et al.")].index,
-            inplace=True,
-        )
+        dataset_authors = ["Charbonnier et al.", "Gutierrez Delgado et al."]
+        for a in dataset_authors:
+            self.dataframe.drop(
+                self.dataframe[self.dataframe["dataset_authors"].str.contains(a)].index,
+                inplace=True,
+            )
 
     def load(self, print_warnings: bool = False):
         """

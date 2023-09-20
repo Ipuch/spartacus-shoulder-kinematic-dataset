@@ -917,6 +917,8 @@ def biomech_origin_string_to_enum(biomech_origin: str) -> BiomechOrigin:
         return BiomechOrigin.Scapula.TRIGNONUM_SPINAE
     elif biomech_origin == "clavicle origin":
         return BiomechOrigin.Clavicle.CUSTOM
+    elif biomech_origin is None:
+        return None
     elif biomech_origin == "nan" or biomech_origin == "None" or math.isnan(biomech_origin):
         return None
     else:
