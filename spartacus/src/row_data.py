@@ -639,11 +639,14 @@ class RowData:
             columns=raw_angle_series_dataframe.columns,
         )
         corrected_angle_series_dataframe["humerothoracic_angle_dof1"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof1"]
+            "humerothoracic_angle_dof1"
+        ]
         corrected_angle_series_dataframe["humerothoracic_angle_dof2"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof2"]
+            "humerothoracic_angle_dof2"
+        ]
         corrected_angle_series_dataframe["humerothoracic_angle_dof3"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof3"]
+            "humerothoracic_angle_dof3"
+        ]
 
         # mean of this three columns
         # assuming we should have the same value, this should minimize the error when collecting the data from figure.
@@ -652,7 +655,6 @@ class RowData:
         ].mean(axis=1)
 
         for i, row in raw_angle_series_dataframe.iterrows():
-
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
                 row.value_dof1, row.value_dof2, row.value_dof3
             )

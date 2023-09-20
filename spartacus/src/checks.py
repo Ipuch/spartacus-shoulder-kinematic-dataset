@@ -145,7 +145,7 @@ def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = Fals
         if print_warnings:
             print("WARNING : euler sequence is not provided, for joint", row.joint, row.article_author_year)
         return False
-    #todo: check nan should disappear
+    # todo: check nan should disappear
     if not isinstance(row.euler_sequence, str) and (row.euler_sequence == "nan" or np.isnan(row.euler_sequence)):
         if print_warnings:
             print("WARNING : euler sequence is nan, for joint", row.joint, row.article_author_year)
