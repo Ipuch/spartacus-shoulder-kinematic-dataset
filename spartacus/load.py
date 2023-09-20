@@ -12,9 +12,10 @@ class Spartacus:
     This is a Dataset Class.
     The class can have methods to load the data, filter it, or perform common operations in a natural language style.
     """
+
     def __init__(
-            self,
-            dataframe: pd.DataFrame,
+        self,
+        dataframe: pd.DataFrame,
     ):
         self.dataframe = dataframe
         self.confident_dataframe = None
@@ -146,7 +147,7 @@ def load_confident_data(df: pd.DataFrame, print_warnings: bool = False) -> pd.Da
 
 
 def load() -> Spartacus:
-    """ Load the confident dataset """
+    """Load the confident dataset"""
     # open the file only_dataset_raw.csv
     df = pd.read_csv(DatasetCSV.CLEAN.value)
     print(df.shape)
