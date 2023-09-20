@@ -32,14 +32,20 @@ jobs:
           mamba info
           mamba list
           
-      - name: Install extra dependencies
-        run: mamba install pytest-cov black pytest pytest-cov codecov -cconda-forge
 
       - name: Test installed version of spartacus
         run: |
+            pwd
+            dir
+            cd ..
+            pwd
+            dir
             python install -e .
             cd
             python -c "import spartacus"
+
+      - name: Install extra dependencies
+        run: mamba install pytest-cov black pytest pytest-cov codecov -cconda-forge
 
       - name: Run the actual tests
         run: pytest -v --color=yes --cov-report term-missing --cov=spartacus tests
