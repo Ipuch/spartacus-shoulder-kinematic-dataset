@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from .enums import Segment, Correction
+from .enums import Segment, Correction, DataFolder
 from .utils import (
     get_segment_columns,
     get_correction_column,
@@ -634,17 +634,21 @@ class RowData:
 
         for csv_filename in csv_filenames:
             if csv_filename is not None:
-                csv_file = pd.read_csv(csv_filename, sep=",")
-                angle_series_dataframe = angle_series_dataframe.append(csv_file.to_angle_series_dataframe())
+                csv_file = pd.read_csv(csv_filename, sep=",", header=None)
+                csv_file.columns = [
+                    "humerothoracic_angle",
+                    "value",
+                ]
+                angle_series_dataframe = pd.concat([angle_series_dataframe, csv_file], ignore_index=True)
 
-    def get_csv_filenames(self):
+    def get_csv_filenames(self) -> tuple[str, str, str, str, str, str]:
         """load the csv filenames from the row data"""
+        folder_path = DataFolder.from_string(self.row["folder"]).value
 
-        return (
-            os.path.join(self.row["folder"], self.row["dof_1st_euler"]),
-            os.path.join(self.row["folder"], self.row["dof_2nd_euler"]),
-            os.path.join(self.row["folder"], self.row["dof_3rd_euler"]),
-            os.path.join(self.row["folder"], self.row["translation_x"]),
-            os.path.join(self.row["folder"], self.row["translation_y"]),
-            os.path.join(self.row["folder"], self.row["translation_z"]),
-        )
+        csv_paths = ()
+
+        for field in ["dof_1st_euler", "dof_2nd_euler", "dof_3rd_euler", "dof_translation_x", "dof_translation_y", "dof_translation_z"]:
+
+            csv_paths += (os.path.join(folder_path, self.row[field]),) if self.row[field] is not None else (None,)
+
+        return csv_paths

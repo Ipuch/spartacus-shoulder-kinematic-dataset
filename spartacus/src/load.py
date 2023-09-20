@@ -19,12 +19,23 @@ class Spartacus:
     ):
         self.dataframe = dataframe
         self.clean_df()
+        self.remove_rows_not_ready_for_analysis()
         self.confident_dataframe = None
 
     def clean_df(self):
         # turn nan into None for the following columns
         # dof_1st_euler, dof_2nd_euler, dof_3rd_euler, dof_translation_x, dof_translation_y, dof_translation_z
         self.dataframe = self.dataframe.where(pd.notna(self.dataframe), None)
+
+    def remove_rows_not_ready_for_analysis(self):
+        # Todo: remove this function ultimately
+        # remove lines I know they are not ready for analysis
+        # drop line with "Charbonnier et al." in dataset_authors
+        dataset_authors = "Charbonnier et al."
+        self.dataframe.drop(
+            self.dataframe[self.dataframe["dataset_authors"].str.contains("Charbonnier et al.")].index,
+            inplace=True,
+        )
 
     def load(self, print_warnings: bool = False):
         """
@@ -101,7 +112,7 @@ def load() -> Spartacus:
     df = pd.read_csv(DatasetCSV.CLEAN.value)
     print(df.shape)
     sp = Spartacus(dataframe=df)
-    sp.load(print_warnings=False)
+    sp.load(print_warnings=True)
     # df = load_confident_data(df, print_warnings=True)
     print(df.shape)
     return sp

@@ -1,5 +1,5 @@
-from src.enums import CartesianAxis, EulerSequence, JointType, DatasetCSV, BiomechDirection, BiomechOrigin, Segment
-from src.checks import (
+from .src.enums import CartesianAxis, EulerSequence, JointType, DatasetCSV, BiomechDirection, BiomechOrigin, Segment
+from .src.checks import (
     check_parent_child_joint,
     check_segment_filled_with_nan,
     check_is_isb_segment,
