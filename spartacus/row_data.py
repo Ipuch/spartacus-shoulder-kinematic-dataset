@@ -597,3 +597,43 @@ class RowData:
 
         else:
             raise NotImplementedError("Check conversion not implemented yet")
+
+    def to_angle_series_dataframe(self):
+        """
+        This converts the row to a panda dataframe with the angles in degrees with the following columns:
+         - article
+         - joint
+         - angle_translation
+         - degree_of_freedom
+         - movement
+         - humerothoracic_angle (one line per angle)
+         - value
+
+        Returns
+        -------
+        pandas.DataFrame
+            The dataframe with the angles in degrees
+        """
+        angle_series_dataframe = pd.DataFrame(
+            columns=["article", "joint", "angle_translation", "degree_of_freedom", "movement", "humerothoracic_angle",
+                     "value"]
+        )
+        # load the csv file
+        csv_filenames = self.get_csv_filenames()
+        for csv_filename in csv_filenames:
+            if csv_filename is not None:
+                # todo: sep are not always as expected (data need to be cleaned)
+                csv_file = pd.read_csv(csv_filename, sep=",")
+                angle_series_dataframe = angle_series_dataframe.append(csv_file.to_angle_series_dataframe())
+
+    def get_csv_filenames(self):
+        """ load the csv filenames from the row data """
+
+        return (
+            self.row["dof_1st_euler"],
+            self.row["dof_2nd_euler"],
+            self.row["dof_3rd_euler"],
+            self.row["dof_translation_x"],
+            self.row["dof_translation_y"],
+            self.row["dof_translation_z"],
+        )
