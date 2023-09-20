@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from shoulder import DatasetCSV
+from spartacus import DatasetCSV
 
 
 def test_no_nan_in_columns():

@@ -1,4 +1,4 @@
-from shoulder import JointType, EulerSequence, Joint
+from spartacus import JointType, EulerSequence, Joint
 
 
 def test_joint():

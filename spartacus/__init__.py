@@ -10,3 +10,4 @@ from .src.checks import (
 
 from .src.row_data import RowData
 from .src.load import load
+from .src.utils import Joint, BiomechCoordinateSystem
