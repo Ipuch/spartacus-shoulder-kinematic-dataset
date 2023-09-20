@@ -1,10 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from spartacus import (
-    DatasetCSV,
-    RowData,
-)
+from .enums import DatasetCSV
+from .row_data import RowData
 
 
 class Spartacus:

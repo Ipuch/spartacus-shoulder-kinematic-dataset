@@ -1,8 +1,8 @@
+import biorbd
+import numpy as np
+
 from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment, Correction
 from .kolz_matrices import get_kolz_rotation_matrix
-import biorbd
-import math
-import numpy as np
 
 
 class BiomechCoordinateSystem:
