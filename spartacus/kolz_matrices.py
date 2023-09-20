@@ -29,21 +29,28 @@ def get_kolz_rotation_matrix(correction: Correction, orthonormalize: bool = True
         # meaning a vector in AC coordinate system is expressed as:
         # a' = R * a
         # where a' is the vector expressed in the PA coordinate system
-        R = np.array(
-            [[0.965, 0.010, -0.263], [-0.057, 0.984, 0.171], [0.257, 0.180, 0.950]],
-        ).T
+        R_pa_ac = np.array(
+            [
+                [0.964732483180704, 0.0100557410449752, -0.263040145164248],
+                [-0.0568391733041278, 0.983654375192805, -0.170860699232318],
+                [0.257022458695919, 0.17978585104532, 0.949534887979275],
+            ],
+        )
+        R = R_pa_ac
 
     elif correction == Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION:
         # meaning a vector in glenoid coordinate system is expressed as:
         # a' = R * a
         # where a' is the vector expressed in the PA coordinate system
-        R = np.array(
+        R_gc_pa = np.array(
             [
-                [0.949, 0.010, -0.314],
-                [-0.056, 0.978, 0.200],
-                [0.310, -0.208, 0.928],
-            ],
-        ).T
+                [0.949221220989932, 0.00968382059265423, -0.314460326974823],
+                [0.0563324947886947, 0.978141286964525, 0.200165613346213],
+                [0.309524996814902, -0.207715782631251, 0.927926952940059],
+            ]
+        )
+        R_pa_gc = R_gc_pa.T
+        R = R_pa_gc
 
     else:
         raise ValueError(
