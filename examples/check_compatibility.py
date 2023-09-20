@@ -1,4 +1,4 @@
-from shoulder import (
+from spartacus import (
     EulerSequence,
     BiomechCoordinateSystem,
     CartesianAxis,

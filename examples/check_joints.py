@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from shoulder import DatasetCSV, Joint, joint_string_to_enum, euler_sequence_to_enum, check_parent_child_joint
+from spartacus import DatasetCSV, Joint, joint_string_to_enum, euler_sequence_to_enum, check_parent_child_joint
 
 # open the file only_dataset_raw.csv
 df = pd.read_csv(DatasetCSV.CLEAN.value)

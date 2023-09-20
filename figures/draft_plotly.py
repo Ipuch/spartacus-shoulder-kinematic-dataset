@@ -9,6 +9,7 @@ import base64
 # Create random data with numpy
 import numpy as np
 import random
+from fake_data import create_random_data
 
 
 # TODO : Put the correct joint in the article.
@@ -18,39 +19,6 @@ import random
 # TODO : Corrolaire : change the data shape at the beginnning ()
 
 # Question à aborder sur la forme des données.
-
-
-def create_random_data(
-    name_article, name_joint, name_dof, angle_or_translation, name_movement, nb_frame, initialize=False
-):
-    if initialize:
-        df = pd.DataFrame(
-            {
-                "article": [],  # Article name should be the comination of the article and the subejct name (id_subject)
-                "joint": [],
-                "angle_translation": [],
-                "degree_of_freedom": [],
-                "movement": [],
-                "humerothoracic_angle": [],
-                "value": [],
-            }
-        )
-    else:
-        random_x = np.linspace(0, 120, nb_frame)
-        random_y0 = np.random.randn(nb_frame) + 5
-        df = pd.DataFrame(
-            {
-                "article": [name_article] * nb_frame,
-                "joint": [name_joint] * nb_frame,
-                "angle_translation": [angle_or_translation] * nb_frame,
-                "degree_of_freedom": [name_dof] * nb_frame,
-                "movement": [name_movement] * nb_frame,
-                "humerothoracic_angle": random_x,
-                "value": random_y0,
-            }
-        )
-
-    return df
 
 
 def generation_full_article(nb_article):

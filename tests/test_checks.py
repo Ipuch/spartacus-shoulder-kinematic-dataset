@@ -1,4 +1,4 @@
-from shoulder import BiomechCoordinateSystem, Joint, CartesianAxis, JointType, EulerSequence
+from spartacus import BiomechCoordinateSystem, Joint, CartesianAxis, JointType, EulerSequence
 
 
 def test_checks():

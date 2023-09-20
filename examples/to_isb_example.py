@@ -4,7 +4,7 @@ The rotation matrix is computed from the axes of the ISB coordinate system.
 The rotation matrix is then converted to Euler angles, and the axes are permuted to match the sequence of the ISB axes.
 Then we try to retrieve the euler angles from the ISB axes, and we compare the results.
 """
-from shoulder import CartesianAxis, Segment, BiomechCoordinateSystem, EulerSequence
+from spartacus import CartesianAxis, Segment, BiomechCoordinateSystem, EulerSequence
 import numpy as np
 import biorbd
 from scipy.spatial.transform import Rotation
