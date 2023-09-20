@@ -35,9 +35,8 @@ jobs:
 
       - name: Test installed version of spartacus
         run: |
-            pwd
-            dir
             pip install -e . --no-deps
+            mamba list
             cd
             python -c "import spartacus"
 
