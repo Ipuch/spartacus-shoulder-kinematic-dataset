@@ -10,4 +10,6 @@ dependencies:
 - matplotlib
 - plotly
 - biorbd
+- dash
+- scipy
 
