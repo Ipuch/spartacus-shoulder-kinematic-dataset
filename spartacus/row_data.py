@@ -629,7 +629,6 @@ class RowData:
         csv_filenames = self.get_csv_filenames()
         for csv_filename in csv_filenames:
             if csv_filename is not None:
-                # todo: sep are not always as expected (data need to be cleaned)
                 csv_file = pd.read_csv(csv_filename, sep=",")
                 angle_series_dataframe = angle_series_dataframe.append(csv_file.to_angle_series_dataframe())
 
