@@ -40,7 +40,7 @@ jobs:
             cd ..
             pwd
             dir
-            python install -e .
+            pip install -e . --no-deps
             cd
             python -c "import spartacus"
 
