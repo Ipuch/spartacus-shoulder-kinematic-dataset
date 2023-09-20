@@ -23,3 +23,4 @@ from .checks import (
 )
 
 from .row_data import RowData
+from .load import load
