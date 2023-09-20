@@ -12,29 +12,29 @@ class DatasetCSV(Enum):
 
 class DataFolder(Enum):
     BOURNE_2003 = Path(__file__).parent.parent / "data" / "Bourne et al 2003"
-    CERRATI_2017 = Path(__file__).parent.parent  / "data" / "Cerrati et al 2017"
-    CHARBONNIER_2017 = Path(__file__).parent.parent  / "data" / "Charbonnier et al 2017"
-    CHU_2012 = Path(__file__).parent.parent  / "data" / "Chu et al 2012"
-    DAL_MASO_2014 = Path(__file__).parent.parent  / "data" / "Dal Maso et al 2014"
-    FUNG_2001 = Path(__file__).parent.parent  / "data" / "Fung et al 2001"
-    GRAICHEN_2000 = Path(__file__).parent.parent  / "data" / "Graichen et al 2000"
-    GUTIERREZ_DELGADO_2017 = Path(__file__).parent.parent  / "data" / "Gutierrez Delgado et al 2017"
-    HALLSTROM_2006 = Path(__file__).parent.parent  / "data" / "Hallström et al 2006"
-    KIJIMA_2015 = Path(__file__).parent.parent  / "data" / "Kijima et al 2015"
-    KIM_2017 = Path(__file__).parent.parent  / "data" / "Kim et al 2017"
-    KONOZO_2017 = Path(__file__).parent.parent  / "data" / "Konozo et al 2017"
-    LAWRENCE_2014 = Path(__file__).parent.parent  / "data" / "Lawrence et al 2014"
-    MATSUKI_2012 = Path(__file__).parent.parent  / "data" / "Matsuki et al 2012"
-    MATSUKI_2014 = Path(__file__).parent.parent  / "data" / "Matsuki et al 2014"
-    MATSUMURA_2013 = Path(__file__).parent.parent  / "data" / "Matsumura et al 2013"
-    MCCLURE_2001 = Path(__file__).parent.parent  / "data" / "McClure et al 2001"
-    NISHINAKA_2008 = Path(__file__).parent.parent  / "data" / "Nishinaka et al 2008"
-    OKI_2012 = Path(__file__).parent.parent  / "data" / "Oki et al 2012"
-    SAHARA_2006 = Path(__file__).parent.parent  / "data" / "Sahara et al 2006"
-    SAHARA_2007 = Path(__file__).parent.parent  / "data" / "Sahara et al 2007"
-    SUGI_2021 = Path(__file__).parent.parent  / "data" / "Sugi et al 2021"
-    TEECE_2008 = Path(__file__).parent.parent  / "data" / "Teece et al 2008"
-    YOSHIDA_2023 = Path(__file__).parent.parent  / "data" / "Yoshida et al 2023"
+    CERRATI_2017 = Path(__file__).parent.parent / "data" / "Cerrati et al 2017"
+    CHARBONNIER_2017 = Path(__file__).parent.parent / "data" / "Charbonnier et al 2017"
+    CHU_2012 = Path(__file__).parent.parent / "data" / "Chu et al 2012"
+    DAL_MASO_2014 = Path(__file__).parent.parent / "data" / "Dal Maso et al 2014"
+    FUNG_2001 = Path(__file__).parent.parent / "data" / "Fung et al 2001"
+    GRAICHEN_2000 = Path(__file__).parent.parent / "data" / "Graichen et al 2000"
+    GUTIERREZ_DELGADO_2017 = Path(__file__).parent.parent / "data" / "Gutierrez Delgado et al 2017"
+    HALLSTROM_2006 = Path(__file__).parent.parent / "data" / "Hallström et al 2006"
+    KIJIMA_2015 = Path(__file__).parent.parent / "data" / "Kijima et al 2015"
+    KIM_2017 = Path(__file__).parent.parent / "data" / "Kim et al 2017"
+    KONOZO_2017 = Path(__file__).parent.parent / "data" / "Konozo et al 2017"
+    LAWRENCE_2014 = Path(__file__).parent.parent / "data" / "Lawrence et al 2014"
+    MATSUKI_2012 = Path(__file__).parent.parent / "data" / "Matsuki et al 2012"
+    MATSUKI_2014 = Path(__file__).parent.parent / "data" / "Matsuki et al 2014"
+    MATSUMURA_2013 = Path(__file__).parent.parent / "data" / "Matsumura et al 2013"
+    MCCLURE_2001 = Path(__file__).parent.parent / "data" / "McClure et al 2001"
+    NISHINAKA_2008 = Path(__file__).parent.parent / "data" / "Nishinaka et al 2008"
+    OKI_2012 = Path(__file__).parent.parent / "data" / "Oki et al 2012"
+    SAHARA_2006 = Path(__file__).parent.parent / "data" / "Sahara et al 2006"
+    SAHARA_2007 = Path(__file__).parent.parent / "data" / "Sahara et al 2007"
+    SUGI_2021 = Path(__file__).parent.parent / "data" / "Sugi et al 2021"
+    TEECE_2008 = Path(__file__).parent.parent / "data" / "Teece et al 2008"
+    YOSHIDA_2023 = Path(__file__).parent.parent / "data" / "Yoshida et al 2023"
 
     @classmethod
     def from_string(cls, data_folder: str):
@@ -70,8 +70,6 @@ class DataFolder(Enum):
             raise ValueError(f"Unknown data folder: {data_folder}")
 
         return the_enum
-
-
 
 
 class CartesianAxis(Enum):

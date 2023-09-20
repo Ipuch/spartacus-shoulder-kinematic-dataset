@@ -263,7 +263,9 @@ class RowData:
         Extract the database entry to state if the segment is correctable or not.
         """
 
-        if self.row[get_is_correctable_column(segment)] is not None and np.isnan(self.row[get_is_correctable_column(segment)]):
+        if self.row[get_is_correctable_column(segment)] is not None and np.isnan(
+            self.row[get_is_correctable_column(segment)]
+        ):
             return None
         if self.row[get_is_correctable_column(segment)] == "nan":
             return None
@@ -647,8 +649,14 @@ class RowData:
 
         csv_paths = ()
 
-        for field in ["dof_1st_euler", "dof_2nd_euler", "dof_3rd_euler", "dof_translation_x", "dof_translation_y", "dof_translation_z"]:
-
+        for field in [
+            "dof_1st_euler",
+            "dof_2nd_euler",
+            "dof_3rd_euler",
+            "dof_translation_x",
+            "dof_translation_y",
+            "dof_translation_z",
+        ]:
             csv_paths += (os.path.join(folder_path, self.row[field]),) if self.row[field] is not None else (None,)
 
         return csv_paths
