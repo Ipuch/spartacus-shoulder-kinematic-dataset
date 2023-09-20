@@ -9,9 +9,8 @@ def create_random_data(
     angle_or_translation,
     name_movement: str,
     nb_frame: int,
-    initialize: bool =False,
+    initialize: bool = False,
 ) -> pd.DataFrame:
-
     # Base structure for DataFrame
     data = {
         "article": [],
@@ -33,7 +32,7 @@ def create_random_data(
         random_y0 = np.random.randn(nb_frame) + 5
 
         for key in ["article", "joint", "angle_translation", "degree_of_freedom", "movement"]:
-            data[key] = [locals()[f'name_{key}']] * nb_frame
+            data[key] = [locals()[f"name_{key}"]] * nb_frame
 
         data["humerothoracic_angle"] = random_x
         data["value"] = random_y0

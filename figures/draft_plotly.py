@@ -20,6 +20,7 @@ from fake_data import create_random_data
 
 # Question à aborder sur la forme des données.
 
+
 def generation_full_article(nb_article):
     nb_joint_by_article = [1, 2, 3]
     nb_dof_by_joint_angle = [0, 1, 2, 3]

@@ -10,30 +10,28 @@ import pandas as pd
 data_folder = os.path.join(os.path.dirname(__file__))
 
 for file in os.listdir(data_folder):
-        print("Folder:", file)
-        # if not a folder continue
-        if not os.path.isdir(os.path.join(data_folder, file)):
-            continue
+    print("Folder:", file)
+    # if not a folder continue
+    if not os.path.isdir(os.path.join(data_folder, file)):
+        continue
 
-        if file == "Graichen et al 2000":
-            continue
+    if file == "Graichen et al 2000":
+        continue
 
-        for subfile in os.listdir(os.path.join(data_folder, file)):
-            if subfile.endswith(".csv"):
-                print("Loading file:", subfile)
-                df = pd.read_csv(os.path.join(data_folder, file, subfile), header=None)
-                print("Shape:", df.shape)
-                print("Columns:", df.columns)
-                print(df.head())
-                df.columns = ["humerothoracic_angle", "value"]
-                print("")
+    for subfile in os.listdir(os.path.join(data_folder, file)):
+        if subfile.endswith(".csv"):
+            print("Loading file:", subfile)
+            df = pd.read_csv(os.path.join(data_folder, file, subfile), header=None)
+            print("Shape:", df.shape)
+            print("Columns:", df.columns)
+            print(df.head())
+            df.columns = ["humerothoracic_angle", "value"]
+            print("")
 
-                if df.shape[1] != 2:
-                    raise ValueError("The csv file should have only two columns.")
-                if df.shape[0] < 1:
-                    raise ValueError("The csv file should have at least one row.")
+            if df.shape[1] != 2:
+                raise ValueError("The csv file should have only two columns.")
+            if df.shape[0] < 1:
+                raise ValueError("The csv file should have at least one row.")
 
 
 print("All csv files have been loaded successfully.")
-
-

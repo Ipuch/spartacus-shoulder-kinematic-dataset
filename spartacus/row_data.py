@@ -615,8 +615,15 @@ class RowData:
             The dataframe with the angles in degrees
         """
         angle_series_dataframe = pd.DataFrame(
-            columns=["article", "joint", "angle_translation", "degree_of_freedom", "movement", "humerothoracic_angle",
-                     "value"]
+            columns=[
+                "article",
+                "joint",
+                "angle_translation",
+                "degree_of_freedom",
+                "movement",
+                "humerothoracic_angle",
+                "value",
+            ]
         )
         # load the csv file
         csv_filenames = self.get_csv_filenames()
@@ -627,7 +634,7 @@ class RowData:
                 angle_series_dataframe = angle_series_dataframe.append(csv_file.to_angle_series_dataframe())
 
     def get_csv_filenames(self):
-        """ load the csv filenames from the row data """
+        """load the csv filenames from the row data"""
 
         return (
             self.row["dof_1st_euler"],
