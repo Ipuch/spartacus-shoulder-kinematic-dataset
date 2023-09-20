@@ -39,7 +39,7 @@ jobs:
         run: |
             python setup.py install
             cd
-            python -c "import shoulder"
+            python -c "import spartacus"
 
       - name: Run the actual tests
         run: pytest -v --color=yes --cov-report term-missing --cov=spartacus tests

@@ -643,6 +643,8 @@ class RowData:
                 ]
                 angle_series_dataframe = pd.concat([angle_series_dataframe, csv_file], ignore_index=True)
 
+        print("end")
+
     def get_csv_filenames(self) -> tuple[str, str, str, str, str, str]:
         """load the csv filenames from the row data"""
         folder_path = DataFolder.from_string(self.row["folder"]).value
