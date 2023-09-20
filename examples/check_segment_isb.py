@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from shoulder import (
+from spartacus import (
     DatasetCSV,
     biomech_direction_string_to_enum,
     BiomechCoordinateSystem,
