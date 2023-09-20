@@ -14,4 +14,6 @@ setup(
     packages=[".", "spartacus", "examples", "spartacus/dataset"],
     python_requires=">=3.10",
     zip_safe=False,
+    include_package_data=True,
+    package_data={'': ['data/*.csv']},
 )
