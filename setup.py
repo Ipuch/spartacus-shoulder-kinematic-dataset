@@ -11,9 +11,10 @@ setup(
     author_email="",
     description="Shoulder dataset treatment",
     long_description=long_description,
-    packages=["spartacus", "examples"],
     python_requires=">=3.10",
     zip_safe=False,
     include_package_data=True,
-    package_data={"": ["data/*.csv", "dataset/*.csv"]},
+    packages=find_packages(where="spartacus"),
+    package_dir={"": "spartacus"},
+    package_data={"": ["*.csv"]},
 )

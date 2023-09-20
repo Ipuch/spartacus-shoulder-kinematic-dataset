@@ -37,7 +37,7 @@ jobs:
 
       - name: Test installed version of spartacus
         run: |
-            python setup.py install
+            python install -e .
             cd
             python -c "import spartacus"
 
