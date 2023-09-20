@@ -37,9 +37,6 @@ jobs:
         run: |
             pwd
             dir
-            cd ..
-            pwd
-            dir
             pip install -e . --no-deps
             cd
             python -c "import spartacus"
