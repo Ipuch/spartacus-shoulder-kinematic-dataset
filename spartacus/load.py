@@ -85,34 +85,6 @@ class Spartacus:
 
         return self.confident_dataframe
 
-    def to_angle_series_dataframe(self):
-        """
-        Convert the dataframe to angle series dataframe with the following columns:
-        "article", "joint", "angle_translation", "degree_of_freedom", "movement", "humerothoracic_angle", "value",
-        "humerothoracic_angle".
-        """
-        # create an empty dataframe
-        angle_series_dataframe = pd.DataFrame(
-            columns=["article", "joint", "angle_translation", "degree_of_freedom", "movement", "humerothoracic_angle", "value"]
-        )
-
-        for i, row in self.confident_dataframe.iterrows():
-            # print(row.article_author_year)
-
-            new_row =
-
-            row_data = RowData(row)
-            row_data.set_segments()
-            row_data.set_rotation_correction_callback()
-
-            # add the callback function to the dataframe
-            row.callback_function = row_data.rotation_correction_callback
-
-            # add the row to the dataframe
-            angle_series_dataframe = pd.concat([angle_series_dataframe, row.to_frame().T], ignore_index=True)
-
-        return angle_series_dataframe
-
 
 def load() -> Spartacus:
     """Load the confident dataset"""
