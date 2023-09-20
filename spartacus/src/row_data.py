@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -238,10 +240,11 @@ class RowData:
 
         if correction_cell == "nan":
             correction_cell = None
-        if not isinstance(correction_cell, str):
+        if not isinstance(correction_cell, str) and correction_cell is not None:
             if np.isnan(correction_cell):
                 correction_cell = None
-        else:
+
+        if correction_cell is not None:
             # separate strings with a comma in several element of list
             correction_cell = correction_cell.replace(" ", "").split(",")
             for i, correction in enumerate(correction_cell):
@@ -259,7 +262,8 @@ class RowData:
         """
         Extract the database entry to state if the segment is correctable or not.
         """
-        if np.isnan(self.row[get_is_correctable_column(segment)]):
+
+        if self.row[get_is_correctable_column(segment)] is not None and np.isnan(self.row[get_is_correctable_column(segment)]):
             return None
         if self.row[get_is_correctable_column(segment)] == "nan":
             return None
@@ -627,6 +631,7 @@ class RowData:
         )
         # load the csv file
         csv_filenames = self.get_csv_filenames()
+
         for csv_filename in csv_filenames:
             if csv_filename is not None:
                 csv_file = pd.read_csv(csv_filename, sep=",")
@@ -636,10 +641,10 @@ class RowData:
         """load the csv filenames from the row data"""
 
         return (
-            self.row["dof_1st_euler"],
-            self.row["dof_2nd_euler"],
-            self.row["dof_3rd_euler"],
-            self.row["dof_translation_x"],
-            self.row["dof_translation_y"],
-            self.row["dof_translation_z"],
+            os.path.join(self.row["folder"], self.row["dof_1st_euler"]),
+            os.path.join(self.row["folder"], self.row["dof_2nd_euler"]),
+            os.path.join(self.row["folder"], self.row["dof_3rd_euler"]),
+            os.path.join(self.row["folder"], self.row["translation_x"]),
+            os.path.join(self.row["folder"], self.row["translation_y"]),
+            os.path.join(self.row["folder"], self.row["translation_z"]),
         )

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from . import (
+from spartacus import (
     DatasetCSV,
     RowData,
 )
@@ -18,7 +18,13 @@ class Spartacus:
         dataframe: pd.DataFrame,
     ):
         self.dataframe = dataframe
+        self.clean_df()
         self.confident_dataframe = None
+
+    def clean_df(self):
+        # turn nan into None for the following columns
+        # dof_1st_euler, dof_2nd_euler, dof_3rd_euler, dof_translation_x, dof_translation_y, dof_translation_z
+        self.dataframe = self.dataframe.where(pd.notna(self.dataframe), None)
 
     def load(self, print_warnings: bool = False):
         """
@@ -79,6 +85,9 @@ class Spartacus:
                 continue
             # add the callback function to the dataframe
             row.callback_function = row_data.rotation_correction_callback
+
+            # not sure yet of this move.
+            df = row_data.to_angle_series_dataframe()
 
             # add the row to the dataframe
             self.confident_dataframe = pd.concat([self.confident_dataframe, row.to_frame().T], ignore_index=True)

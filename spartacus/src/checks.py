@@ -81,6 +81,10 @@ def check_segment_filled_with_nan(row: pd.Series, segment: list, print_warnings:
     bool
         True if the segment is filled with NaN values, False otherwise.
     """
+    if row[segment[0]] is None or row[segment[1]] is None or row[segment[2]] is None:
+        if print_warnings:
+            print(segment, " is filled with nan")
+        return True
     if isinstance(row[segment[0]], float) or isinstance(row[segment[1]], float) or isinstance(row[segment[2]], float):
         if np.isnan(row[segment[0]]) or np.isnan(row[segment[1]]) or np.isnan(row[segment[2]]):
             if print_warnings:
