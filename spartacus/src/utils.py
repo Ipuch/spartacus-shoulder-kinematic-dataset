@@ -918,4 +918,3 @@ def get_is_correctable_column(segment: Segment) -> str:
         return "humerus_is_isb_correctable"
     else:
         raise ValueError(f"{segment} is not a valid segment.")
-

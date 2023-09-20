@@ -203,7 +203,6 @@ class JointType(Enum):
 
     @classmethod
     def from_string(cls, joint: str):
-
         dico = {
             "glenohumeral": cls.GLENO_HUMERAL,
             "scapulothoracic": cls.SCAPULO_THORACIC,
@@ -250,7 +249,6 @@ class EulerSequence(Enum):
 
     @classmethod
     def from_string(cls, sequence: str):
-
         if sequence is None:
             return None
 
