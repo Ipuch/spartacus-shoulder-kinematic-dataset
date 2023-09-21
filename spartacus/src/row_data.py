@@ -604,7 +604,7 @@ class RowData:
             raise NotImplementedError("Check conversion not implemented yet")
 
     def import_data(self):
-        """ this function import the data of the following row """
+        """this function import the data of the following row"""
         # todo: translation
 
         # load the csv file
@@ -649,7 +649,12 @@ class RowData:
             )
 
             # populate the dataframe
-            corrected_angle_series_dataframe.loc[i] = [row.humerothoracic_angle, corrected_dof_1, corrected_dof_2, corrected_dof_3]
+            corrected_angle_series_dataframe.loc[i] = [
+                row.humerothoracic_angle,
+                corrected_dof_1,
+                corrected_dof_2,
+                corrected_dof_3,
+            ]
 
         self.corrected_data = corrected_angle_series_dataframe
         return corrected_angle_series_dataframe
@@ -694,23 +699,26 @@ def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_
     csv_file_dof1 = load_csv(
         csv_filenames[0],
         [
-        "humerothoracic_angle_dof1",
-        "value_dof1",
-    ])
+            "humerothoracic_angle_dof1",
+            "value_dof1",
+        ],
+    )
 
     csv_file_dof2 = load_csv(
         csv_filenames[1],
         [
             "humerothoracic_angle_dof2",
             "value_dof2",
-        ])
+        ],
+    )
 
     csv_file_dof3 = load_csv(
         csv_filenames[2],
         [
             "humerothoracic_angle_dof3",
             "value_dof3",
-        ])
+        ],
+    )
 
     concatenated_dataframe = pd.concat([df, csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
     print(concatenated_dataframe[["humerothoracic_angle_dof1", "humerothoracic_angle_dof2"]])

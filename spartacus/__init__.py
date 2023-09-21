@@ -1,7 +1,13 @@
-from .src.enums import (CartesianAxis,
-                        EulerSequence, JointType, DatasetCSV, BiomechDirection, BiomechOrigin, Segment,
-                        DataFolder,
-                        )
+from .src.enums import (
+    CartesianAxis,
+    EulerSequence,
+    JointType,
+    DatasetCSV,
+    BiomechDirection,
+    BiomechOrigin,
+    Segment,
+    DataFolder,
+)
 from .src.checks import (
     check_parent_child_joint,
     check_segment_filled_with_nan,

@@ -30,13 +30,13 @@ class Spartacus:
         # remove lines I know they are not ready for analysis
         # drop line with "Charbonnier et al." in dataset_authors
         dataset_authors = [
-            "Charbonnier et al.", # no data yet.
+            "Charbonnier et al.",  # no data yet.
             "Gutierrez Delgado et al.",
-            "Fung et al." , # csv file problem naming.
-            "Graichen et al.", # array
+            "Fung et al.",  # csv file problem naming.
+            "Graichen et al.",  # array
             "Hallstrom et al.",
-            "Kim et al.", # array
-            "Lawrence et al.", # csv file problem naming.
+            "Kim et al.",  # array
+            "Lawrence et al.",  # csv file problem naming.
         ]
         for a in dataset_authors:
             self.dataframe.drop(
@@ -113,7 +113,7 @@ class Spartacus:
         return self.confident_dataframe
 
     def _load_rows(self):
-        """ Only for testing purpose """
+        """Only for testing purpose"""
         columns = self.dataframe.columns
         columns = np.append(columns, "callback_function")
 

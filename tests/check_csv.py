@@ -12,7 +12,6 @@ from spartacus import DataFolder, Spartacus, DatasetCSV
 
 @pytest.mark.parametrize("data_folder", DataFolder)
 def test_data_format(data_folder):
-
     if data_folder == DataFolder.GRAICHEN_2000:
         return
 
