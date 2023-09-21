@@ -16,9 +16,12 @@ class Spartacus:
         dataframe: pd.DataFrame,
     ):
         self.dataframe = dataframe
+        self.confident_dataframe = None
         self.clean_df()
         self.remove_rows_not_ready_for_analysis()
-        self.confident_dataframe = None
+        self.rows = []
+        self.rows_output = None
+
 
     def clean_df(self):
         # turn nan into None for the following columns
@@ -44,9 +47,13 @@ class Spartacus:
                 inplace=True,
             )
 
-    def load(self, print_warnings: bool = False):
+    def set_correction_callbacks_from_segment_joint_validity(self, print_warnings: bool = False):
         """
-        Load the confident dataset
+        This function will add a callback function to the dataframe.
+        Before setting the callback function, it will check the validity of the joint and the segments
+        declared in the dataframe.
+
+        !!! It skips the rows that are not valid.
 
         Parameters
         ---------
@@ -60,9 +67,6 @@ class Spartacus:
 
         # create an empty dataframe
         self.confident_dataframe = pd.DataFrame(columns=columns)
-
-        # keep article_year == 2008
-        # df = df[df["article_year"] == 2008]
 
         for i, row in self.dataframe.iterrows():
             # print(row.article_author_year)
@@ -112,17 +116,6 @@ class Spartacus:
 
         return self.confident_dataframe
 
-    def _load_rows(self):
-        """Only for testing purpose"""
-        columns = self.dataframe.columns
-        columns = np.append(columns, "callback_function")
-
-        # create an empty dataframe
-        self.confident_dataframe = pd.DataFrame(columns=columns)
-
-        for i, row in self.dataframe.iterrows():
-            row_data = RowData(row)
-
 
 def load() -> Spartacus:
     """Load the confident dataset"""
@@ -130,7 +123,8 @@ def load() -> Spartacus:
     df = pd.read_csv(DatasetCSV.CLEAN.value)
     print(df.shape)
     sp = Spartacus(dataframe=df)
-    sp.load(print_warnings=True)
+    sp.load_data_from_main_dataset()
+    sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=True)
     # df = load_confident_data(df, print_warnings=True)
     print(df.shape)
     return sp
