@@ -36,6 +36,7 @@ class Spartacus:
             "Graichen et al.", # array
             "Hallstrom et al.",
             "Kim et al.", # array
+            "Lawrence et al.", # csv file problem naming.
         ]
         for a in dataset_authors:
             self.dataframe.drop(
