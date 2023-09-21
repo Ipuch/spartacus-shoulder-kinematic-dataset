@@ -76,6 +76,11 @@ class RowData:
         self.rotation_correction_callback = None
         self.translation_correction_callback = None
 
+        self.csv_filenames = None
+        self.data = None
+        self.import_data()
+        self.corrected_data = None
+
     def check_all_segments_validity(self, print_warnings: bool = False) -> bool:
         """
         Check all the segments of the row are valid.
@@ -598,6 +603,14 @@ class RowData:
         else:
             raise NotImplementedError("Check conversion not implemented yet")
 
+    def import_data(self):
+        """this function import the data of the following row"""
+        # todo: translation
+
+        # load the csv file
+        self.csv_filenames = self.get_euler_csv_filenames()
+        self.data = load_euler_csv(self.csv_filenames)
+
     def to_angle_series_dataframe(self):
         """
         This converts the row to a panda dataframe with the angles in degrees with the following columns:
@@ -625,39 +638,26 @@ class RowData:
                 "value",
             ]
         )
-        # load the csv file
-        csv_filenames = self.get_euler_csv_filenames()
-        raw_angle_series_dataframe = load_euler_csv(csv_filenames)
 
         corrected_angle_series_dataframe = pd.DataFrame(
-            columns=raw_angle_series_dataframe.columns,
+            columns=self.data.columns,
         )
-        corrected_angle_series_dataframe["humerothoracic_angle_dof1"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof1"
-        ]
-        corrected_angle_series_dataframe["humerothoracic_angle_dof2"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof2"
-        ]
-        corrected_angle_series_dataframe["humerothoracic_angle_dof3"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof3"
-        ]
 
-        # mean of this three columns
-        # assuming we should have the same value, this should minimize the error when collecting the data from figure.
-        corrected_angle_series_dataframe["humerothoracic_angle"] = raw_angle_series_dataframe[
-            ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
-        ].mean(axis=1)
-
-        for i, row in raw_angle_series_dataframe.iterrows():
+        for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
                 row.value_dof1, row.value_dof2, row.value_dof3
             )
 
-            corrected_angle_series_dataframe["value_dof1"].iloc[i] = corrected_dof_1
-            corrected_angle_series_dataframe["value_dof2"].iloc[i] = corrected_dof_2
-            corrected_angle_series_dataframe["value_dof3"].iloc[i] = corrected_dof_3
+            # populate the dataframe
+            corrected_angle_series_dataframe.loc[i] = [
+                row.humerothoracic_angle,
+                corrected_dof_1,
+                corrected_dof_2,
+                corrected_dof_3,
+            ]
 
-        print("end")
+        self.corrected_data = corrected_angle_series_dataframe
+        return corrected_angle_series_dataframe
 
     def get_euler_csv_filenames(self) -> tuple[str, str, str]:
         """load the csv filenames from the row data"""
@@ -690,28 +690,58 @@ class RowData:
         return csv_paths
 
 
-def load_euler_csv(csv_filenames: tuple[str, str, str]) -> pd.DataFrame:
+def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_data: bool = True) -> pd.DataFrame:
     """
     Load the csv file from the filename and return a pandas dataframe.
     """
-    csv_file_dof1 = pd.read_csv(csv_filenames[0], sep=",", header=None)
-    csv_file_dof1.columns = [
-        "humerothoracic_angle_dof1",
-        "value_dof1",
-    ]
+    df = pd.DataFrame(columns=["humerothoracic_angle"])
 
-    csv_file_dof2 = pd.read_csv(csv_filenames[1], sep=",", header=None)
-    csv_file_dof2.columns = [
-        "humerothoracic_angle_dof2",
-        "value_dof2",
-    ]
+    csv_file_dof1 = load_csv(
+        csv_filenames[0],
+        [
+            "humerothoracic_angle_dof1",
+            "value_dof1",
+        ],
+    )
 
-    csv_file_dof3 = pd.read_csv(csv_filenames[2], sep=",", header=None)
-    csv_file_dof3.columns = [
-        "humerothoracic_angle_dof3",
-        "value_dof3",
-    ]
+    csv_file_dof2 = load_csv(
+        csv_filenames[1],
+        [
+            "humerothoracic_angle_dof2",
+            "value_dof2",
+        ],
+    )
 
-    concatenated_dataframe = pd.concat([csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
+    csv_file_dof3 = load_csv(
+        csv_filenames[2],
+        [
+            "humerothoracic_angle_dof3",
+            "value_dof3",
+        ],
+    )
+
+    concatenated_dataframe = pd.concat([df, csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
+    print(concatenated_dataframe[["humerothoracic_angle_dof1", "humerothoracic_angle_dof2"]])
+    # mean of this three columns
+    # assuming we should have the same value, this should minimize the error when collecting the data from figure.
+    concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[
+        ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
+    ].mean(axis=1)
+
+    if drop_humerothoracic_raw_data:
+        concatenated_dataframe.drop(
+            columns=["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"],
+            inplace=True,
+        )
 
     return concatenated_dataframe
+
+
+def load_csv(csv_filenames, columns):
+    if csv_filenames is not None:
+        csv_file_dof1 = pd.read_csv(csv_filenames, sep=",", header=None)
+        csv_file_dof1.columns = columns
+    else:
+        csv_file_dof1 = pd.DataFrame(columns=columns)
+
+    return csv_file_dof1

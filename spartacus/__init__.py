@@ -1,5 +1,14 @@
-from .code.enums import CartesianAxis, EulerSequence, JointType, DatasetCSV, BiomechDirection, BiomechOrigin, Segment
-from .code.checks import (
+from .src.enums import (
+    CartesianAxis,
+    EulerSequence,
+    JointType,
+    DatasetCSV,
+    BiomechDirection,
+    BiomechOrigin,
+    Segment,
+    DataFolder,
+)
+from .src.checks import (
     check_parent_child_joint,
     check_segment_filled_with_nan,
     check_is_isb_segment,
@@ -8,7 +17,7 @@ from .code.checks import (
     check_same_orientation,
 )
 
-from .code.row_data import RowData
-from .code.load import load
-from .code.utils import Joint, BiomechCoordinateSystem
-from .code.checks import check_same_orientation
+from .src.row_data import RowData
+from .src.load import load, Spartacus
+from .src.utils import Joint, BiomechCoordinateSystem
+from .src.checks import check_same_orientation
