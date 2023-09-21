@@ -76,6 +76,11 @@ class RowData:
         self.rotation_correction_callback = None
         self.translation_correction_callback = None
 
+        self.csv_filenames = None
+        self.data = None
+        self.import_data()
+        self.corrected_data = None
+
     def check_all_segments_validity(self, print_warnings: bool = False) -> bool:
         """
         Check all the segments of the row are valid.
@@ -598,6 +603,14 @@ class RowData:
         else:
             raise NotImplementedError("Check conversion not implemented yet")
 
+    def import_data(self):
+        """ this function import the data of the following row """
+        # todo: translation
+
+        # load the csv file
+        self.csv_filenames = self.get_euler_csv_filenames()
+        self.data = load_euler_csv(self.csv_filenames)
+
     def to_angle_series_dataframe(self):
         """
         This converts the row to a panda dataframe with the angles in degrees with the following columns:
@@ -625,23 +638,20 @@ class RowData:
                 "value",
             ]
         )
-        # load the csv file
-        csv_filenames = self.get_euler_csv_filenames()
-        raw_angle_series_dataframe = load_euler_csv(csv_filenames)
 
         corrected_angle_series_dataframe = pd.DataFrame(
-            columns=raw_angle_series_dataframe.columns,
+            columns=self.data.columns,
         )
 
-        for i, row in raw_angle_series_dataframe.iterrows():
+        for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
                 row.value_dof1, row.value_dof2, row.value_dof3
             )
 
-            corrected_angle_series_dataframe["value_dof1"].iloc[i] = corrected_dof_1
-            corrected_angle_series_dataframe["value_dof2"].iloc[i] = corrected_dof_2
-            corrected_angle_series_dataframe["value_dof3"].iloc[i] = corrected_dof_3
+            # populate the dataframe
+            corrected_angle_series_dataframe.loc[i] = [row.humerothoracic_angle, corrected_dof_1, corrected_dof_2, corrected_dof_3]
 
+        self.corrected_data = corrected_angle_series_dataframe
         return corrected_angle_series_dataframe
 
     def get_euler_csv_filenames(self) -> tuple[str, str, str]:
