@@ -112,6 +112,17 @@ class Spartacus:
 
         return self.confident_dataframe
 
+    def _load_rows(self):
+        """ Only for testing purpose """
+        columns = self.dataframe.columns
+        columns = np.append(columns, "callback_function")
+
+        # create an empty dataframe
+        self.confident_dataframe = pd.DataFrame(columns=columns)
+
+        for i, row in self.dataframe.iterrows():
+            row_data = RowData(row)
+
 
 def load() -> Spartacus:
     """Load the confident dataset"""

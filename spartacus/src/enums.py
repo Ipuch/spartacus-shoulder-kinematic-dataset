@@ -14,7 +14,7 @@ class DatasetCSV(Enum):
 class DataFolder(Enum):
     BOURNE_2003 = Path(__file__).parent.parent / "data" / "Bourne 2003"
     CEREATTI_2017 = Path(__file__).parent.parent / "data" / "Cereatti et al 2017" / "S2M"
-    CHARBONNIER_2017 = Path(__file__).parent.parent / "data" / "Charbonnier et al 2017"
+    CHARBONNIER_2014 = Path(__file__).parent.parent / "data" / "Charbonnier et al 2014"
     CHU_2012 = Path(__file__).parent.parent / "data" / "Chu et al 2012"
     DAL_MASO_2014 = Path(__file__).parent.parent / "data" / "Dal Maso et al 2014"
     FUNG_2001 = Path(__file__).parent.parent / "data" / "Fung et al 2001"
@@ -43,7 +43,7 @@ class DataFolder(Enum):
         folder_name_to_enum = {
             "Bourne 2003": cls.BOURNE_2003,
             "Cereatti et al 2017/S2M": cls.CEREATTI_2017,
-            "Charbonnier et al 2017": cls.CHARBONNIER_2017,
+            "Charbonnier et al 2014": cls.CHARBONNIER_2014,
             "Chu et al 2012": cls.CHU_2012,
             "Dal Maso et al 2014": cls.DAL_MASO_2014,
             "Fung et al 2001": cls.FUNG_2001,

@@ -5,23 +5,21 @@ It is expected to have only two columns per csv file and at least 1 row.
 
 import os
 import pandas as pd
+import pytest
 
-# load all the csv files in the data folder here and its subfolers.
-data_folder = os.path.join(os.path.dirname(__file__))
+from spartacus import DataFolder, Spartacus, DatasetCSV
 
-for file in os.listdir(data_folder):
-    print("Folder:", file)
-    # if not a folder continue
-    if not os.path.isdir(os.path.join(data_folder, file)):
-        continue
 
-    if file == "Graichen et al 2000":
-        continue
+@pytest.mark.parametrize("data_folder", DataFolder)
+def test_data_format(data_folder):
 
-    for subfile in os.listdir(os.path.join(data_folder, file)):
+    if data_folder == DataFolder.GRAICHEN_2000:
+        return
+
+    for subfile in os.listdir(data_folder.value):
         if subfile.endswith(".csv"):
             print("Loading file:", subfile)
-            df = pd.read_csv(os.path.join(data_folder, file, subfile), header=None)
+            df = pd.read_csv(os.path.join(data_folder.value, subfile), header=None)
             print("Shape:", df.shape)
             print("Columns:", df.columns)
             print(df.head())
@@ -33,5 +31,15 @@ for file in os.listdir(data_folder):
             if df.shape[0] < 1:
                 raise ValueError("The csv file should have at least one row.")
 
+    print("All csv files have been loaded successfully.")
 
-print("All csv files have been loaded successfully.")
+
+def test_data_loading():
+    # open the file only_dataset_raw.csv
+    df = pd.read_csv(DatasetCSV.CLEAN.value)
+    print(df.shape)
+    sp = Spartacus(dataframe=df)
+    sp._load_rows()
+    # df = load_confident_data(df, print_warnings=True)
+    print(df.shape)
+    return sp
