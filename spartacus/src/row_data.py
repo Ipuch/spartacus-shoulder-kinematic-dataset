@@ -632,21 +632,6 @@ class RowData:
         corrected_angle_series_dataframe = pd.DataFrame(
             columns=raw_angle_series_dataframe.columns,
         )
-        corrected_angle_series_dataframe["humerothoracic_angle_dof1"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof1"
-        ]
-        corrected_angle_series_dataframe["humerothoracic_angle_dof2"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof2"
-        ]
-        corrected_angle_series_dataframe["humerothoracic_angle_dof3"] = raw_angle_series_dataframe[
-            "humerothoracic_angle_dof3"
-        ]
-
-        # mean of this three columns
-        # assuming we should have the same value, this should minimize the error when collecting the data from figure.
-        corrected_angle_series_dataframe["humerothoracic_angle"] = raw_angle_series_dataframe[
-            ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
-        ].mean(axis=1)
 
         for i, row in raw_angle_series_dataframe.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
@@ -657,7 +642,7 @@ class RowData:
             corrected_angle_series_dataframe["value_dof2"].iloc[i] = corrected_dof_2
             corrected_angle_series_dataframe["value_dof3"].iloc[i] = corrected_dof_3
 
-        print("end")
+        return corrected_angle_series_dataframe
 
     def get_euler_csv_filenames(self) -> tuple[str, str, str]:
         """load the csv filenames from the row data"""
@@ -690,10 +675,12 @@ class RowData:
         return csv_paths
 
 
-def load_euler_csv(csv_filenames: tuple[str, str, str]) -> pd.DataFrame:
+def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_data: bool = True) -> pd.DataFrame:
     """
     Load the csv file from the filename and return a pandas dataframe.
     """
+    df = pd.DataFrame(columns=["humerothoracic_angle"])
+
     csv_file_dof1 = pd.read_csv(csv_filenames[0], sep=",", header=None)
     csv_file_dof1.columns = [
         "humerothoracic_angle_dof1",
@@ -712,6 +699,18 @@ def load_euler_csv(csv_filenames: tuple[str, str, str]) -> pd.DataFrame:
         "value_dof3",
     ]
 
-    concatenated_dataframe = pd.concat([csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
+    concatenated_dataframe = pd.concat([df, csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
+
+    # mean of this three columns
+    # assuming we should have the same value, this should minimize the error when collecting the data from figure.
+    concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[
+        ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
+    ].mean(axis=1)
+
+    if drop_humerothoracic_raw_data:
+        concatenated_dataframe.drop(
+            columns=["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"],
+            inplace=True,
+        )
 
     return concatenated_dataframe

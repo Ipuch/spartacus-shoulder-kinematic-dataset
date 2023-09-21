@@ -201,7 +201,7 @@ print(np.hstack((R12, new_R)))
 if np.all(np.abs(new_euler_scipy - euler_scipy) < 0.0001):
     print("ratios are ok")
 else:
-    from spartacus.code.utils import flip_rotations
+    from spartacus.src.utils import flip_rotations
 
     print("ratios are not ok, trying to flip the rotations")
     new_euler_flipped = flip_rotations(new_euler_scipy, isb_sequence)
