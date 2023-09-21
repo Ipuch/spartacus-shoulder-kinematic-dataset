@@ -12,7 +12,7 @@ class DatasetCSV(Enum):
 
 
 class DataFolder(Enum):
-    BOURNE_2003 = Path(__file__).parent.parent / "data" / "Bourne et al 2003"
+    BOURNE_2003 = Path(__file__).parent.parent / "data" / "Bourne 2003"
     CEREATTI_2017 = Path(__file__).parent.parent / "data" / "Cereatti et al 2017" / "S2M"
     CHARBONNIER_2017 = Path(__file__).parent.parent / "data" / "Charbonnier et al 2017"
     CHU_2012 = Path(__file__).parent.parent / "data" / "Chu et al 2012"
@@ -20,11 +20,11 @@ class DataFolder(Enum):
     FUNG_2001 = Path(__file__).parent.parent / "data" / "Fung et al 2001"
     GRAICHEN_2000 = Path(__file__).parent.parent / "data" / "Graichen et al 2000"
     GUTIERREZ_DELGADO_2017 = Path(__file__).parent.parent / "data" / "Gutierrez Delgado et al 2017"
-    HALLSTROM_2006 = Path(__file__).parent.parent / "data" / "Hallström et al 2006"
+    HALLSTROM_2006 = Path(__file__).parent.parent / "data" / "Hallstrom et al 2006"
     KIJIMA_2015 = Path(__file__).parent.parent / "data" / "Kijima et al 2015"
     KIM_2017 = Path(__file__).parent.parent / "data" / "Kim et al 2017"
     KOLZ_2020 = Path(__file__).parent.parent / "data" / "Kolz et al 2020"
-    KONOZO_2017 = Path(__file__).parent.parent / "data" / "Konozo et al 2017"
+    KONOZO_2017 = Path(__file__).parent.parent / "data" / "Kozono et al 2017"
     LAWRENCE_2014 = Path(__file__).parent.parent / "data" / "Lawrence et al 2014"
     MATSUKI_2012 = Path(__file__).parent.parent / "data" / "Matsuki et al 2012"
     MATSUKI_2014 = Path(__file__).parent.parent / "data" / "Matsuki et al 2014"
@@ -41,7 +41,7 @@ class DataFolder(Enum):
     @classmethod
     def from_string(cls, data_folder: str):
         folder_name_to_enum = {
-            "Bourne et al 2003": cls.BOURNE_2003,
+            "Bourne 2003": cls.BOURNE_2003,
             "Cereatti et al 2017/S2M": cls.CEREATTI_2017,
             "Charbonnier et al 2017": cls.CHARBONNIER_2017,
             "Chu et al 2012": cls.CHU_2012,
@@ -49,11 +49,11 @@ class DataFolder(Enum):
             "Fung et al 2001": cls.FUNG_2001,
             "Graichen et al 2000": cls.GRAICHEN_2000,
             "Gutierrez Delgado et al 2017": cls.GUTIERREZ_DELGADO_2017,
-            "Hallström et al 2006": cls.HALLSTROM_2006,
+            "Hallstrom et al 2006": cls.HALLSTROM_2006,
             "Kijima et al 2015": cls.KIJIMA_2015,
             "Kim et al 2017": cls.KIM_2017,
             "Kolz et al 2020": cls.KOLZ_2020,
-            "Konozo et al 2017": cls.KONOZO_2017,
+            "Kozono et al 2017": cls.KONOZO_2017,
             "Lawrence et al 2014": cls.LAWRENCE_2014,
             "Matsuki et al 2012": cls.MATSUKI_2012,
             "Matsuki et al 2014": cls.MATSUKI_2014,

@@ -29,7 +29,14 @@ class Spartacus:
         # Todo: remove this function ultimately
         # remove lines I know they are not ready for analysis
         # drop line with "Charbonnier et al." in dataset_authors
-        dataset_authors = ["Charbonnier et al.", "Gutierrez Delgado et al."]
+        dataset_authors = [
+            "Charbonnier et al.", # no data yet.
+            "Gutierrez Delgado et al.",
+            "Fung et al." , # csv file problem naming.
+            "Graichen et al.", # array
+            "Hallstrom et al.",
+            "Kim et al.", # array
+        ]
         for a in dataset_authors:
             self.dataframe.drop(
                 self.dataframe[self.dataframe["dataset_authors"].str.contains(a)].index,
