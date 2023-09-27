@@ -133,16 +133,22 @@ class Spartacus:
         )
 
         for i, row in self.confident_dataframe.iterrows():
-            # print(row.article_author_year)
 
             row_data = RowData(row)
+
+            row_data.check_all_segments_validity(print_warnings=False)
+            row_data.check_joint_validity(print_warnings=False)
+            row_data.set_segments()
+            row_data.check_segments_correction_validity(print_warnings=False)
             row_data.set_rotation_correction_callback()
-            row_data.to_angle_series_dataframe()
+
+            row_data.import_data()
+            df_angle_series = row_data.to_angle_series_dataframe()
 
             # add the row to the dataframe
-            output_dataframe = pd.concat([output_dataframe, row.to_frame().T], ignore_index=True)
+            output_dataframe = pd.concat([output_dataframe, df_angle_series], ignore_index=True)
 
-        return self.confident_dataframe
+        return output_dataframe
 
 
 def load() -> Spartacus:
@@ -152,6 +158,7 @@ def load() -> Spartacus:
     print(df.shape)
     sp = Spartacus(dataframe=df)
     sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=True)
+    sp.import_confident_data()
     # df = load_confident_data(df, print_warnings=True)
     print(df.shape)
     return sp
