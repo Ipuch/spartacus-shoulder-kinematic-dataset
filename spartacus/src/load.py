@@ -15,12 +15,16 @@ class Spartacus:
         self,
         dataframe: pd.DataFrame,
     ):
+
         self.dataframe = dataframe
-        self.confident_dataframe = None
+
         self.clean_df()
         self.remove_rows_not_ready_for_analysis()
         self.rows = []
         self.rows_output = None
+
+        self.confident_dataframe = None
+        self.confident_data_values = None
 
     def clean_df(self):
         # turn nan into None for the following columns
@@ -46,7 +50,7 @@ class Spartacus:
                 inplace=True,
             )
 
-    def set_correction_callbacks_from_segment_joint_validity(self, print_warnings: bool = False):
+    def set_correction_callbacks_from_segment_joint_validity(self, print_warnings: bool = False) -> pd.DataFrame:
         """
         This function will add a callback function to the dataframe.
         Before setting the callback function, it will check the validity of the joint and the segments
@@ -113,7 +117,11 @@ class Spartacus:
 
         return self.confident_dataframe
 
-    def import_confident_data(self):
+    def import_confident_data(self) -> pd.DataFrame:
+        """
+        This function will import the data from the dataframe, using the callback functions.
+        Only the data corresponding to the rows that are considered good and have a callback function will be imported.
+        """
         if self.confident_dataframe is None:
             raise ValueError(
                 "The dataframe has not been checked yet. " "Use set_correction_callbacks_from_segment_joint_validity"
@@ -146,6 +154,7 @@ class Spartacus:
             # add the row to the dataframe
             output_dataframe = pd.concat([output_dataframe, df_angle_series], ignore_index=True)
 
+        self.confident_data_values = output_dataframe
         return output_dataframe
 
 
