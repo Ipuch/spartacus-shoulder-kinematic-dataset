@@ -49,9 +49,6 @@ class RowData:
         self.child_segment = Segment.from_string(self.row.child)
         self.child_columns = get_segment_columns(self.child_segment)
 
-        self.check_all_segments_validity(print_warnings=True)
-        self.check_joint_validity(print_warnings=True)
-
         self.joint = None
 
         self.parent_biomech_sys = None

@@ -78,6 +78,11 @@ class Spartacus:
                 print("")
                 print("row_data.joint", row.article_author_year)
 
+            if not row_data.check_all_segments_validity(print_warnings=print_warnings):
+                continue
+            if not row_data.check_joint_validity(print_warnings=print_warnings):
+                continue
+
             row_data.set_segments()
             rotation_validity, translation_validity = row_data.check_segments_correction_validity(
                 print_warnings=print_warnings
