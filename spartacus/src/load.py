@@ -16,9 +16,14 @@ class Spartacus:
         dataframe: pd.DataFrame,
     ):
         self.dataframe = dataframe
+
         self.clean_df()
         self.remove_rows_not_ready_for_analysis()
+        self.rows = []
+        self.rows_output = None
+
         self.confident_dataframe = None
+        self.confident_data_values = None
 
     def clean_df(self):
         # turn nan into None for the following columns
@@ -44,9 +49,13 @@ class Spartacus:
                 inplace=True,
             )
 
-    def load(self, print_warnings: bool = False):
+    def set_correction_callbacks_from_segment_joint_validity(self, print_warnings: bool = False) -> pd.DataFrame:
         """
-        Load the confident dataset
+        This function will add a callback function to the dataframe.
+        Before setting the callback function, it will check the validity of the joint and the segments
+        declared in the dataframe.
+
+        !!! It skips the rows that are not valid.
 
         Parameters
         ---------
@@ -60,9 +69,6 @@ class Spartacus:
 
         # create an empty dataframe
         self.confident_dataframe = pd.DataFrame(columns=columns)
-
-        # keep article_year == 2008
-        # df = df[df["article_year"] == 2008]
 
         for i, row in self.dataframe.iterrows():
             # print(row.article_author_year)
@@ -78,6 +84,7 @@ class Spartacus:
                 continue
             if not row_data.check_joint_validity(print_warnings=print_warnings):
                 continue
+
             row_data.set_segments()
             rotation_validity, translation_validity = row_data.check_segments_correction_validity(
                 print_warnings=print_warnings
@@ -104,24 +111,50 @@ class Spartacus:
             # add the callback function to the dataframe
             row.callback_function = row_data.rotation_correction_callback
 
-            # not sure yet of this move.
-            df = row_data.to_angle_series_dataframe()
-
             # add the row to the dataframe
             self.confident_dataframe = pd.concat([self.confident_dataframe, row.to_frame().T], ignore_index=True)
 
         return self.confident_dataframe
 
-    def _load_rows(self):
-        """Only for testing purpose"""
-        columns = self.dataframe.columns
-        columns = np.append(columns, "callback_function")
+    def import_confident_data(self) -> pd.DataFrame:
+        """
+        This function will import the data from the dataframe, using the callback functions.
+        Only the data corresponding to the rows that are considered good and have a callback function will be imported.
+        """
+        if self.confident_dataframe is None:
+            raise ValueError(
+                "The dataframe has not been checked yet. " "Use set_correction_callbacks_from_segment_joint_validity"
+            )
 
-        # create an empty dataframe
-        self.confident_dataframe = pd.DataFrame(columns=columns)
+        output_dataframe = pd.DataFrame(
+            columns=[
+                "article",
+                "joint",
+                "angle_translation",
+                "degree_of_freedom",
+                "movement",
+                "humerothoracic_angle",
+                "value",
+            ]
+        )
 
-        for i, row in self.dataframe.iterrows():
+        for i, row in self.confident_dataframe.iterrows():
             row_data = RowData(row)
+
+            row_data.check_all_segments_validity(print_warnings=False)
+            row_data.check_joint_validity(print_warnings=False)
+            row_data.set_segments()
+            row_data.check_segments_correction_validity(print_warnings=False)
+            row_data.set_rotation_correction_callback()
+
+            row_data.import_data()
+            df_angle_series = row_data.to_angle_series_dataframe()
+
+            # add the row to the dataframe
+            output_dataframe = pd.concat([output_dataframe, df_angle_series], ignore_index=True)
+
+        self.confident_data_values = output_dataframe
+        return output_dataframe
 
 
 def load() -> Spartacus:
@@ -130,7 +163,8 @@ def load() -> Spartacus:
     df = pd.read_csv(DatasetCSV.CLEAN.value)
     print(df.shape)
     sp = Spartacus(dataframe=df)
-    sp.load(print_warnings=True)
+    sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=True)
+    sp.import_confident_data()
     # df = load_confident_data(df, print_warnings=True)
     print(df.shape)
     return sp

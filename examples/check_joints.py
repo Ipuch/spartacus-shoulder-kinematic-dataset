@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from spartacus import DatasetCSV, Joint, joint_string_to_enum, euler_sequence_to_enum, check_parent_child_joint
+from spartacus import DatasetCSV, Joint, JointType, EulerSequence, check_parent_child_joint
 
 # open the file only_dataset_raw.csv
 df = pd.read_csv(DatasetCSV.CLEAN.value)
@@ -13,8 +13,8 @@ for i, row in df.iterrows():
 
     # build the coordinate system
     bjoint = Joint(
-        joint_type=joint_string_to_enum(row.joint),
-        euler_sequence=euler_sequence_to_enum(row.euler_sequence),
+        joint_type=JointType.from_string(row.joint),
+        euler_sequence=EulerSequence.from_string(row.euler_sequence),
     )
 
     if not check_parent_child_joint(bjoint.joint_type, parent_name=row.parent, child_name=row.child):

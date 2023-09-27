@@ -43,15 +43,17 @@ class RowData:
         """
         self.row = row
 
-        self.joint = None
-
         self.parent_segment = Segment.from_string(self.row.parent)
         self.parent_columns = get_segment_columns(self.parent_segment)
-        self.parent_biomech_sys = None
-        self.parent_corrections = None
 
         self.child_segment = Segment.from_string(self.row.child)
         self.child_columns = get_segment_columns(self.child_segment)
+
+        self.joint = None
+
+        self.parent_biomech_sys = None
+        self.parent_corrections = None
+
         self.child_biomech_sys = None
         self.child_corrections = None
 
@@ -78,8 +80,8 @@ class RowData:
 
         self.csv_filenames = None
         self.data = None
-        self.import_data()
         self.corrected_data = None
+        self.melted_corrected_data = None
 
     def check_all_segments_validity(self, print_warnings: bool = False) -> bool:
         """
@@ -610,6 +612,9 @@ class RowData:
         # load the csv file
         self.csv_filenames = self.get_euler_csv_filenames()
         self.data = load_euler_csv(self.csv_filenames)
+        self.data["article"] = self.row.article_author_year
+        self.data["joint"] = JointType.from_string(self.row.joint)
+        self.data["humeral_motion"] = self.row.humeral_motion
 
     def to_angle_series_dataframe(self):
         """
@@ -627,20 +632,17 @@ class RowData:
         pandas.DataFrame
             The dataframe with the angles in degrees
         """
-        angle_series_dataframe = pd.DataFrame(
+
+        corrected_angle_series_dataframe = pd.DataFrame(
             columns=[
                 "article",
                 "joint",
-                "angle_translation",
-                "degree_of_freedom",
-                "movement",
+                "humeral_motion",
                 "humerothoracic_angle",
-                "value",
-            ]
-        )
-
-        corrected_angle_series_dataframe = pd.DataFrame(
-            columns=self.data.columns,
+                "value_dof1",
+                "value_dof2",
+                "value_dof3",
+            ],
         )
 
         for i, row in self.data.iterrows():
@@ -650,6 +652,9 @@ class RowData:
 
             # populate the dataframe
             corrected_angle_series_dataframe.loc[i] = [
+                self.row.article_author_year,
+                self.row.joint,
+                self.row.humeral_motion,
                 row.humerothoracic_angle,
                 corrected_dof_1,
                 corrected_dof_2,
@@ -657,7 +662,16 @@ class RowData:
             ]
 
         self.corrected_data = corrected_angle_series_dataframe
-        return corrected_angle_series_dataframe
+        self.melted_corrected_data = corrected_angle_series_dataframe.melt(
+            id_vars=["article", "joint", "humeral_motion", "humerothoracic_angle"],
+            value_vars=["value_dof1", "value_dof2", "value_dof3"],
+            var_name="degree_of_freedom",
+            value_name="value",
+        )
+        self.melted_corrected_data["degree_of_freedom"] = self.melted_corrected_data["degree_of_freedom"].replace(
+            {"value_dof1": "1", "value_dof2": "2", "value_dof3": "3"}
+        )
+        return self.melted_corrected_data
 
     def get_euler_csv_filenames(self) -> tuple[str, str, str]:
         """load the csv filenames from the row data"""
@@ -721,7 +735,7 @@ def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_
     )
 
     concatenated_dataframe = pd.concat([df, csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
-    print(concatenated_dataframe[["humerothoracic_angle_dof1", "humerothoracic_angle_dof2"]])
+
     # mean of this three columns
     # assuming we should have the same value, this should minimize the error when collecting the data from figure.
     concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[

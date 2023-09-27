@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import pytest
 
-from spartacus import DataFolder, Spartacus, DatasetCSV
+from spartacus import DataFolder, Spartacus, DatasetCSV, RowData
 
 
 @pytest.mark.parametrize("data_folder", DataFolder)
@@ -42,7 +42,9 @@ def test_data_loading():
     df = pd.read_csv(DatasetCSV.CLEAN.value)
     print(df.shape)
     sp = Spartacus(dataframe=df)
-    sp._load_rows()
-    # df = load_confident_data(df, print_warnings=True)
+    for i, row in sp.dataframe.iterrows():
+        row_data = RowData(row)
+        row_data.import_data()
+
     print(df.shape)
     return sp

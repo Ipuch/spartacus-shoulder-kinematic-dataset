@@ -3,9 +3,9 @@ import numpy as np
 
 from spartacus import (
     DatasetCSV,
-    biomech_direction_string_to_enum,
+    BiomechDirection,
+    BiomechOrigin,
     BiomechCoordinateSystem,
-    biomech_origin_string_to_enum,
     Segment,
 )
 
@@ -42,10 +42,10 @@ for i, row in df.iterrows():
 
         # build the coordinate system
         bsys = BiomechCoordinateSystem.from_biomech_directions(
-            x=biomech_direction_string_to_enum(row[segment[0]]),
-            y=biomech_direction_string_to_enum(row[segment[1]]),
-            z=biomech_direction_string_to_enum(row[segment[2]]),
-            origin=biomech_origin_string_to_enum(row[segment[3]]),
+            x=BiomechDirection.from_string(row[segment[0]]),
+            y=BiomechDirection.from_string(row[segment[1]]),
+            z=BiomechDirection.from_string(row[segment[2]]),
+            origin=BiomechOrigin.from_string(row[segment[3]]),
             segment=segment_enum,
         )
 
