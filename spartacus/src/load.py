@@ -22,7 +22,6 @@ class Spartacus:
         self.rows = []
         self.rows_output = None
 
-
     def clean_df(self):
         # turn nan into None for the following columns
         # dof_1st_euler, dof_2nd_euler, dof_3rd_euler, dof_translation_x, dof_translation_y, dof_translation_z
@@ -115,10 +114,10 @@ class Spartacus:
         return self.confident_dataframe
 
     def import_confident_data(self):
-
         if self.confident_dataframe is None:
-            raise ValueError("The dataframe has not been checked yet. "
-                             "Use set_correction_callbacks_from_segment_joint_validity")
+            raise ValueError(
+                "The dataframe has not been checked yet. " "Use set_correction_callbacks_from_segment_joint_validity"
+            )
 
         output_dataframe = pd.DataFrame(
             columns=[
@@ -133,7 +132,6 @@ class Spartacus:
         )
 
         for i, row in self.confident_dataframe.iterrows():
-
             row_data = RowData(row)
 
             row_data.check_all_segments_validity(print_warnings=False)
