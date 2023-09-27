@@ -15,7 +15,6 @@ class Spartacus:
         self,
         dataframe: pd.DataFrame,
     ):
-
         self.dataframe = dataframe
 
         self.clean_df()
