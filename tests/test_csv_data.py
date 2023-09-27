@@ -43,6 +43,8 @@ def test_data_loading():
     print(df.shape)
     sp = Spartacus(dataframe=df)
     for i, row in sp.dataframe.iterrows():
-        RowData(row)
+        row_data = RowData(row)
+        row_data.import_data()
+
     print(df.shape)
     return sp

@@ -43,15 +43,20 @@ class RowData:
         """
         self.row = row
 
-        self.joint = None
-
         self.parent_segment = Segment.from_string(self.row.parent)
         self.parent_columns = get_segment_columns(self.parent_segment)
-        self.parent_biomech_sys = None
-        self.parent_corrections = None
 
         self.child_segment = Segment.from_string(self.row.child)
         self.child_columns = get_segment_columns(self.child_segment)
+
+        self.check_all_segments_validity(print_warnings=True)
+        self.check_joint_validity(print_warnings=True)
+
+        self.joint = None
+
+        self.parent_biomech_sys = None
+        self.parent_corrections = None
+
         self.child_biomech_sys = None
         self.child_corrections = None
 
@@ -78,7 +83,6 @@ class RowData:
 
         self.csv_filenames = None
         self.data = None
-        self.import_data()
         self.corrected_data = None
 
     def check_all_segments_validity(self, print_warnings: bool = False) -> bool:
@@ -610,6 +614,9 @@ class RowData:
         # load the csv file
         self.csv_filenames = self.get_euler_csv_filenames()
         self.data = load_euler_csv(self.csv_filenames)
+        self.data["article"] = self.row.article_author_year
+        self.data["joint"] = JointType.from_string(self.row.joint)
+        self.data["humeral_motion"] = self.row.humeral_motion
 
     def to_angle_series_dataframe(self):
         """
