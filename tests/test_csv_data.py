@@ -34,6 +34,7 @@ def test_data_format(data_folder):
             if df.shape[0] < 1:
                 raise ValueError("The csv file should have at least one row.")
 
+            # todo: exceptions to kolz et al 2020, need to be removed
             if "GH" in subfile and "_elevationSagittal_11" in subfile:
                 continue
             if "ST" in subfile and "_rotation0Abd_3" in subfile:
