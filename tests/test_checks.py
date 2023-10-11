@@ -1,4 +1,5 @@
-from spartacus import BiomechCoordinateSystem, Joint, CartesianAxis, JointType, EulerSequence
+import pytest
+from spartacus import BiomechCoordinateSystem, Joint, CartesianAxis, JointType, EulerSequence, BiomechOrigin, Segment
 
 
 def test_checks():
@@ -86,3 +87,41 @@ def test_checks():
     )
     print(sterno_clav.is_joint_sequence_isb())
     assert sterno_clav.is_joint_sequence_isb() == False
+
+
+def test_joint_sequence_isb():
+    joint = Joint(JointType.STERNO_CLAVICULAR, EulerSequence.YXZ, BiomechOrigin.Thorax.T7, Segment.THORAX)
+    assert joint.is_joint_sequence_isb() == True
+
+
+def test_isb_euler_sequence():
+    joint = Joint(JointType.GLENO_HUMERAL, EulerSequence.YXY, BiomechOrigin.Humerus.GLENOHUMERAL_HEAD, Segment.HUMERUS)
+    assert joint.isb_euler_sequence() == EulerSequence.YXY
+
+
+def test_is_sequence_convertible_through_factors():
+    joint = Joint(JointType.STERNO_CLAVICULAR, EulerSequence.YXZ, BiomechOrigin.Thorax.T7, Segment.THORAX)
+    assert joint.is_sequence_convertible_through_factors() == True
+
+    joint = Joint(JointType.GLENO_HUMERAL, EulerSequence.YXY, BiomechOrigin.Humerus.GLENOHUMERAL_HEAD, Segment.HUMERUS)
+    assert joint.is_sequence_convertible_through_factors() == True
+
+    joint = Joint(JointType.GLENO_HUMERAL, EulerSequence.YXZ, BiomechOrigin.Humerus.GLENOHUMERAL_HEAD, Segment.HUMERUS)
+    assert joint.is_sequence_convertible_through_factors() == False
+
+
+def test_biomech_origin_from_string():
+    assert BiomechOrigin.from_string("T7") == BiomechOrigin.Thorax.T7
+    assert BiomechOrigin.from_string("GH") == BiomechOrigin.Humerus.GLENOHUMERAL_HEAD
+    assert BiomechOrigin.from_string("AC") == BiomechOrigin.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER
+
+    with pytest.raises(ValueError):
+        BiomechOrigin.from_string("INVALID_ORIGIN")
+
+
+def test_segment_from_string():
+    assert Segment.from_string("thorax") == Segment.THORAX
+    assert Segment.from_string("humerus") == Segment.HUMERUS
+
+    with pytest.raises(ValueError):
+        Segment.from_string("INVALID_SEGMENT")
