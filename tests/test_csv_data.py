@@ -12,11 +12,7 @@ from spartacus import DataFolder, Spartacus, DatasetCSV, RowData
 
 @pytest.mark.parametrize("data_folder", DataFolder)
 def test_data_format(data_folder):
-    if (
-        data_folder == DataFolder.GRAICHEN_2000
-        or data_folder == DataFolder.DAL_MASO_2014
-        or data_folder == DataFolder.CHARBONNIER_2014
-    ):
+    if data_folder == DataFolder.DAL_MASO_2014 or data_folder == DataFolder.CHARBONNIER_2014:
         return
 
     for subfile in os.listdir(data_folder.value):
@@ -33,16 +29,6 @@ def test_data_format(data_folder):
                 raise ValueError("The csv file should have only two columns.")
             if df.shape[0] < 1:
                 raise ValueError("The csv file should have at least one row.")
-
-            # todo: exceptions to kolz et al 2020, need to be removed
-            if "GH" in subfile and "_elevationSagittal_11" in subfile:
-                continue
-            if "ST" in subfile and "_rotation0Abd_3" in subfile:
-                continue
-            if "GH" in subfile and "_rotation0Abd_3" in subfile:
-                continue
-            if "ST" in subfile and "_elevationSagittal_11" in subfile:
-                continue
 
             # verify that the first column is a float
             try:

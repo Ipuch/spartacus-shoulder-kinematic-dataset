@@ -304,7 +304,7 @@ class RowData:
             output = False
             if print_warnings:
                 print(
-                    f"Joint {self.row.joint} has no correction value in the parent segment {self.row.parent}, "
+                    f"Joint {self.row.joint} has no correction value in the segment Scapula, "
                     f"it should be filled with a {Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION} or a "
                     f"{Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION} correction, because the segment "
                     f"origin is not on an isb axis. "
@@ -341,6 +341,22 @@ class RowData:
                 )
         else:
             output = True
+        return output
+
+    def _check_segment_has_to_isb_or_like_correction(self, correction, print_warnings: bool = False) -> bool:
+        correction = [] if correction is None else correction
+        output = self._check_segment_has_to_isb_like_correction(correction, print_warnings=False)
+        if not output:
+            output = self._check_segment_has_to_isb_correction(correction, print_warnings=False)
+        if not output:
+            if print_warnings:
+                print(
+                    f"Joint {self.row.joint} has no correction value in the parent segment {self.row.parent}, "
+                    f"it should be filled with a "
+                    f"{Correction.TO_ISB_LIKE_ROTATION} or {Correction.TO_ISB_ROTATION} "
+                    f"correction, because the segment is not isb. "
+                    f"Current value: {correction}"
+                )
         return output
 
     def check_segments_correction_validity(self, print_warnings: bool = False) -> tuple[bool, bool]:
@@ -437,18 +453,30 @@ class RowData:
             and self.parent_biomech_sys.is_origin_on_an_isb_axis()
             and not parent_is_thorax_global
         ):
-            parent_output = self._check_segment_has_to_isb_correction(parent_correction, print_warnings=print_warnings)
+            parent_output = self._check_segment_has_to_isb_or_like_correction(
+                parent_correction, print_warnings=print_warnings
+            )
+            # if self.parent_segment == Segment.SCAPULA:
+            #     parent_output = self._check_segment_has_kolz_correction(parent_correction, print_warnings=print_warnings)
+            # I believe there should be a kolz correction when the origin is on an isb axis
             if self.parent_segment == Segment.SCAPULA:
-                parent_output = self._check_segment_has_kolz_correction(
-                    parent_correction, print_warnings=print_warnings
-                )
+                if self._check_segment_has_kolz_correction(parent_correction, print_warnings=False):
+                    parent_output = False
+                    print("WARNING: Kolz correction should not be filled when the origin is on an isb axis")
             self.parent_segment_usable_for_rotation_data = parent_output
             self.parent_segment_usable_for_translation_data = False
 
         if not self.child_biomech_sys.is_isb_oriented() and self.child_biomech_sys.is_origin_on_an_isb_axis():
-            child_output = self._check_segment_has_to_isb_correction(child_correction, print_warnings=print_warnings)
+            child_output = self._check_segment_has_to_isb_or_like_correction(
+                child_correction, print_warnings=print_warnings
+            )
+            # if self.child_segment == Segment.SCAPULA:
+            #     child_output = self._check_segment_has_kolz_correction(child_correction, print_warnings=print_warnings)
+            # I believe there should be a kolz correction when the origin is on an isb axis
             if self.child_segment == Segment.SCAPULA:
-                child_output = self._check_segment_has_kolz_correction(child_correction, print_warnings=print_warnings)
+                if self._check_segment_has_kolz_correction(child_correction, print_warnings=False):
+                    child_output = False
+                    print("WARNING: Kolz correction should not be filled when the origin is on an isb axis")
             self.child_segment_usable_for_rotation_data = child_output
             self.child_segment_usable_for_translation_data = False
 
