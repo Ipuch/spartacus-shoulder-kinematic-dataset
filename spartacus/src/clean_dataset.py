@@ -1,7 +1,6 @@
 import pandas as pd
 
-from .enums import DatasetCSV
-
+from enums import DatasetCSV
 
 # open the file only_dataset_raw.csv
 df = pd.read_csv(DatasetCSV.RAW.value, delimiter=",")
