@@ -18,9 +18,7 @@ class DataFolder(Enum):
     CHU_2012 = Path(__file__).parent.parent / "data" / "Chu et al 2012"
     DAL_MASO_2014 = Path(__file__).parent.parent / "data" / "Dal Maso et al 2014"
     FUNG_2001 = Path(__file__).parent.parent / "data" / "Fung et al 2001"
-    GRAICHEN_2000 = Path(__file__).parent.parent / "data" / "Graichen et al 2000"
     GUTIERREZ_DELGADO_2017 = Path(__file__).parent.parent / "data" / "Gutierrez Delgado et al 2017"
-    HALLSTROM_2006 = Path(__file__).parent.parent / "data" / "Hallstrom et al 2006"
     KIJIMA_2015 = Path(__file__).parent.parent / "data" / "Kijima et al 2015"
     KIM_2017 = Path(__file__).parent.parent / "data" / "Kim et al 2017"
     KOLZ_2020 = Path(__file__).parent.parent / "data" / "Kolz et al 2020"
@@ -48,9 +46,7 @@ class DataFolder(Enum):
             "Chu et al 2012": cls.CHU_2012,
             "Dal Maso et al 2014": cls.DAL_MASO_2014,
             "Fung et al 2001": cls.FUNG_2001,
-            "Graichen et al 2000": cls.GRAICHEN_2000,
             "Gutierrez Delgado et al 2017": cls.GUTIERREZ_DELGADO_2017,
-            "Hallstrom et al 2006": cls.HALLSTROM_2006,
             "Kijima et al 2015": cls.KIJIMA_2015,
             "Kim et al 2017": cls.KIM_2017,
             "Kolz et al 2020": cls.KOLZ_2020,
