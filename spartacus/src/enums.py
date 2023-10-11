@@ -85,10 +85,10 @@ class CartesianAxis(Enum):
 class BiomechDirection(Enum):
     """Enum for the biomechanical direction"""
 
-    PlusAnteroPosterior = "PlusAntero-Posterior"
+    PlusPosteroAnterior = "PlusAntero-Posterior"
     PlusInferoSuperior = "PlusInfero-Superior"
     PlusMedioLateral = "PlusMedio-Lateral"
-    MinusAnteroPosterior = "MinusAntero-Posterior"
+    MinusPosteroAnterior = "MinusAntero-Posterior"
     MinusInferoSuperior = "MinusInfero-Superior"
     MinusMedioLateral = "MinusMedio-Lateral"
 
@@ -96,10 +96,10 @@ class BiomechDirection(Enum):
     def from_string(cls, biomech_direction: str):
         biomech_direction_to_enum = {
             "+mediolateral": cls.PlusMedioLateral,
-            "+anteroposterior": cls.PlusAnteroPosterior,
+            "+posteroanterior": cls.PlusPosteroAnterior,
             "+inferosuperior": cls.PlusInferoSuperior,
             "-mediolateral": cls.MinusMedioLateral,
-            "-anteroposterior": cls.MinusAnteroPosterior,
+            "-posteroanterior": cls.MinusPosteroAnterior,
             "-inferosuperior": cls.MinusInferoSuperior,
         }
 
@@ -117,9 +117,9 @@ class BiomechDirection(Enum):
 
     @property
     def sign(self):
-        if self == self.PlusAnteroPosterior or self == self.PlusMedioLateral or self == self.PlusInferoSuperior:
+        if self == self.PlusPosteroAnterior or self == self.PlusMedioLateral or self == self.PlusInferoSuperior:
             return 1
-        elif self == self.MinusAnteroPosterior or self == self.MinusMedioLateral or self == self.MinusInferoSuperior:
+        elif self == self.MinusPosteroAnterior or self == self.MinusMedioLateral or self == self.MinusInferoSuperior:
             return -1
         else:
             raise ValueError("Unknown biomech direction")

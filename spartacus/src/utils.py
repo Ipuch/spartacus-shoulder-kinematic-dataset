@@ -58,7 +58,7 @@ class BiomechCoordinateSystem:
 
         for axis, positive_enum, negative_enum in zip(actual_axes, positive_enums_axis, negative_enums_axis):
             if axis.sign == 1:
-                if axis == BiomechDirection.PlusAnteroPosterior:
+                if axis == BiomechDirection.PlusPosteroAnterior:
                     my_arg["antero_posterior_axis"] = positive_enum
                     continue
                 elif axis == BiomechDirection.PlusMedioLateral:
@@ -68,7 +68,7 @@ class BiomechCoordinateSystem:
                     my_arg["infero_superior_axis"] = positive_enum
                     continue
             elif axis.sign == -1:
-                if axis == BiomechDirection.MinusAnteroPosterior:
+                if axis == BiomechDirection.MinusPosteroAnterior:
                     my_arg["antero_posterior_axis"] = negative_enum
                     continue
                 elif axis == BiomechDirection.MinusMedioLateral:
