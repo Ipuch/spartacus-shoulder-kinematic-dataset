@@ -199,8 +199,8 @@ Most of the landmarks comes from Wu et al. 2005:
 variable type: string
 X, Y and Z denote the axis of the segment coordinates system.
 The anatomical direction of the axis:
-- +anteroposterior: the axis is pointing anteriorly
-- -anteroposterior: the axis is pointing posteriorly
+- +posteroanterior: the axis is pointing anteriorly
+- -posteroanterior: the axis is pointing posteriorly
 - +mediolateral: the axis is pointing medially
 - -mediolateral: the axis is pointing laterally
 - +superoinferior: the axis is pointing superiorly
