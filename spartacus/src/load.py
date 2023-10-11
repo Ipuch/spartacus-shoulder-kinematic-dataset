@@ -163,7 +163,7 @@ def load() -> Spartacus:
     df = pd.read_csv(DatasetCSV.CLEAN.value)
     print(df.shape)
     sp = Spartacus(dataframe=df)
-    sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=True)
+    sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=False)
     sp.import_confident_data()
     # df = load_confident_data(df, print_warnings=True)
     print(df.shape)
