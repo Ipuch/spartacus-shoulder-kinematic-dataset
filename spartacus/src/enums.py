@@ -26,6 +26,7 @@ class DataFolder(Enum):
     KOLZ_2020 = Path(__file__).parent.parent / "data" / "Kolz et al 2020"
     KONOZO_2017 = Path(__file__).parent.parent / "data" / "Kozono et al 2017"
     LAWRENCE_2014 = Path(__file__).parent.parent / "data" / "Lawrence et al 2014"
+    MATSUKI_2011 = Path(__file__).parent.parent / "data" / "Matsuki et al 2011"
     MATSUKI_2012 = Path(__file__).parent.parent / "data" / "Matsuki et al 2012"
     MATSUKI_2014 = Path(__file__).parent.parent / "data" / "Matsuki et al 2014"
     MATSUMURA_2013 = Path(__file__).parent.parent / "data" / "Matsumura et al 2013"
@@ -55,6 +56,7 @@ class DataFolder(Enum):
             "Kolz et al 2020": cls.KOLZ_2020,
             "Kozono et al 2017": cls.KONOZO_2017,
             "Lawrence et al 2014": cls.LAWRENCE_2014,
+            "Matsuki et al 2011": cls.MATSUKI_2011,
             "Matsuki et al 2012": cls.MATSUKI_2012,
             "Matsuki et al 2014": cls.MATSUKI_2014,
             "Matsumura et al 2013": cls.MATSUMURA_2013,
