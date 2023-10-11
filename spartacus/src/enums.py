@@ -319,6 +319,7 @@ class Correction(Enum):
             "to_isb": cls.TO_ISB_ROTATION,
             "to_isb_like": cls.TO_ISB_LIKE_ROTATION,
             "kolz_AC_to_PA": cls.SCAPULA_KOLZ_AC_TO_PA_ROTATION,
+            "kolz_GC_to_PA": cls.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION,
             "glenoid_to_isb_cs": cls.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION,
             "Sulkar et al. 2021": cls.HUMERUS_SULKAR_ROTATION,
             "Lagace 2012": cls.SCAPULA_LAGACE_DISPLACEMENT,
