@@ -7,24 +7,23 @@ import base64
 from spartacus import load
 
 
-
 # TODO : Put the correct joint in the article.
 # TODO : Add a curve directly from the app running
 # TODO : Update graph when data is added.
 # TODO : check for name (flexion extension abduction adduction etc.. with positive and negative value + adapted name if needed for specific joint)
 # Question à aborder sur la forme des données.
 extracted_data = load().import_confident_data()
-extracted_data.angle_translation = 'angle'
+extracted_data.angle_translation = "angle"
 # TODO : do a function to change the name of the degree of freedom
 # Todo : Change the name of the function to be more clean ==> not draft anymore.
 # Begin to check curves for outlier.
 for i in range(extracted_data.degree_of_freedom.size):
-    if extracted_data.degree_of_freedom[i] == '1':
-        extracted_data.degree_of_freedom[i] = 'flexion'
-    elif extracted_data.degree_of_freedom[i] == '2':
-        extracted_data.degree_of_freedom[i] = 'abduction'
-    elif extracted_data.degree_of_freedom[i] == '3':
-        extracted_data.degree_of_freedom[i] = 'external_rotation'
+    if extracted_data.degree_of_freedom[i] == "1":
+        extracted_data.degree_of_freedom[i] = "flexion"
+    elif extracted_data.degree_of_freedom[i] == "2":
+        extracted_data.degree_of_freedom[i] = "abduction"
+    elif extracted_data.degree_of_freedom[i] == "3":
+        extracted_data.degree_of_freedom[i] = "external_rotation"
 app = Dash(__name__)
 
 app.layout = html.Div(
