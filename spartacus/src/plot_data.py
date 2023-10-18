@@ -16,21 +16,20 @@ from spartacus import load
 # TODO : Update graph when data is added.
 # TODO : check for name (flexion extension abduction adduction etc.. with positive and negative value + adapted name if needed for specific joint)
 # Question à aborder sur la forme des données.
-#toto_1 = generation_full_article(30)
-toto = load().import_confident_data()
-toto.angle_translation = 'angle'
+extracted_data = load().import_confident_data()
+extracted_data.angle_translation = 'angle'
 # TODO : do a function to change the name of the degree of freedom
 # TODO : plot point instead of line
 # TODO : put figure in spartacus
 # Todo : Change the name of the function to be more clean ==> not draft anymore.
 # Begin to check curves for outlier.
-for i in range(toto.degree_of_freedom.size):
-    if toto.degree_of_freedom[i] == '1':
-        toto.degree_of_freedom[i] = 'flexion'
-    elif toto.degree_of_freedom[i] == '2':
-        toto.degree_of_freedom[i] = 'abduction'
-    elif toto.degree_of_freedom[i] == '3':
-        toto.degree_of_freedom[i] = 'external_rotation'
+for i in range(extracted_data.degree_of_freedom.size):
+    if extracted_data.degree_of_freedom[i] == '1':
+        extracted_data.degree_of_freedom[i] = 'flexion'
+    elif extracted_data.degree_of_freedom[i] == '2':
+        extracted_data.degree_of_freedom[i] = 'abduction'
+    elif extracted_data.degree_of_freedom[i] == '3':
+        extracted_data.degree_of_freedom[i] = 'external_rotation'
 app = Dash(__name__)
 
 app.layout = html.Div(
@@ -43,18 +42,18 @@ app.layout = html.Div(
         # Show the different options in different collumn
         dcc.Dropdown(
             id="humeral_motion",
-            options=sorted([i for i in toto.humeral_motion.unique()]),
-            value=sorted([i for i in toto.humeral_motion.unique()])[0],
+            options=sorted([i for i in extracted_data.humeral_motion.unique()]),
+            value=sorted([i for i in extracted_data.humeral_motion.unique()])[0],
         ),
         dcc.Checklist(
             id="joint",
-            options=sorted([i for i in toto.joint.unique()]),
-            value=sorted([i for i in toto.joint.unique()]),
+            options=sorted([i for i in extracted_data.joint.unique()]),
+            value=sorted([i for i in extracted_data.joint.unique()]),
             inline=True,
         ),
         dcc.Dropdown(
-            options=sorted([i for i in toto.angle_translation.unique()]),
-            value=sorted([i for i in toto.angle_translation.unique()])[0],
+            options=sorted([i for i in extracted_data.angle_translation.unique()]),
+            value=sorted([i for i in extracted_data.angle_translation.unique()])[0],
             id="angle_translation",
         ),
         dcc.Upload(
@@ -84,7 +83,7 @@ app.layout = html.Div(
     Input("upload-data", "contents"),
 )
 def update_output(contents):
-    global toto
+    global extracted_data
 
     if contents is not None:
         content_type, content_string = contents[0].split(",")
@@ -92,11 +91,11 @@ def update_output(contents):
         decoded = base64.b64decode(content_string)
         df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
 
-        frames = [toto, df]
+        frames = [extracted_data, df]
 
-        toto = pd.concat(frames)
-        print(toto.size)
-    return toto.size
+        extracted_data = pd.concat(frames)
+        print(extracted_data.size)
+    return extracted_data.size
 
 
 # Export data
@@ -110,7 +109,7 @@ def update_output(contents):
     prevent_initial_call=True,
 )
 def export_data(humeral_motion, joint, angle_translation, n_clicks):
-    df = toto  # replace with your own data source
+    df = extracted_data  # replace with your own data source
     mask_joint = df.joint.isin(joint)
     mask_mvt = df.humeral_motion.isin([humeral_motion])
     # We have to put Angle translation in a list because it is a string
@@ -129,7 +128,7 @@ def export_data(humeral_motion, joint, angle_translation, n_clicks):
     Input("angle_translation", "value"),
 )
 def update_line_chart(humeral_motion, joint, angle_translation):
-    df = toto  # replace with your own data source
+    df = extracted_data  # replace with your own data source
     mask_joint = df.joint.isin(joint)
     mask_mvt = df.humeral_motion.isin([humeral_motion])
     # We have to put Angle translation in a list because it is a string
