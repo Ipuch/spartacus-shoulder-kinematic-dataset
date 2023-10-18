@@ -36,7 +36,7 @@ def test_first_example():
     humeral_motions = list(Chu2012["humeral_motion"].unique())
     assert "frontal elevation" in humeral_motions
     assert "scapular elevation" in humeral_motions
-    assert "internal rotation rotation 90 degree-abducted" in humeral_motions
+    assert "internal-external rotation 90 degree-abducted" in humeral_motions
 
     joints = list(Chu2012["joint"].unique())
     assert "scapulothoracic" in joints
