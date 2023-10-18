@@ -10,6 +10,8 @@ import base64
 import numpy as np
 import random
 from fake_data import create_random_data
+from spartacus import load
+
 
 
 # TODO : Put the correct joint in the article.
@@ -17,9 +19,9 @@ from fake_data import create_random_data
 # TODO : be able to switch from format artcile et format 16/9 (écran)
 # TODO : Change the data shape in the end for export
 # TODO : Corrolaire : change the data shape at the beginnning ()
-
+# TODO : Update graph when data is added.
+# TODO : check for name (flexion extension abduction adduction etc.. with positive and negative value + adapted name if needed for specific joint)
 # Question à aborder sur la forme des données.
-
 
 def generation_full_article(nb_article):
     nb_joint_by_article = [1, 2, 3]
@@ -64,8 +66,16 @@ def generation_full_article(nb_article):
     return df
 
 
-toto = generation_full_article(30)
-
+#toto_1 = generation_full_article(30)
+toto = load().import_confident_data()
+toto.angle_translation = 'angle'
+for i in range(toto.degree_of_freedom.size):
+    if toto.degree_of_freedom[i] == '1':
+        toto.degree_of_freedom[i] = 'flexion'
+    elif toto.degree_of_freedom[i] == '2':
+        toto.degree_of_freedom[i] = 'abduction'
+    elif toto.degree_of_freedom[i] == '3':
+        toto.degree_of_freedom[i] = 'external_rotation'
 app = Dash(__name__)
 
 app.layout = html.Div(
@@ -77,9 +87,9 @@ app.layout = html.Div(
         dcc.Graph(id="graph"),
         # Show the different options in different collumn
         dcc.Dropdown(
-            id="movement",
-            options=sorted([i for i in toto.movement.unique()]),
-            value=sorted([i for i in toto.movement.unique()])[0],
+            id="humeral_motion",
+            options=sorted([i for i in toto.humeral_motion.unique()]),
+            value=sorted([i for i in toto.humeral_motion.unique()])[0],
         ),
         dcc.Checklist(
             id="joint",
@@ -135,18 +145,19 @@ def update_output(contents):
 
 
 # Export data
+# TODO : what should be exported when the user ask it (only what is visible or everything)
 @callback(
     Output("download-dataframe-csv", "data"),
-    State("movement", "value"),
+    State("humeral_motion", "value"),
     State("joint", "value"),
     State("angle_translation", "value"),
     Input("btn_csv", "n_clicks"),
     prevent_initial_call=True,
 )
-def export_data(movement, joint, angle_translation, n_clicks):
+def export_data(humeral_motion, joint, angle_translation, n_clicks):
     df = toto  # replace with your own data source
     mask_joint = df.joint.isin(joint)
-    mask_mvt = df.movement.isin([movement])
+    mask_mvt = df.humeral_motion.isin([humeral_motion])
     # We have to put Angle translation in a list because it is a string
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
@@ -158,14 +169,14 @@ def export_data(movement, joint, angle_translation, n_clicks):
 
 @app.callback(
     Output("graph", "figure"),
-    Input("movement", "value"),
+    Input("humeral_motion", "value"),
     Input("joint", "value"),
     Input("angle_translation", "value"),
 )
-def update_line_chart(movement, joint, angle_translation):
+def update_line_chart(humeral_motion, joint, angle_translation):
     df = toto  # replace with your own data source
     mask_joint = df.joint.isin(joint)
-    mask_mvt = df.movement.isin([movement])
+    mask_mvt = df.humeral_motion.isin([humeral_motion])
     # We have to put Angle translation in a list because it is a string
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
