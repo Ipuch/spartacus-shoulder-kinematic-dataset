@@ -10,17 +10,12 @@ from spartacus import load
 
 # TODO : Put the correct joint in the article.
 # TODO : Add a curve directly from the app running
-# TODO : be able to switch from format artcile et format 16/9 (écran)
-# TODO : Change the data shape in the end for export
-# TODO : Corrolaire : change the data shape at the beginnning ()
 # TODO : Update graph when data is added.
 # TODO : check for name (flexion extension abduction adduction etc.. with positive and negative value + adapted name if needed for specific joint)
 # Question à aborder sur la forme des données.
 extracted_data = load().import_confident_data()
 extracted_data.angle_translation = 'angle'
 # TODO : do a function to change the name of the degree of freedom
-# TODO : plot point instead of line
-# TODO : put figure in spartacus
 # Todo : Change the name of the function to be more clean ==> not draft anymore.
 # Begin to check curves for outlier.
 for i in range(extracted_data.degree_of_freedom.size):
