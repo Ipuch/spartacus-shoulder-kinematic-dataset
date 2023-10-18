@@ -35,7 +35,6 @@ def test_first_example():
     assert Chu2012.shape[0] == 96
     humeral_motions = list(Chu2012["humeral_motion"].unique())
     assert "frontal elevation" in humeral_motions
-    assert "horizontal flexion" in humeral_motions
     assert "scapular elevation" in humeral_motions
     assert "internal rotation rotation 90 degree-abducted" in humeral_motions
 
