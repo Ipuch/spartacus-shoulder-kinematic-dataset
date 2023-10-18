@@ -1,71 +1,29 @@
 # test
 from dash import Dash, dcc, html, Input, Output, State, callback
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
 import io
 import base64
-
-# Create random data with numpy
-import numpy as np
-import random
-from fake_data import create_random_data
+from spartacus import load
 
 
 # TODO : Put the correct joint in the article.
 # TODO : Add a curve directly from the app running
-# TODO : be able to switch from format artcile et format 16/9 (écran)
-# TODO : Change the data shape in the end for export
-# TODO : Corrolaire : change the data shape at the beginnning ()
-
+# TODO : Update graph when data is added.
+# TODO : check for name (flexion extension abduction adduction etc.. with positive and negative value + adapted name if needed for specific joint)
 # Question à aborder sur la forme des données.
-
-
-def generation_full_article(nb_article):
-    nb_joint_by_article = [1, 2, 3]
-    nb_dof_by_joint_angle = [0, 1, 2, 3]
-    nb_dof_by_joint_translation = [0, 1, 2, 3]
-    nb_movement_by_article = [1, 2, 3, 4]
-
-    name_joints = ["humerothoracic", "acromioclavicular", "glenohumeral", "scapulothoracic"]
-    name_movements = ["movement_1", "movement_2", "movement_3", "movement_4"]
-    dof_translation = ["X", "Y", "Z"]
-    dof_angle = ["flexion", "abduction", "external_rotation"]
-    nb_frame = [6, 20, 30]
-    df = create_random_data("", "", "", "", "", 6, initialize=True)
-    for i in range(nb_article):
-        name_article = "article_" + str(i)
-        final_nb_frame = random.choice(nb_frame)
-        final_nb_joint = random.choice(nb_joint_by_article)
-        final_list_joint = random.sample(name_joints, final_nb_joint)
-
-        final_number_dof_angle = random.choice(nb_dof_by_joint_angle)
-        final_dof_angle = random.sample(dof_angle, final_number_dof_angle)
-
-        final_number_dof_translation = random.choice(nb_dof_by_joint_translation)
-        final_dof_angle_translation = random.sample(dof_translation, final_number_dof_translation)
-
-        final_number_movement = random.choice(nb_movement_by_article)
-        final_list_movement = random.sample(name_movements, final_number_movement)
-
-        for name_joint in final_list_joint:
-            for name_movement in final_list_movement:
-                for name_dof in final_dof_angle:
-                    df_temp = create_random_data(
-                        name_article, name_joint, name_dof, "angle", name_movement, final_nb_frame
-                    )
-                    df = pd.concat([df, df_temp])
-                for name_dof in final_dof_angle_translation:
-                    df_temp = create_random_data(
-                        name_article, name_joint, name_dof, "translation", name_movement, final_nb_frame
-                    )
-                    df = pd.concat([df, df_temp])
-
-    return df
-
-
-toto = generation_full_article(30)
-
+extracted_data = load().import_confident_data()
+extracted_data.angle_translation = "angle"
+# TODO : do a function to change the name of the degree of freedom
+# Todo : Change the name of the function to be more clean ==> not draft anymore.
+# Begin to check curves for outlier.
+for i in range(extracted_data.degree_of_freedom.size):
+    if extracted_data.degree_of_freedom[i] == "1":
+        extracted_data.degree_of_freedom[i] = "flexion"
+    elif extracted_data.degree_of_freedom[i] == "2":
+        extracted_data.degree_of_freedom[i] = "abduction"
+    elif extracted_data.degree_of_freedom[i] == "3":
+        extracted_data.degree_of_freedom[i] = "external_rotation"
 app = Dash(__name__)
 
 app.layout = html.Div(
@@ -77,19 +35,19 @@ app.layout = html.Div(
         dcc.Graph(id="graph"),
         # Show the different options in different collumn
         dcc.Dropdown(
-            id="movement",
-            options=sorted([i for i in toto.movement.unique()]),
-            value=sorted([i for i in toto.movement.unique()])[0],
+            id="humeral_motion",
+            options=sorted([i for i in extracted_data.humeral_motion.unique()]),
+            value=sorted([i for i in extracted_data.humeral_motion.unique()])[0],
         ),
         dcc.Checklist(
             id="joint",
-            options=sorted([i for i in toto.joint.unique()]),
-            value=sorted([i for i in toto.joint.unique()]),
+            options=sorted([i for i in extracted_data.joint.unique()]),
+            value=sorted([i for i in extracted_data.joint.unique()]),
             inline=True,
         ),
         dcc.Dropdown(
-            options=sorted([i for i in toto.angle_translation.unique()]),
-            value=sorted([i for i in toto.angle_translation.unique()])[0],
+            options=sorted([i for i in extracted_data.angle_translation.unique()]),
+            value=sorted([i for i in extracted_data.angle_translation.unique()])[0],
             id="angle_translation",
         ),
         dcc.Upload(
@@ -119,7 +77,7 @@ app.layout = html.Div(
     Input("upload-data", "contents"),
 )
 def update_output(contents):
-    global toto
+    global extracted_data
 
     if contents is not None:
         content_type, content_string = contents[0].split(",")
@@ -127,26 +85,27 @@ def update_output(contents):
         decoded = base64.b64decode(content_string)
         df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
 
-        frames = [toto, df]
+        frames = [extracted_data, df]
 
-        toto = pd.concat(frames)
-        print(toto.size)
-    return toto.size
+        extracted_data = pd.concat(frames)
+        print(extracted_data.size)
+    return extracted_data.size
 
 
 # Export data
+# TODO : what should be exported when the user ask it (only what is visible or everything)
 @callback(
     Output("download-dataframe-csv", "data"),
-    State("movement", "value"),
+    State("humeral_motion", "value"),
     State("joint", "value"),
     State("angle_translation", "value"),
     Input("btn_csv", "n_clicks"),
     prevent_initial_call=True,
 )
-def export_data(movement, joint, angle_translation, n_clicks):
-    df = toto  # replace with your own data source
+def export_data(humeral_motion, joint, angle_translation, n_clicks):
+    df = extracted_data  # replace with your own data source
     mask_joint = df.joint.isin(joint)
-    mask_mvt = df.movement.isin([movement])
+    mask_mvt = df.humeral_motion.isin([humeral_motion])
     # We have to put Angle translation in a list because it is a string
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
@@ -158,14 +117,14 @@ def export_data(movement, joint, angle_translation, n_clicks):
 
 @app.callback(
     Output("graph", "figure"),
-    Input("movement", "value"),
+    Input("humeral_motion", "value"),
     Input("joint", "value"),
     Input("angle_translation", "value"),
 )
-def update_line_chart(movement, joint, angle_translation):
-    df = toto  # replace with your own data source
+def update_line_chart(humeral_motion, joint, angle_translation):
+    df = extracted_data  # replace with your own data source
     mask_joint = df.joint.isin(joint)
-    mask_mvt = df.movement.isin([movement])
+    mask_mvt = df.humeral_motion.isin([humeral_motion])
     # We have to put Angle translation in a list because it is a string
     mask_angle_translation = df.angle_translation.isin([angle_translation])
     # In order to have the data in the correct orger we have to define a list ordering the data
@@ -180,7 +139,7 @@ def update_line_chart(movement, joint, angle_translation):
         list_orga = ["flexion", "abduction", "external_rotation"]
     elif angle_translation == "translation":
         list_orga = ["X", "Y", "Z"]
-    fig = px.line(
+    fig = px.scatter(
         df[mask_mvt & mask_joint & mask_angle_translation],
         x="humerothoracic_angle",
         y="value",
