@@ -145,7 +145,7 @@ def update_line_chart(humeral_motion, joint, angle_translation):
         list_orga = ["flexion", "abduction", "external_rotation"]
     elif angle_translation == "translation":
         list_orga = ["X", "Y", "Z"]
-    fig = px.line(
+    fig = px.scatter(
         df[mask_mvt & mask_joint & mask_angle_translation],
         x="humerothoracic_angle",
         y="value",
