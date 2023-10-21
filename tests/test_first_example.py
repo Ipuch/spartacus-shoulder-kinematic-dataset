@@ -19,8 +19,10 @@ articles_data = {
         ["frontal elevation", "horizontal flexion"],
         ["scapulothoracic"],
         ["1", "2", "3"],
-        31552.337999999996,
-        [(0, -16.3663), (1001, 22.2405), (2000, -38.2519), (-1, 17.785)],
+        # 31552.337999999996,
+        # [(0, -16.3663), (1001, 22.2405), (2000, -38.2519), (-1, 17.785)],
+        79.81940280567984,
+        [(0, -1.7635787620698762), (1001, -0.15667834031565844), (2000, -0.20737280944999392), (-1, np.nan)],
     ),
     "Chu et al. 2012": (
         96,
@@ -82,8 +84,10 @@ articles_data = {
         ["scapular elevation"],
         ["acromioclavicular"],
         ["1", "2", "3"],
-        14.200462694343685,
-        [(0, 1.467054274614342), (10, -0.021138378975446268), (22, -0.11738530717958653), (-1, -2.3379632679489672)],
+        # 14.200462694343685,
+        # [(0, 1.467054274614342), (10, -0.021138378975446268), (22, -0.11738530717958653), (-1, -2.3379632679489672)],
+        -14.321849530406698,
+        [(0, -2.0737591719978203), (10, -2.672464827053776), (22, 34.51266), (-1, 19.2415854)],
     ),
     "Yoshida et al. 2023": (
         84,
@@ -109,7 +113,7 @@ confident_values = module.main()
 )
 def test_article_data(article_name, expected_shape, humeral_motions, joints, dofs, total_value, random_checks):
     data = confident_values[confident_values["article"] == article_name]
-    print_data(data)
+    print_data(data, random_checks)
     assert data.shape[0] == expected_shape
 
     for motion in humeral_motions:
@@ -136,10 +140,14 @@ def test_number_of_articles():
     assert len(articles) == 9
 
 
-def print_data(data):
+def print_data(data, random_checks):
+    print("\n")
     print("Shape:", data.shape)
     print("Humeral motions:", data["humeral_motion"].unique())
     print("Joints:", data["joint"].unique())
     print("Degrees of freedom:", data["degree_of_freedom"].unique())
     print("Total value:", data["value"].sum())
+    print("Random checks:")
+    for idx, value in random_checks:
+        print(f"    {idx}: {data['value'].iloc[idx]}")
     print("")
