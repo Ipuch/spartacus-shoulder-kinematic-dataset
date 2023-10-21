@@ -26,6 +26,8 @@ from .checks import (
     check_is_translation_provided,
     check_parent_child_joint,
     check_same_orientation,
+    check_is_isb_correctable,
+    check_correction_methods,
 )
 
 
@@ -117,6 +119,12 @@ class RowData:
             )
             # second check
             if not check_is_isb_segment(self.row, bsys, print_warnings=print_warnings):
+                output = False
+
+            if not check_is_isb_correctable(self.row, bsys, print_warnings=print_warnings):
+                output = False
+
+            if not check_correction_methods(self, bsys, print_warnings=print_warnings):
                 output = False
 
             # third check if the segment is direct or not
@@ -280,6 +288,25 @@ class RowData:
             return False
 
         raise ValueError("The is_correctable column is not a boolean value")
+
+    def extract_is_isb(self, segment: Segment) -> bool:
+        """ Extract the database entry to state if the segment is isb or not. """
+        if self.row[get_is_isb_column(segment)] is not None and np.isnan(
+            self.row[get_is_isb_column(segment)]
+        ):
+            return None
+        if self.row[get_is_isb_column(segment)] == "nan":
+            return None
+        if self.row[get_is_isb_column(segment)] == "true":
+            return True
+        if self.row[get_is_isb_column(segment)] == "false":
+            return False
+        if self.row[get_is_isb_column(segment)]:
+            return True
+        if not self.row[get_is_isb_column(segment)]:
+            return False
+
+        raise ValueError("The is_isb column is not a boolean value")
 
     def _check_segment_has_no_correction(self, correction, print_warnings: bool = False) -> bool:
         if correction is not None:

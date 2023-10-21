@@ -180,7 +180,7 @@ def check_is_isb_correctable(row: pd.Series, bsys: BiomechCoordinateSystem, prin
     return True
 
 
-def check_correction_methods(row: pd.Series, bsys: BiomechCoordinateSystem, print_warnings: bool = False) -> bool:
+def check_correction_methods(row: "RowData", bsys: BiomechCoordinateSystem, print_warnings: bool = False) -> bool:
     """
     This function checks if the correction method is in accordance with the segment type
     if the segment is a scapula, we can find correction methods
@@ -210,7 +210,7 @@ def check_correction_methods(row: pd.Series, bsys: BiomechCoordinateSystem, prin
         # even if it leads to isb like segment
         return True
     else:
-        correction_cell = row[get_correction_column(bsys.segment)]
+        correction_cell = row.extract_corrections(bsys.segment)
         if correction_cell is not None:
             # there is a correction method
             # then is_correctable should be either true or false
