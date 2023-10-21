@@ -37,9 +37,7 @@ class Spartacus:
         dataset_authors = [
             "Charbonnier et al.",  # no data yet.
             "Gutierrez Delgado et al.",
-            "Fung et al.",  # csv file problem naming.
-            "Graichen et al.",  # array
-            "Hallstrom et al.",
+            # "Fung et al.",  # csv file problem naming.
             "Kim et al.",  # array
             "Lawrence et al.",  # csv file problem naming.
         ]
