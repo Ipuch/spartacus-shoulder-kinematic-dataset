@@ -1,77 +1,145 @@
+import numpy as np
+import pytest
+
 from .utils import TestUtils
 
 
-def test_first_example():
-    spartacus = TestUtils.spartacus_folder()
-    module = TestUtils.load_module(spartacus + "/examples/first_example.py")
-    confident_values = module.main()
+# Data for each article test
+articles_data = {
+    ## "Article name": (
+    # expected_shape i.e. number of rows
+    # humeral_motions i.e. list of humeral motions
+    # joints i.e. list of joints
+    # dofs i.e. list of degrees of freedom
+    # total_value i.e. sum of all values
+    # random_checks i.e. list of tuples (index, value) to check
+    # ),
+    "Bourne 2003": (
+        2550,
+        ["frontal elevation", "horizontal flexion"],
+        ["scapulothoracic"],
+        ["1", "2", "3"],
+        31552.337999999996,
+        [(0, -16.3663), (1001, 22.2405), (2000, -38.2519), (-1, 17.785)],
+    ),
+    "Chu et al. 2012": (
+        96,
+        ["frontal elevation", "scapular elevation", "internal-external rotation 90 degree-abducted"],
+        ["scapulothoracic"],
+        ["1", "2", "3"],
+        -553.7318,
+        [(0, 20.8327), (30, -2.386), (60, -8.4559), (-1, -4.9707)],
+    ),
+    # TODO: "Fung et al. 2001": (0, [], [], [], 0, []),
+    "Cereatti et al. 2017": (
+        3495,
+        ["frontal elevation", "sagittal elevation"],
+        ["glenohumeral"],
+        ["1", "2", "3"],
+        90447.72414830001,
+        [(0, 86.818), (1001, 58.179), (2000, -65.967), (-1, 63.876)],
+    ),
+    "Kolz et al. 2020": (
+        80862,
+        [
+            "frontal elevation",
+            "scapular elevation",
+            "sagittal elevation",
+            "internal-external rotation 0 degree-abducted",
+            "internal-external rotation 90 degree-abducted",
+        ],
+        ["glenohumeral", "scapulothoracic"],
+        ["1", "2", "3"],
+        1788111.3421318345,
+        [(0, 16.7114492478597), (1001, 89.1886474934728), (40001, 2.1350129808377), (-1, 5.87426453808623)],
+    ),
+    "Kozono et al. 2017": (
+        30,
+        ["internal-external rotation 0 degree-abducted"],
+        ["glenohumeral"],
+        ["1", "2", "3"],
+        0,
+        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
+    ),
+    "Matsumura et al. 2013": (
+        99,
+        ["frontal elevation", "scapular elevation", "sagittal elevation"],
+        ["scapulothoracic"],
+        ["1", "2", "3"],
+        -558.322,
+        [(0, -23.068), (20, 32.64), (60, -0.921), (-1,  11.971)],
+    ),
+    "Oki et al. 2012": (
+        354,
+        ["frontal elevation", "sagittal elevation", "horizontal flexion"],
+        ["scapulothoracic", "sternoclavicular"],
+        ["1", "2", "3"],
+        2341.1053,
+        [(0, -23.5715), (100, 23.6982), (200,  15.4229), (-1, 31.7351)],
+    ),
+    "Teece et al. 2008": (
+        39,
+        ["scapular elevation"],
+        ["acromioclavicular"],
+        ["1", "2", "3"],
+        14.200462694343685,
+        [(0, 1.467054274614342), (10, -0.021138378975446268), (22, -0.11738530717958653), (-1, -2.3379632679489672)],
+    ),
+    "Yoshida et al. 2023": (
+        84,
+        ["sagittal elevation"],
+        ["glenohumeral", "scapulothoracic"],
+        ["1", "2", "3"],
+        912.7213939526243,
+        [(0, -2.2092814772601055), (40, 2.8373811388792496), (65, 34.51266), (-1, 19.2415854)],
+    ),
+    # Add other articles here in the same format
+}
+transformed_data_article = [[name] + list(values) for name, values in articles_data.items()]
 
-    # verify the number of unique articles
+
+spartacus = TestUtils.spartacus_folder()
+module = TestUtils.load_module(spartacus + "/examples/first_example.py")
+confident_values = module.main()
+
+
+# This line parameterizes the test function below
+@pytest.mark.parametrize(
+    "article_name,expected_shape,humeral_motions,joints,dofs,total_value,random_checks", transformed_data_article
+)
+def test_article_data(article_name, expected_shape, humeral_motions, joints, dofs, total_value, random_checks):
+    data = confident_values[confident_values["article"] == article_name]
+    print_data(data)
+    assert data.shape[0] == expected_shape
+
+    for motion in humeral_motions:
+        assert motion in data["humeral_motion"].unique()
+    assert len(data["humeral_motion"].unique()) == len(humeral_motions)
+
+    for joint in joints:
+        assert joint in data["joint"].unique()
+    assert len(data["joint"].unique()) == len(joints)
+
+    for dof in dofs:
+        assert dof in data["degree_of_freedom"].unique()
+    assert len(data["degree_of_freedom"].unique()) == len(dofs)
+
+    for idx, value in random_checks:
+        np.testing.assert_almost_equal(data["value"].iloc[idx], value)
+
+    np.testing.assert_almost_equal(data["value"].sum(), total_value, decimal=10)
+
+
+def test_number_of_articles():
+    # Check number of unique articles after processing all
     articles = list(confident_values["article"].unique())
     assert len(articles) == 9
 
-    # Verify that the dataframe has the correct data
-    Bourne2003 = confident_values[confident_values["article"] == "Bourne 2003"]
-    assert Bourne2003.shape[0] == 2550
-    humeral_motions = list(Bourne2003["humeral_motion"].unique())
-    assert "frontal elevation" in humeral_motions
-    assert "horizontal flexion" in humeral_motions
 
-    joints = list(Bourne2003["joint"].unique())
-    assert "scapulothoracic" in joints
-
-    dofs = list(Bourne2003["degree_of_freedom"].unique())
-    assert "1" in dofs
-    assert "2" in dofs
-    assert "3" in dofs
-
-    # test three random values in the value columns and start and end
-    assert Bourne2003["value"].iloc[0] == -16.3663
-    assert Bourne2003["value"].iloc[1001] == 22.2405
-    assert Bourne2003["value"].iloc[2000] == -38.2519
-    assert Bourne2003["value"].iloc[-1] == 17.785
-
-    Chu2012 = confident_values[confident_values["article"] == "Chu et al. 2012"]
-    assert Chu2012.shape[0] == 96
-    humeral_motions = list(Chu2012["humeral_motion"].unique())
-    assert "frontal elevation" in humeral_motions
-    assert "scapular elevation" in humeral_motions
-    assert "internal-external rotation 90 degree-abducted" in humeral_motions
-
-    joints = list(Chu2012["joint"].unique())
-    assert "scapulothoracic" in joints
-
-    dofs = list(Chu2012["degree_of_freedom"].unique())
-    assert "1" in dofs
-    assert "2" in dofs
-    assert "3" in dofs
-
-    # test three random values in the value columns and start and end
-    assert Chu2012["value"].iloc[0] == 20.8327
-    assert Chu2012["value"].iloc[30] == -2.386
-    assert Chu2012["value"].iloc[60] == -8.4559
-    assert Chu2012["value"].iloc[-1] == -4.9707
-
-    # Fung2001 = confident_values[confident_values["article"] == "Fung et al. 2001"]
-    # todo
-
-    Cereatti2017 = confident_values[confident_values["article"] == "Cereatti et al. 2017"]
-    assert Cereatti2017.shape[0] == 3495
-    humeral_motions = list(Cereatti2017["humeral_motion"].unique())
-
-    assert "frontal elevation" in humeral_motions
-    assert "sagittal elevation" in humeral_motions
-
-    joints = list(Cereatti2017["joint"].unique())
-    assert "glenohumeral" in joints
-
-    dofs = list(Cereatti2017["degree_of_freedom"].unique())
-    assert "1" in dofs
-    assert "2" in dofs
-    assert "3" in dofs
-
-    # test three random values in the value columns and start and end
-    assert Cereatti2017["value"].iloc[0] == 86.818
-    assert Cereatti2017["value"].iloc[1001] == 58.179
-    assert Cereatti2017["value"].iloc[2000] == -65.967
-    assert Cereatti2017["value"].iloc[-1] == 63.876
+def print_data(data):
+    print("Shape:", data.shape)
+    print("Humeral motions:", data["humeral_motion"].unique())
+    print("Joints:", data["joint"].unique())
+    print("Degrees of freedom:", data["degree_of_freedom"].unique())
+    print("Total value:", data["value"].sum())
+    print("")
