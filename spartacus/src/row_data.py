@@ -290,10 +290,8 @@ class RowData:
         raise ValueError("The is_correctable column is not a boolean value")
 
     def extract_is_isb(self, segment: Segment) -> bool:
-        """ Extract the database entry to state if the segment is isb or not. """
-        if self.row[get_is_isb_column(segment)] is not None and np.isnan(
-            self.row[get_is_isb_column(segment)]
-        ):
+        """Extract the database entry to state if the segment is isb or not."""
+        if self.row[get_is_isb_column(segment)] is not None and np.isnan(self.row[get_is_isb_column(segment)]):
             return None
         if self.row[get_is_isb_column(segment)] == "nan":
             return None
