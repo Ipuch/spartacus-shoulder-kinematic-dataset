@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .enums import JointType, Segment
+from .enums import JointType, Segment, BiomechOrigin, Correction
 from .utils import (
     Joint,
     BiomechCoordinateSystem,
@@ -136,6 +136,126 @@ def check_is_isb_segment(row: pd.Series, bsys: BiomechCoordinateSystem, print_wa
         return False
 
     return True
+
+
+def check_is_isb_correctable(row: pd.Series, bsys: BiomechCoordinateSystem, print_warnings: bool = False) -> bool:
+    """
+    This function checks if the segment is said to be isb correctable
+    if True then isb should be false
+    if none then isb should be true
+
+    Parameters
+    ----------
+    bsys : BiomechCoordinateSystem
+        The biomechanical coordinate system to check.
+    row : pandas.Series
+        The row of the dataset to check.
+    print_warnings : bool, optional
+        If True, print warnings when inconsistencies are found. The default is False.
+
+    Returns
+    -------
+    bool
+        True if is_correctable is consistent with is_isb, False otherwise.
+
+    Notes
+    -----
+
+    """
+    is_isb = row[get_is_isb_column(bsys.segment)]
+    is_correctable_col = row[get_is_correctable_column(bsys.segment)]
+    if is_isb:
+        output = is_correctable_col is None
+    if not is_isb:
+        output = is_correctable_col is not None
+
+    if not output and print_warnings:
+        print("WARNING : inconsistency in the dataset")
+        print("-- ", row.article_author_year, " --")
+        print(bsys.segment)
+        print("expected ISB:", is_isb)
+        print("expected ISB correctable:", is_correctable_col)
+        return False
+
+    return True
+
+
+def check_correction_methods(row: "RowData", bsys: BiomechCoordinateSystem, print_warnings: bool = False) -> bool:
+    """
+    This function checks if the correction method is in accordance with the segment type
+    if the segment is a scapula, we can find correction methods
+    if the segment is a humerus, clavicle, or thorax, we cannot find correction methods
+    as it is already stated in the previous column if it's possible to get isb segment or isb like segment
+
+    Parameters
+    ----------
+    bsys : BiomechCoordinateSystem
+        The biomechanical coordinate system to check.
+    row : pandas.Series
+        The row of the dataset to check.
+    print_warnings : bool, optional
+        If True, print warnings when inconsistencies are found. The default is False.
+
+    Returns
+    -------
+    bool
+        True if the correction method is in accordance with the segment type, False otherwise.
+
+    Notes
+    -----
+
+    """
+    if bsys.segment == Segment.SCAPULA:
+        # there is correction methods that can be applied to the scapula
+        # even if it leads to isb like segment
+        correction_cell = row.extract_corrections(bsys.segment)
+        if correction_cell is None:
+            return True
+        else:
+            if bsys.origin == BiomechOrigin.Scapula.GLENOID_CENTER:
+                if Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION in correction_cell:
+                    return True
+                else:
+                    if print_warnings:
+                        print(
+                            "WARNING : inconsistency in the dataset. "
+                            "The correction method is not consistent with the segment origin."
+                        )
+                        print("-- ", row.row.article_author_year, " --")
+                        print(bsys.origin)
+                        print("detected correction method:", correction_cell)
+                    return False
+            if bsys.origin == BiomechOrigin.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER:
+                if Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION in correction_cell:
+                    return True
+                else:
+                    if print_warnings:
+                        print(
+                            "WARNING : inconsistency in the dataset. "
+                            "The correction method is not consistent with the segment origin."
+                        )
+                        print("-- ", row.row.article_author_year, " --")
+                        print(bsys.origin)
+                        print("detected correction method:", correction_cell)
+                    return False
+
+    else:
+        correction_cell = row.extract_corrections(bsys.segment)
+        if correction_cell is not None:
+            # there is a correction method
+            # then is_correctable should be either true or false
+            if print_warnings:
+                print(
+                    "WARNING : inconsistency in the dataset. "
+                    "There should be no correction method for segment such as humerus, clavicle, or thorax."
+                )
+                print("-- ", row.article_author_year, " --")
+                print(bsys.segment)
+                print("detected correction method:", correction_cell)
+            return False
+
+        else:
+            return True
 
 
 def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = False) -> bool:
