@@ -463,11 +463,11 @@ class RowData:
             and not parent_is_thorax_global
         ):
             # if self.parent_segment == Segment.SCAPULA:
-                # parent_output = self._check_segment_has_kolz_correction(
-                #     parent_correction, print_warnings=print_warnings
-                # )
+            # parent_output = self._check_segment_has_kolz_correction(
+            #     parent_correction, print_warnings=print_warnings
+            # )
             # else:
-                # self.parent_definition_risk = True
+            # self.parent_definition_risk = True
             self.parent_segment_usable_for_rotation_data = True
             self.parent_segment_usable_for_translation_data = False
 
@@ -495,9 +495,9 @@ class RowData:
             #     parent_output = self._check_segment_has_kolz_correction(parent_correction, print_warnings=print_warnings)
             # I believe there should be a kolz correction when the origin is on an isb axis
             # if self.parent_segment == Segment.SCAPULA:
-                # if self._check_segment_has_kolz_correction(parent_correction, print_warnings=False):
-                #     parent_output = False
-                #     print("WARNING: Kolz correction should not be filled when the origin is on an isb axis")
+            # if self._check_segment_has_kolz_correction(parent_correction, print_warnings=False):
+            #     parent_output = False
+            #     print("WARNING: Kolz correction should not be filled when the origin is on an isb axis")
             self.parent_segment_usable_for_rotation_data = parent_output
             self.parent_segment_usable_for_translation_data = False
 

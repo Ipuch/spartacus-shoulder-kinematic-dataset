@@ -55,7 +55,6 @@ class Spartacus:
                 inplace=True,
             )
 
-
     def set_correction_callbacks_from_segment_joint_validity(self, print_warnings: bool = False) -> pd.DataFrame:
         """
         This function will add a callback function to the dataframe.
