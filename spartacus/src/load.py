@@ -37,7 +37,6 @@ class Spartacus:
         dataset_authors = [
             "Charbonnier et al.",  # no data yet.
             "Gutierrez Delgado et al.",
-            # "Fung et al.",  # csv file problem naming.
             "Kim et al.",  # array
             "Lawrence et al.",  # csv file problem naming.
         ]
@@ -46,6 +45,16 @@ class Spartacus:
                 self.dataframe[self.dataframe["dataset_authors"].str.contains(a)].index,
                 inplace=True,
             )
+        article_author_year = [
+            "Sahara et al. 2006",  # no rotation data
+            "Sugi et al. 2021",
+        ]
+        for a in article_author_year:
+            self.dataframe.drop(
+                self.dataframe[self.dataframe["article_author_year"].str.contains(a)].index,
+                inplace=True,
+            )
+
 
     def set_correction_callbacks_from_segment_joint_validity(self, print_warnings: bool = False) -> pd.DataFrame:
         """
@@ -159,9 +168,23 @@ def load() -> Spartacus:
     """Load the confident dataset"""
     # open the file only_dataset_raw.csv
     df = pd.read_csv(DatasetCSV.CLEAN.value)
+    # temporary for debugging
+    # df = df[df["dataset_authors"] == "Fung et al."]
+    # keep Fung and Bourne
+    # df = df[df["dataset_authors"].isin(["Fung et al.", "Bourne"])]
+    # df = df[df["dataset_authors"].isin(["Bourne"])]
+    # df = df[df["dataset_authors"] == "Chu et al."]
+    # df = df[df["dataset_authors"] == "Dal Maso et al."]
+    # df = df[df["dataset_authors"] == "Kolz et al."]
+    # df = df[df["dataset_authors"] == "Kozono et al."]
+    # df = df[df["dataset_authors"] == "Matsumura et al."]
+    # df = df[df["dataset_authors"] == "Oki et al."]
+    # df = df[df["dataset_authors"] == "Teece et al."]
+    # df = df[df["dataset_authors"] == "Yoshida et al."]
+
     print(df.shape)
     sp = Spartacus(dataframe=df)
-    sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=False)
+    sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=True)
     sp.import_confident_data()
     # df = load_confident_data(df, print_warnings=True)
     print(df.shape)

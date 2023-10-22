@@ -87,7 +87,8 @@ articles_data = {
         # 14.200462694343685,
         # [(0, 1.467054274614342), (10, -0.021138378975446268), (22, -0.11738530717958653), (-1, -2.3379632679489672)],
         -14.321849530406698,
-        [(0, -2.0737591719978203), (10, -2.672464827053776), (22, 34.51266), (-1, 19.2415854)],
+        # [(0, -2.0737591719978203), (10, -2.672464827053776), (22, 34.51266), (-1, 19.2415854)],
+        [(0, -2.0737591719978203), (10, -2.672464827053776), (22, -0.21841936528834072), (-1, -0.20111009003612457)],
     ),
     "Yoshida et al. 2023": (
         84,
@@ -137,7 +138,7 @@ def test_article_data(article_name, expected_shape, humeral_motions, joints, dof
 def test_number_of_articles():
     # Check number of unique articles after processing all
     articles = list(confident_values["article"].unique())
-    assert len(articles) == 9
+    assert len(articles) == 12
 
 
 def print_data(data, random_checks):

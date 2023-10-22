@@ -213,7 +213,7 @@ def check_correction_methods(row: "RowData", bsys: BiomechCoordinateSystem, prin
             return True
         else:
             if bsys.origin == BiomechOrigin.Scapula.GLENOID_CENTER:
-                if correction_cell == Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION:
+                if Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION in correction_cell:
                     return True
                 else:
                     if print_warnings:
@@ -221,12 +221,12 @@ def check_correction_methods(row: "RowData", bsys: BiomechCoordinateSystem, prin
                             "WARNING : inconsistency in the dataset. "
                             "The correction method is not consistent with the segment origin."
                         )
-                        print("-- ", row.article_author_year, " --")
+                        print("-- ", row.row.article_author_year, " --")
                         print(bsys.origin)
                         print("detected correction method:", correction_cell)
                     return False
             if bsys.origin == BiomechOrigin.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER:
-                if correction_cell == Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION:
+                if Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION in correction_cell:
                     return True
                 else:
                     if print_warnings:
@@ -234,7 +234,7 @@ def check_correction_methods(row: "RowData", bsys: BiomechCoordinateSystem, prin
                             "WARNING : inconsistency in the dataset. "
                             "The correction method is not consistent with the segment origin."
                         )
-                        print("-- ", row.article_author_year, " --")
+                        print("-- ", row.row.article_author_year, " --")
                         print(bsys.origin)
                         print("detected correction method:", correction_cell)
                     return False
