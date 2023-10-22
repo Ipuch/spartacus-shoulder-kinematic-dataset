@@ -78,6 +78,14 @@ articles_data = {
         0,
         [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
     ),
+    "Lawrence et al. 2014": (
+        684,
+        ["frontal elevation", "scapular elevation", "sagittal elevation"],
+        ["glenohumeral", "scapulothoracic", "acromioclavicular", "sternoclavicular"],
+        ["1", "2", "3"],
+        1593.1771566789885,
+        [(0, 1.9972169116554843), (1, 2.73877806083706), (2, -1.5717100982089567), (-1, 25.0)],
+    ),
     "Matsumura et al. 2013": (
         99,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
@@ -161,22 +169,26 @@ def test_article_data(article_name, expected_shape, humeral_motions, joints, dof
 def test_number_of_articles():
     # Check number of unique articles after processing all
     articles = list(confident_values["article"].unique())
-    assert len(articles) == 12
-    # test name of studies in one unique test
+
     assert [
-        "Bourne 2003",
-        "Chu et al. 2012",
-        "Cereatti et al. 2017",
-        "Fung et al. 2001",
-        "Kijima et al. 2015",
-        "Kolz et al. 2020",
-        "Kozono et al. 2017",
-        "Matsumura et al. 2013",
-        "Matsuki et al. 2012",
-        "Oki et al. 2012",
-        "Teece et al. 2008",
-        "Yoshida et al. 2023",
-    ] == articles
+               "Bourne 2003",
+               "Chu et al. 2012",
+               "Cereatti et al. 2017",
+               "Fung et al. 2001",
+               "Kijima et al. 2015",
+               "Kolz et al. 2020",
+               "Kozono et al. 2017",
+               "Lawrence et al. 2014",
+               "Matsumura et al. 2013",
+               "Matsuki et al. 2012",
+               "Oki et al. 2012",
+               "Teece et al. 2008",
+               "Yoshida et al. 2023",
+           ] == articles
+
+    assert len(articles) == 13
+
+    assert confident_values.shape[0] == 89226
 
 
 def print_data(data, random_checks):
