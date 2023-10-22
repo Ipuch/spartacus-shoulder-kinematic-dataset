@@ -148,3 +148,5 @@ figures/*.png
 figures/Bourne et al 2004/*.png
 
 *.pdf
+
+spartacus/dataset/only_dataset_raw_old.csv
