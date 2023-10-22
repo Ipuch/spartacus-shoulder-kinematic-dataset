@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .enums import JointType, Segment
+from .enums import JointType, Segment, BiomechOrigin, Correction
 from .utils import (
     Joint,
     BiomechCoordinateSystem,
@@ -208,7 +208,37 @@ def check_correction_methods(row: "RowData", bsys: BiomechCoordinateSystem, prin
     if bsys.segment == Segment.SCAPULA:
         # there is correction methods that can be applied to the scapula
         # even if it leads to isb like segment
-        return True
+        correction_cell = row.extract_corrections(bsys.segment)
+        if correction_cell is None:
+            return True
+        else:
+            if bsys.origin == BiomechOrigin.Scapula.GLENOID_CENTER:
+                if correction_cell == Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION:
+                    return True
+                else:
+                    if print_warnings:
+                        print(
+                            "WARNING : inconsistency in the dataset. "
+                            "The correction method is not consistent with the segment origin."
+                        )
+                        print("-- ", row.article_author_year, " --")
+                        print(bsys.origin)
+                        print("detected correction method:", correction_cell)
+                    return False
+            if bsys.origin == BiomechOrigin.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER:
+                if correction_cell == Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION:
+                    return True
+                else:
+                    if print_warnings:
+                        print(
+                            "WARNING : inconsistency in the dataset. "
+                            "The correction method is not consistent with the segment origin."
+                        )
+                        print("-- ", row.article_author_year, " --")
+                        print(bsys.origin)
+                        print("detected correction method:", correction_cell)
+                    return False
+
     else:
         correction_cell = row.extract_corrections(bsys.segment)
         if correction_cell is not None:
