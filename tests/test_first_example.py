@@ -32,7 +32,22 @@ articles_data = {
         -553.7318,
         [(0, 20.8327), (30, -2.386), (60, -8.4559), (-1, -4.9707)],
     ),
-    # TODO: "Fung et al. 2001": (0, [], [], [], 0, []),
+    "Fung et al. 2001": (
+        621,
+        ["frontal elevation", "scapular elevation", "sagittal elevation"],
+        ["scapulothoracic"],
+        ["1", "2", "3"],
+        9.07857770131519,
+        [(0, -1.2859013480021593), (30, -1.198043258526987), (60, -2.6301109122779853), (-1, -1.5928787318010431)],
+    ),
+    "Kijima et al. 2015": (
+        24,
+        ['scapular elevation'],
+        ['glenohumeral'],
+        ["1", "2", "3"],
+        0,
+        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
+    ),
     "Cereatti et al. 2017": (
         3495,
         ["frontal elevation", "sagittal elevation"],
@@ -70,6 +85,14 @@ articles_data = {
         ["1", "2", "3"],
         -558.322,
         [(0, -23.068), (20, 32.64), (60, -0.921), (-1, 11.971)],
+    ),
+    "Matsuki et al. 2012": (
+        288,
+        ["scapular elevation"],
+        ["glenohumeral"],
+        ["1", "2", "3"],
+        0,
+        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
     ),
     "Oki et al. 2012": (
         354,
@@ -139,6 +162,16 @@ def test_number_of_articles():
     # Check number of unique articles after processing all
     articles = list(confident_values["article"].unique())
     assert len(articles) == 12
+    # test name of studies in one unique test
+    assert ["Bourne 2003", "Chu et al. 2012", "Cereatti et al. 2017",
+            "Fung et al. 2001",
+            "Kijima et al. 2015",
+            "Kolz et al. 2020",
+            "Kozono et al. 2017",
+            "Matsumura et al. 2013",
+            "Matsuki et al. 2012",
+            "Oki et al. 2012",
+            "Teece et al. 2008", "Yoshida et al. 2023"] == articles
 
 
 def print_data(data, random_checks):
