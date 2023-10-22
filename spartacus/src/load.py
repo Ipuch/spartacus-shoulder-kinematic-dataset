@@ -36,7 +36,7 @@ class Spartacus:
         # drop line with "Charbonnier et al." in dataset_authors
         dataset_authors = [
             "Charbonnier et al.",  # no data yet.
-            "Gutierrez Delgado et al.", # not usable finally ?
+            "Gutierrez Delgado et al.",  # not usable finally ?
             "Kim et al.",  # no data yet.
         ]
         for a in dataset_authors:

@@ -171,20 +171,20 @@ def test_number_of_articles():
     articles = list(confident_values["article"].unique())
 
     assert [
-               "Bourne 2003",
-               "Chu et al. 2012",
-               "Cereatti et al. 2017",
-               "Fung et al. 2001",
-               "Kijima et al. 2015",
-               "Kolz et al. 2020",
-               "Kozono et al. 2017",
-               "Lawrence et al. 2014",
-               "Matsumura et al. 2013",
-               "Matsuki et al. 2012",
-               "Oki et al. 2012",
-               "Teece et al. 2008",
-               "Yoshida et al. 2023",
-           ] == articles
+        "Bourne 2003",
+        "Chu et al. 2012",
+        "Cereatti et al. 2017",
+        "Fung et al. 2001",
+        "Kijima et al. 2015",
+        "Kolz et al. 2020",
+        "Kozono et al. 2017",
+        "Lawrence et al. 2014",
+        "Matsumura et al. 2013",
+        "Matsuki et al. 2012",
+        "Oki et al. 2012",
+        "Teece et al. 2008",
+        "Yoshida et al. 2023",
+    ] == articles
 
     assert len(articles) == 13
 
