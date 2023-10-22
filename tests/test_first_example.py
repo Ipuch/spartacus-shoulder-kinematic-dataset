@@ -42,8 +42,8 @@ articles_data = {
     ),
     "Kijima et al. 2015": (
         24,
-        ['scapular elevation'],
-        ['glenohumeral'],
+        ["scapular elevation"],
+        ["glenohumeral"],
         ["1", "2", "3"],
         0,
         [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
@@ -163,15 +163,20 @@ def test_number_of_articles():
     articles = list(confident_values["article"].unique())
     assert len(articles) == 12
     # test name of studies in one unique test
-    assert ["Bourne 2003", "Chu et al. 2012", "Cereatti et al. 2017",
-            "Fung et al. 2001",
-            "Kijima et al. 2015",
-            "Kolz et al. 2020",
-            "Kozono et al. 2017",
-            "Matsumura et al. 2013",
-            "Matsuki et al. 2012",
-            "Oki et al. 2012",
-            "Teece et al. 2008", "Yoshida et al. 2023"] == articles
+    assert [
+        "Bourne 2003",
+        "Chu et al. 2012",
+        "Cereatti et al. 2017",
+        "Fung et al. 2001",
+        "Kijima et al. 2015",
+        "Kolz et al. 2020",
+        "Kozono et al. 2017",
+        "Matsumura et al. 2013",
+        "Matsuki et al. 2012",
+        "Oki et al. 2012",
+        "Teece et al. 2008",
+        "Yoshida et al. 2023",
+    ] == articles
 
 
 def print_data(data, random_checks):
