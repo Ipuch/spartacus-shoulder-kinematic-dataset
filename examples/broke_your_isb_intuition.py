@@ -14,55 +14,7 @@ import numpy as np
 # Let's choose scipy as this is a more common toolbox
 from scipy.spatial.transform import Rotation
 
-
-# compute the rotation matrix from the axes, R_isb_local
-def compute_rotation_matrix_from_axes(
-    anterior_posterior_axis: np.ndarray,
-    infero_superior_axis: np.ndarray,
-    medio_lateral_axis: np.ndarray,
-):
-    """
-    Compute the rotation matrix from the axes of the ISB coordinate system
-
-    Parameters
-    ----------
-    anterior_posterior_axis: np.ndarray
-        The anterior-posterior axis expressed in the ISB coordinate system
-    infero_superior_axis: np.ndarray
-        The infero-superior axis expressed in the ISB coordinate system
-    medio_lateral_axis: np.ndarray
-        The medio-lateral axis expressed in the ISB coordinate system
-
-    Returns
-    -------
-    np.ndarray
-        The rotation matrix from the ISB coordinate system to the local coordinate system
-        R_isb_local
-        meaning when a vector v expressed in local coordinates is transformed to ISB coordinates
-        v_isb = R_isb_local @ v_local
-    """
-    return np.array(
-        [
-            # X axis                                    Y axis                                      Z axis ,
-            #  in ISB base
-            [
-                anterior_posterior_axis[0, 0],
-                infero_superior_axis[0, 0],
-                medio_lateral_axis[0, 0],
-            ],
-            [
-                anterior_posterior_axis[1, 0],
-                infero_superior_axis[1, 0],
-                medio_lateral_axis[1, 0],
-            ],
-            [
-                anterior_posterior_axis[2, 0],
-                infero_superior_axis[2, 0],
-                medio_lateral_axis[2, 0],
-            ],
-        ],
-        dtype=np.float64,
-    ).T  # where the transpose was missing in the original code
+from spartacus import compute_rotation_matrix_from_axes
 
 
 def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:

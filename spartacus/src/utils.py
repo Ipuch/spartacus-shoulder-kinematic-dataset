@@ -160,31 +160,9 @@ class BiomechCoordinateSystem:
 
         """
 
-        # # find X axis in the cartesian axis
-        # x_in_global =
-
-        return np.array(
-            [
-                # X axis                                    Y axis                                      Z axis ,
-                #  in ISB base
-                [
-                    self.anterior_posterior_axis.value[1][0],
-                    self.infero_superior_axis.value[1][0],
-                    self.medio_lateral_axis.value[1][0],
-                ],
-                [
-                    self.anterior_posterior_axis.value[1][1],
-                    self.infero_superior_axis.value[1][1],
-                    self.medio_lateral_axis.value[1][1],
-                ],
-                [
-                    self.anterior_posterior_axis.value[1][2],
-                    self.infero_superior_axis.value[1][2],
-                    self.medio_lateral_axis.value[1][2],
-                ],
-            ],
-            dtype=np.float64,
-        ).T
+        return compute_rotation_matrix_from_axes(anterior_posterior_axis=self.anterior_posterior_axis,
+                                                 infero_superior_axis=self.infero_superior_axis,
+                                                 medio_lateral_axis=self.medio_lateral_axis)
 
     def __print__(self):
         print(f"Segment: {self.segment}")
@@ -918,3 +896,54 @@ def get_is_correctable_column(segment: Segment) -> str:
         return "humerus_is_isb_correctable"
     else:
         raise ValueError(f"{segment} is not a valid segment.")
+
+
+def compute_rotation_matrix_from_axes(
+    anterior_posterior_axis: np.ndarray,
+    infero_superior_axis: np.ndarray,
+    medio_lateral_axis: np.ndarray,
+):
+    """
+    Compute the rotation matrix from the axes of the ISB coordinate system, the rotation matrix from the axes,
+    named R_isb_local such that v_isb = R_isb_local @ v_local
+
+    Parameters
+    ----------
+    anterior_posterior_axis: np.ndarray
+        The anterior-posterior axis expressed in the ISB coordinate system
+    infero_superior_axis: np.ndarray
+        The infero-superior axis expressed in the ISB coordinate system
+    medio_lateral_axis: np.ndarray
+        The medio-lateral axis expressed in the ISB coordinate system
+
+    Returns
+    -------
+    np.ndarray
+        The rotation matrix from the ISB coordinate system to the local coordinate system
+        R_isb_local
+        meaning when a vector v expressed in local coordinates is transformed to ISB coordinates
+        v_isb = R_isb_local @ v_local
+    """
+    return np.array(
+        [
+            # X axis                                    Y axis                                      Z axis ,
+            #  in ISB base
+            [
+                anterior_posterior_axis[0, 0],
+                infero_superior_axis[0, 0],
+                medio_lateral_axis[0, 0],
+            ],
+            [
+                anterior_posterior_axis[1, 0],
+                infero_superior_axis[1, 0],
+                medio_lateral_axis[1, 0],
+            ],
+            [
+                anterior_posterior_axis[2, 0],
+                infero_superior_axis[2, 0],
+                medio_lateral_axis[2, 0],
+            ],
+        ],
+        dtype=np.float64,
+    ).T  # where the transpose was missing in the original code
+
