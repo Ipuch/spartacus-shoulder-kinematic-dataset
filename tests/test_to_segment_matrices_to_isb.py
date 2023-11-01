@@ -84,28 +84,6 @@ def test_rotation_matrix_from_axes_not_isb_yxz():
     assert np.allclose(v_in_isb, v_in_isb_expected)
 
 
-# def test_rotation_matrix_from_axes_not_isb_yxz():
-#     R_isb_local = compute_rotation_matrix_from_axes(
-#         anterior_posterior_axis=Y,
-#         infero_superior_axis=-X,
-#         medio_lateral_axis=Z,
-#     )
-#
-#     assert np.allclose(R_isb_local, np.array([[0., 1., 0.],
-#                                               [-1., 0., 0.],
-#                                               [0., 0., 1.]]))
-#
-#     # Does it mean what it should mean?
-#     # Let's consider a vector in the original local coordinate system
-#     v_in_local = np.array([1, 2, 3])[:, np.newaxis]
-#     v_in_isb_expected = np.array([2, -1, 3])[:, np.newaxis]
-#
-#     # Let's rotate it to the ISB coordinate system
-#     v_in_isb = R_isb_local @ v_in_local
-#
-#     assert np.allclose(v_in_isb, v_in_isb_expected)
-
-
 def test_from_two_segment_local_yzx_joint_zyx_to_yxz():
     # Let's consider another local coordinate system, with the following axes
     R_isb_local = compute_rotation_matrix_from_axes(
