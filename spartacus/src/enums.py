@@ -249,7 +249,6 @@ class EulerSequence(Enum):
 
         return the_enum
 
-
     @classmethod
     def from_string(cls, sequence: str):
         if sequence is None:
