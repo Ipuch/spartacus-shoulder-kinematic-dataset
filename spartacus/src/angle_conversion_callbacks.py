@@ -34,6 +34,33 @@ def get_angle_conversion_callback_from_sequence(
     return lambda rot1, rot2, rot3: convert_euler_angles(previous_sequence_str, new_sequence_str, rot1, rot2, rot3)
 
 
+def from_euler_angles_to_rotation_matrix(
+    previous_sequence_str: str,
+    rot1,
+    rot2,
+    rot3,
+):
+
+    rotation_matrix_object = biorbd.Rotation.fromEulerAngles(np.array([rot1, rot2, rot3]), seq=previous_sequence_str)
+    rotation_matrix = rotation_matrix_object.to_array()
+    return rotation_matrix
+
+
+def isb_framed_rotation_matrix_from_euler_angles(
+    previous_sequence_str: str,
+    rot1,
+    rot2,
+    rot3,
+    bsys_parent: BiomechCoordinateSystem,
+    bsys_child: BiomechCoordinateSystem,
+)-> np.ndarray:
+    rotation_matrix = from_euler_angles_to_rotation_matrix(previous_sequence_str, rot1, rot2, rot3)
+
+    converted_rotation_matrix = bsys_child.get_rotation_matrix() @ rotation_matrix @ bsys_parent.get_rotation_matrix().T
+
+    return converted_rotation_matrix
+
+
 def convert_euler_angles_and_frames_to_isb(
     previous_sequence_str: str,
     new_sequence_str: str,
@@ -43,13 +70,16 @@ def convert_euler_angles_and_frames_to_isb(
     bsys_parent: BiomechCoordinateSystem,
     bsys_child: BiomechCoordinateSystem,
 ):
-    rotation_matrix_object = biorbd.Rotation.fromEulerAngles(np.array([rot1, rot2, rot3]), seq=previous_sequence_str)
-    rotation_matrix = rotation_matrix_object.to_array()
+    isb_framed_rotation_matrix = isb_framed_rotation_matrix_from_euler_angles(
+        previous_sequence_str,
+        rot1,
+        rot2,
+        rot3,
+        bsys_parent,
+        bsys_child,
+    )
 
-    # I'm pretty sure the rotation matrix is R_parent_child(rot1, rot2, rot3)
-    converted_rotation_matrix = bsys_parent.get_rotation_matrix() @ rotation_matrix @ bsys_child.get_rotation_matrix().T
-
-    new_rotation_matrix_object = mat_2_rotation(converted_rotation_matrix)
+    new_rotation_matrix_object = mat_2_rotation(isb_framed_rotation_matrix)
     return biorbd.Rotation.toEulerAngles(new_rotation_matrix_object, seq=new_sequence_str).to_array()
 
 
