@@ -53,8 +53,8 @@ def isb_framed_rotation_matrix_from_euler_angles(
     bsys_parent: BiomechCoordinateSystem,
     bsys_child: BiomechCoordinateSystem,
 ) -> np.ndarray:
-    rotation_matrix = from_euler_angles_to_rotation_matrix(previous_sequence_str, rot1, rot2, rot3)
 
+    rotation_matrix = from_euler_angles_to_rotation_matrix(previous_sequence_str, rot1, rot2, rot3)
     converted_rotation_matrix = bsys_child.get_rotation_matrix() @ rotation_matrix @ bsys_parent.get_rotation_matrix().T
 
     return converted_rotation_matrix
