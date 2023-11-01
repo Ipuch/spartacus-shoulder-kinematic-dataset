@@ -5,7 +5,6 @@ import pandas as pd
 
 from .joint import Joint
 from .biomech_system import BiomechCoordinateSystem
-from .conversion_utils import convert_rotation_matrix_from_one_coordinate_system_to_another
 
 from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType
 from .utils import (

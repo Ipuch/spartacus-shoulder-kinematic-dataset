@@ -22,5 +22,4 @@ from .src.load import load, Spartacus
 from .src.utils import compute_rotation_matrix_from_axes, flip_rotations
 from .src.joint import Joint
 from .src.biomech_system import BiomechCoordinateSystem
-from .src.conversion_utils import convert_rotation_matrix_from_one_coordinate_system_to_another
 from .src.checks import check_same_orientation
