@@ -3,14 +3,15 @@ import os
 import numpy as np
 import pandas as pd
 
+from .joint import Joint
+from .biomech_system import BiomechCoordinateSystem
+from .conversion_utils import convert_rotation_matrix_from_one_coordinate_system_to_another
+
 from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType
 from .utils import (
     get_segment_columns,
     get_correction_column,
     get_is_correctable_column,
-    BiomechCoordinateSystem,
-    Joint,
-    convert_rotation_matrix_from_one_coordinate_system_to_another,
     get_is_isb_column,
 )
 

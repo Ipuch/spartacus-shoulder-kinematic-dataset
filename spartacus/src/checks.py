@@ -3,12 +3,12 @@ import pandas as pd
 
 from .enums import JointType, Segment, BiomechOrigin, Correction
 from .utils import (
-    Joint,
-    BiomechCoordinateSystem,
     get_is_isb_column,
     get_is_correctable_column,
     get_correction_column,
 )
+from .joint import Joint
+from .biomech_system import BiomechCoordinateSystem
 
 
 def check_parent_child_joint(bjoint: Joint, row: pd.Series, print_warnings: bool = False):
