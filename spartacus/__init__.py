@@ -19,5 +19,5 @@ from .src.checks import (
 
 from .src.row_data import RowData
 from .src.load import load, Spartacus
-from .src.utils import Joint, BiomechCoordinateSystem, compute_rotation_matrix_from_axes
+from .src.utils import Joint, BiomechCoordinateSystem, compute_rotation_matrix_from_axes, flip_rotations
 from .src.checks import check_same_orientation

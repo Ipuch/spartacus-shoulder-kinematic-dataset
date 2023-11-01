@@ -1,244 +1,9 @@
 import biorbd
 import numpy as np
 
-from .enums import CartesianAxis, EulerSequence, JointType, BiomechDirection, BiomechOrigin, Segment, Correction
+from .biomech_sytem import BiomechCoordinateSystem
+from .enums import CartesianAxis, EulerSequence, JointType, Segment, Correction
 from .kolz_matrices import get_kolz_rotation_matrix
-
-
-class BiomechCoordinateSystem:
-    def __init__(
-        self,
-        segment: Segment,
-        antero_posterior_axis: CartesianAxis,
-        infero_superior_axis: CartesianAxis,
-        medio_lateral_axis: CartesianAxis,
-        origin=None,
-    ):
-        # verify isinstance
-        if not isinstance(antero_posterior_axis, CartesianAxis):
-            raise TypeError("antero_posterior_axis should be of type CartesianAxis")
-        if not isinstance(infero_superior_axis, CartesianAxis):
-            raise TypeError("infero_superior_axis should be of type CartesianAxis")
-        if not isinstance(medio_lateral_axis, CartesianAxis):
-            raise TypeError("medio_lateral_axis should be of type CartesianAxis")
-        # verity they are all different
-        if (
-            antero_posterior_axis == infero_superior_axis
-            or antero_posterior_axis == medio_lateral_axis
-            or infero_superior_axis == medio_lateral_axis
-        ):
-            raise ValueError("antero_posterior_axis, infero_superior_axis, medio_lateral_axis should be different")
-
-        self.anterior_posterior_axis = antero_posterior_axis
-        self.infero_superior_axis = infero_superior_axis
-        self.medio_lateral_axis = medio_lateral_axis
-
-        self.origin = origin
-        self.segment = segment
-
-    @classmethod
-    def from_biomech_directions(
-        cls,
-        x: BiomechDirection,
-        y: BiomechDirection,
-        z: BiomechDirection,
-        origin: BiomechOrigin = None,
-        segment: Segment = None,
-    ):
-        my_arg = dict()
-
-        # verify each of the x, y, z is different
-        if x == y or x == z or y == z:
-            raise ValueError("x, y, z should be different")
-
-        # verify is positive or negative
-        actual_axes = [x, y, z]
-        positive_enums_axis = [CartesianAxis.plusX, CartesianAxis.plusY, CartesianAxis.plusZ]
-        negative_enums_axis = [CartesianAxis.minusX, CartesianAxis.minusY, CartesianAxis.minusZ]
-
-        for axis, positive_enum, negative_enum in zip(actual_axes, positive_enums_axis, negative_enums_axis):
-            if axis.sign == 1:
-                if axis == BiomechDirection.PlusPosteroAnterior:
-                    my_arg["antero_posterior_axis"] = positive_enum
-                    continue
-                elif axis == BiomechDirection.PlusMedioLateral:
-                    my_arg["medio_lateral_axis"] = positive_enum
-                    continue
-                elif axis == BiomechDirection.PlusInferoSuperior:
-                    my_arg["infero_superior_axis"] = positive_enum
-                    continue
-            elif axis.sign == -1:
-                if axis == BiomechDirection.MinusPosteroAnterior:
-                    my_arg["antero_posterior_axis"] = negative_enum
-                    continue
-                elif axis == BiomechDirection.MinusMedioLateral:
-                    my_arg["medio_lateral_axis"] = negative_enum
-                    continue
-                elif axis == BiomechDirection.MinusInferoSuperior:
-                    my_arg["infero_superior_axis"] = negative_enum
-                    continue
-
-        my_arg["origin"] = origin
-        my_arg["segment"] = segment
-
-        return cls(**my_arg)
-
-    def is_isb_origin(self) -> bool:
-        if self.segment == Segment.THORAX and self.origin == BiomechOrigin.Thorax.IJ:
-            return True
-        elif self.segment == Segment.CLAVICLE and self.origin == BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER:
-            return True
-        elif self.segment == Segment.SCAPULA and self.origin == BiomechOrigin.Scapula.ANGULAR_ACROMIALIS:
-            return True
-        elif self.segment == Segment.HUMERUS and self.origin == BiomechOrigin.Humerus.GLENOHUMERAL_HEAD:
-            return True
-        else:
-            return False
-
-    def is_origin_on_an_isb_axis(self) -> bool:
-        """
-        Return True if the origin is on an ISB axis, False otherwise
-
-        NOTE
-        ----
-        The true definition would be, the origin is part of the process to build an ISB axis.
-
-        """
-        if self.is_isb_origin():
-            return True
-
-        if self.segment == Segment.THORAX:
-            if self.origin == BiomechOrigin.Thorax.C7:
-                return True
-            elif self.origin == BiomechOrigin.Thorax.T8:
-                return True
-            elif self.origin == BiomechOrigin.Thorax.PX:
-                return True
-            else:
-                return False
-
-        if self.segment == Segment.CLAVICLE:
-            if self.origin == BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER:
-                return True
-            elif self.origin == BiomechOrigin.Clavicle.ACROMIOCLAVICULAR_JOINT_CENTER:
-                return True
-            else:
-                return False
-
-        if self.segment == Segment.SCAPULA:
-            if self.origin == BiomechOrigin.Scapula.TRIGNONUM_SPINAE:
-                return True
-            elif self.origin == BiomechOrigin.Scapula.ANGULUS_INFERIOR:
-                return True
-            else:
-                return False
-
-        if self.segment == Segment.HUMERUS:
-            if self.origin == BiomechOrigin.Humerus.MIDPOINT_EPICONDYLES:
-                return True
-            else:
-                return False
-
-    def is_isb(self) -> bool:
-        return self.is_isb_oriented() and self.is_isb_origin()
-
-    def is_isb_oriented(self) -> bool:
-        condition_1 = self.anterior_posterior_axis is CartesianAxis.plusX
-        condition_2 = self.infero_superior_axis is CartesianAxis.plusY
-        condition_3 = self.medio_lateral_axis is CartesianAxis.plusZ
-        return condition_1 and condition_2 and condition_3
-
-    def is_direct(self) -> bool:
-        """check if the frame is direct (True) or indirect (False)"""
-        return np.linalg.det(self.get_rotation_matrix()) > 0
-
-    def get_rotation_matrix(self):
-        """
-        write the rotation matrix from the cartesian axis
-
-        such that a_in_isb = R_to_isb_from_local @ a_in_local
-
-        """
-
-        return compute_rotation_matrix_from_axes(
-            anterior_posterior_axis=self.anterior_posterior_axis.value[1][:, np.newaxis],
-            infero_superior_axis=self.infero_superior_axis.value[1][:, np.newaxis],
-            medio_lateral_axis=self.medio_lateral_axis.value[1][:, np.newaxis],
-        )
-
-    def __print__(self):
-        print(f"Segment: {self.segment}")
-        print(f"Origin: {self.origin}")
-        print(f"Anterior Posterior Axis: {self.anterior_posterior_axis}")
-        print(f"Medio Lateral Axis: {self.medio_lateral_axis}")
-        print(f"Infero Superior Axis: {self.infero_superior_axis}")
-
-
-class Joint:
-    def __init__(
-        self,
-        joint_type: JointType,
-        euler_sequence: EulerSequence,
-        translation_origin: BiomechOrigin,
-        translation_frame: Segment,
-    ):
-        self.joint_type = joint_type
-        self.euler_sequence = euler_sequence
-        self.translation_origin = translation_origin
-        self.translation_frame = translation_frame
-
-    def is_joint_sequence_isb(self) -> bool:
-        return EulerSequence.isb_from_joint_type(self.joint_type) == self.euler_sequence
-
-    def isb_euler_sequence(self) -> EulerSequence:
-        return EulerSequence.isb_from_joint_type(self.joint_type)
-
-    # todo: stuff for translations ..?
-
-    def is_sequence_convertible_through_factors(self, print_warning: bool = False) -> bool:
-        """
-        Check if the euler sequence of the joint can be converted to the ISB sequence with factors 1 or -1
-
-        We expect the euler sequence to have three different letters, if the ISB sequence is YXZ (steroclavicular, acromioclavicular, scapulothoracic)
-        We expect the euler sequence to have two different letters, if the ISB sequence is YXY (glenohumeral, thoracohumeral)
-
-        Return
-        ------
-        bool
-            True if the sequence can be converted with factors 1 or -1, False otherwise
-        """
-        if self.joint_type in (JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR, JointType.SCAPULO_THORACIC):
-            sequence_wanted = EulerSequence.YXZ
-            # check that we have three different letters in the sequence
-            if len(set(self.euler_sequence.value)) != 3:
-                if print_warning:
-                    print(
-                        "The euler sequence of the joint must have three different letters to be able to convert with factors 1"
-                        f"or -1 to the ISB sequence {sequence_wanted.value}, but the sequence of the joint is"
-                        f" {self.euler_sequence.value}"
-                    )
-                return False
-
-        elif self.joint_type in (JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL):
-            sequence_wanted = EulerSequence.YXY
-            # check that the sequence in joint.euler_sequence as the same two letters for the first and third rotations
-            if self.euler_sequence.value[0] != self.euler_sequence.value[2]:
-                if print_warning:
-                    print(
-                        "The euler sequence of the joint must have the same two letters for the first and third rotations"
-                        f"to be able to convert with factors 1 or -1 to the ISB sequence {sequence_wanted.value},"
-                        f" but the sequence of the joint is {self.euler_sequence.value}"
-                    )
-                return False
-        else:
-            if print_warning:
-                print(
-                    "The joint type must be JointType.STERNO_CLAVICULAR, JointType.ACROMIO_CLAVICULAR,"
-                    "JointType.SCAPULO_THORACIC, JointType.GLENO_HUMERAL, JointType.THORACO_HUMERAL"
-                )
-            return False
-
-        return True
 
 
 def get_conversion_from_not_isb_to_isb_oriented(
@@ -849,55 +614,43 @@ def get_conversion_from_not_isb_to_isb_oriented_v2(
 
 
 def get_segment_columns(segment: Segment) -> list[str]:
-    if segment == Segment.THORAX:
-        return ["thorax_x", "thorax_y", "thorax_z", "thorax_origin"]
-    elif segment == Segment.CLAVICLE:
-        return ["clavicle_x", "clavicle_y", "clavicle_z", "clavicle_origin"]
-    elif segment == Segment.SCAPULA:
-        return ["scapula_x", "scapula_y", "scapula_z", "scapula_origin"]
-    elif segment == Segment.HUMERUS:
-        return ["humerus_x", "humerus_y", "humerus_z", "humerus_origin"]
-    else:
-        raise ValueError(f"{segment} is not a valid segment.")
+    columns = {
+        Segment.THORAX: ["thorax_x", "thorax_y", "thorax_z", "thorax_origin"],
+        Segment.CLAVICLE: ["clavicle_x", "clavicle_y", "clavicle_z", "clavicle_origin"],
+        Segment.SCAPULA: ["scapula_x", "scapula_y", "scapula_z", "scapula_origin"],
+        Segment.HUMERUS: ["humerus_x", "humerus_y", "humerus_z", "humerus_origin"]
+    }
+    return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
 
 def get_is_isb_column(segment: Segment) -> str:
-    if segment == Segment.THORAX:
-        return "thorax_is_isb"
-    elif segment == Segment.CLAVICLE:
-        return "clavicle_is_isb"
-    elif segment == Segment.SCAPULA:
-        return "scapula_is_isb"
-    elif segment == Segment.HUMERUS:
-        return "humerus_is_isb"
-    else:
-        raise ValueError(f"{segment} is not a valid segment.")
+    columns = {
+        Segment.THORAX: "thorax_is_isb",
+        Segment.CLAVICLE: "clavicle_is_isb",
+        Segment.SCAPULA: "scapula_is_isb",
+        Segment.HUMERUS: "humerus_is_isb"
+    }
+    return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
 
 def get_correction_column(segment: Segment) -> str:
-    if segment == Segment.THORAX:
-        return "thorax_correction_method"
-    elif segment == Segment.CLAVICLE:
-        return "clavicle_correction_method"
-    elif segment == Segment.SCAPULA:
-        return "scapula_correction_method"
-    elif segment == Segment.HUMERUS:
-        return "humerus_correction_method"
-    else:
-        raise ValueError(f"{segment} is not a valid segment.")
+    columns = {
+        Segment.THORAX: "thorax_correction_method",
+        Segment.CLAVICLE: "clavicle_correction_method",
+        Segment.SCAPULA: "scapula_correction_method",
+        Segment.HUMERUS: "humerus_correction_method"
+    }
+    return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
 
 def get_is_correctable_column(segment: Segment) -> str:
-    if segment == Segment.THORAX:
-        return "thorax_is_isb_correctable"
-    elif segment == Segment.CLAVICLE:
-        return "clavicle_is_isb_correctable"
-    elif segment == Segment.SCAPULA:
-        return "scapula_is_isb_correctable"
-    elif segment == Segment.HUMERUS:
-        return "humerus_is_isb_correctable"
-    else:
-        raise ValueError(f"{segment} is not a valid segment.")
+    columns = {
+        Segment.THORAX: "thorax_is_isb_correctable",
+        Segment.CLAVICLE: "clavicle_is_isb_correctable",
+        Segment.SCAPULA: "scapula_is_isb_correctable",
+        Segment.HUMERUS: "humerus_is_isb_correctable"
+    }
+    return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
 
 def compute_rotation_matrix_from_axes(

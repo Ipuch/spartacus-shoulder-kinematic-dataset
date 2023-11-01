@@ -14,67 +14,7 @@ import numpy as np
 # Let's choose scipy as this is a more common toolbox
 from scipy.spatial.transform import Rotation
 
-from spartacus import compute_rotation_matrix_from_axes
-
-
-def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
-    """
-    Return an alternate sequence with the second angle inverted, but that
-        leads to the same rotation matrices. See below for more information.
-
-    Parameters
-    ----------
-    angles: np.ndarray
-        The rotation angles
-    seq: str
-        The sequence of the rotation angles
-
-    Returns
-    -------
-    np.ndarray
-        The rotation angles flipped
-
-
-    Source
-    ------
-    github.com/felixchenier/kineticstoolkit/blob/24e3dd39a6546d475732b70609c07fcc26dc2ff7/kineticstoolkit/geometry.py#L526-L537
-
-    Notes
-    -----
-    Before flipping, the angles are:
-
-    - First angle belongs to [-180, 180] degrees (both inclusive)
-    - Second angle belongs to:
-
-        - [-90, 90] degrees if all axes are different. e.g., xyz
-        - [0, 180] degrees if first and third axes are the same e.g., zxz
-
-    - Third angle belongs to [-180, 180] degrees (both inclusive)
-
-    If after flipping, the angles are:
-
-    - First angle belongs to [-180, 180] degrees (both inclusive)
-    - Second angle belongs to:
-
-        - [-180, -90], [90, 180] degrees if all axes are different. e.g., xyz
-        - [-180, 0] degrees if first and third axes are the same e.g., zxz
-
-    - Third angle belongs to [-180, 180] degrees (both inclusive)
-    """
-    offset = np.pi  # only in radians
-
-    if seq[0] == seq[2]:  # Euler angles
-        angles[0] = np.mod(angles[0], 2 * offset) - offset
-        angles[1] = -angles[1]
-        angles[2] = np.mod(angles[2], 2 * offset) - offset
-    else:  # Tait-Bryan angles
-        angles[0] = np.mod(angles[0], 2 * offset) - offset
-        angles[1] = offset - angles[1]
-        angles[angles[1] > offset, :] -= 2 * offset
-        angles[2] = np.mod(angles[2], 2 * offset) - offset
-
-    return angles
-
+from spartacus import compute_rotation_matrix_from_axes, flip_rotations
 
 # simplification for matlabists
 X = np.array([1, 0, 0])[:, np.newaxis]  # (3 x 1)
