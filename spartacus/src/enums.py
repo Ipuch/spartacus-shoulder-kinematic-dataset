@@ -243,7 +243,7 @@ class EulerSequence(Enum):
             JointType.THORACO_HUMERAL: cls.YXY,
         }
 
-        the_enum = sequence_name_to_enum.get(sequence)
+        the_enum = joint_type_to_euler_sequence.get(joint_type)
         if the_enum is None:
             raise ValueError("JointType not recognized")
 

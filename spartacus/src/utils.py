@@ -161,9 +161,9 @@ class BiomechCoordinateSystem:
         """
 
         return compute_rotation_matrix_from_axes(
-            anterior_posterior_axis=self.anterior_posterior_axis,
-            infero_superior_axis=self.infero_superior_axis,
-            medio_lateral_axis=self.medio_lateral_axis,
+            anterior_posterior_axis=self.anterior_posterior_axis.value[1][:, np.newaxis],
+            infero_superior_axis=self.infero_superior_axis.value[1][:, np.newaxis],
+            medio_lateral_axis=self.medio_lateral_axis.value[1][:, np.newaxis],
         )
 
     def __print__(self):
