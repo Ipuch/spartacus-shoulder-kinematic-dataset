@@ -600,23 +600,29 @@ class RowData:
         """
 
         self.isb_rotation_matrix_callback = lambda rot1, rot2, rot3: isb_framed_rotation_matrix_from_euler_angles(
-                rot1=rot1,
-                rot2=rot2,
-                rot3=rot3,
-                previous_sequence_str=self.joint.euler_sequence.value,
-                bsys_parent=self.parent_biomech_sys,
-                bsys_child=self.child_biomech_sys,
+            rot1=rot1,
+            rot2=rot2,
+            rot3=rot3,
+            previous_sequence_str=self.joint.euler_sequence.value,
+            bsys_parent=self.parent_biomech_sys,
+            bsys_child=self.child_biomech_sys,
         )
 
-        parent_matrix_correction = np.eye(3) if self.parent_corrections is None else get_kolz_rotation_matrix(
-            correction=self.parent_corrections[0])
-        child_matrix_correction = np.eye(3) if self.child_corrections is None else get_kolz_rotation_matrix(
-            correction=self.child_corrections[0])
+        parent_matrix_correction = (
+            np.eye(3)
+            if self.parent_corrections is None
+            else get_kolz_rotation_matrix(correction=self.parent_corrections[0])
+        )
+        child_matrix_correction = (
+            np.eye(3)
+            if self.child_corrections is None
+            else get_kolz_rotation_matrix(correction=self.child_corrections[0])
+        )
 
         self.correct_isb_rotation_matrix_callback = lambda rot1, rot2, rot3: set_corrections_on_rotation_matrix(
-                matrix=self.isb_rotation_matrix_callback(rot1, rot2, rot3),
-                child_matrix_correction=child_matrix_correction,
-                parent_matrix_correction=parent_matrix_correction,
+            matrix=self.isb_rotation_matrix_callback(rot1, rot2, rot3),
+            child_matrix_correction=child_matrix_correction,
+            parent_matrix_correction=parent_matrix_correction,
         )
 
         self.rotation_correction_callback = lambda rot1, rot2, rot3: rotation_matrix_2_euler_angles(
