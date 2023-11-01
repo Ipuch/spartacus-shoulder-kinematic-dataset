@@ -66,4 +66,3 @@ class Joint:
             return False
 
         return True
-

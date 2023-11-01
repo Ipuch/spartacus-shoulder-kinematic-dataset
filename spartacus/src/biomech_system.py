@@ -109,7 +109,10 @@ class BiomechCoordinateSystem:
 
         ON_ISB_AXES = {
             Segment.THORAX: [BiomechOrigin.Thorax.C7, BiomechOrigin.Thorax.T8, BiomechOrigin.Thorax.PX],
-            Segment.CLAVICLE: [BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER, BiomechOrigin.Clavicle.ACROMIOCLAVICULAR_JOINT_CENTER],
+            Segment.CLAVICLE: [
+                BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER,
+                BiomechOrigin.Clavicle.ACROMIOCLAVICULAR_JOINT_CENTER,
+            ],
             Segment.SCAPULA: [BiomechOrigin.Scapula.TRIGNONUM_SPINAE, BiomechOrigin.Scapula.ANGULUS_INFERIOR],
             Segment.HUMERUS: [BiomechOrigin.Humerus.MIDPOINT_EPICONDYLES],
         }
@@ -149,4 +152,3 @@ class BiomechCoordinateSystem:
         print(f"Anterior Posterior Axis: {self.anterior_posterior_axis}")
         print(f"Medio Lateral Axis: {self.medio_lateral_axis}")
         print(f"Infero Superior Axis: {self.infero_superior_axis}")
-

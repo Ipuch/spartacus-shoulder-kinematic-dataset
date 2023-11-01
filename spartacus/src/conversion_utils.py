@@ -479,4 +479,3 @@ def get_conversion_from_not_isb_to_isb_oriented_v2(
     )
 
     return True, the_tuple
-

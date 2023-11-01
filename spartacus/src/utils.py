@@ -3,9 +3,11 @@ import numpy as np
 
 from .enums import Segment
 
+
 def mat_2_rotation(R: np.ndarray) -> biorbd.Rotation:
     """Convert a 3x3 matrix to a biorbd.Rotation"""
     return biorbd.Rotation(R[0, 0], R[0, 1], R[0, 2], R[1, 0], R[1, 1], R[1, 2], R[2, 0], R[2, 1], R[2, 2])
+
 
 def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
     """
@@ -64,7 +66,6 @@ def flip_rotations(angles: np.ndarray, seq: str) -> np.ndarray:
         angles[2] = np.mod(angles[2], 2 * offset) - offset
 
     return angles
-
 
 
 # def check_biomech_consistency(
@@ -137,7 +138,7 @@ def get_segment_columns(segment: Segment) -> list[str]:
         Segment.THORAX: ["thorax_x", "thorax_y", "thorax_z", "thorax_origin"],
         Segment.CLAVICLE: ["clavicle_x", "clavicle_y", "clavicle_z", "clavicle_origin"],
         Segment.SCAPULA: ["scapula_x", "scapula_y", "scapula_z", "scapula_origin"],
-        Segment.HUMERUS: ["humerus_x", "humerus_y", "humerus_z", "humerus_origin"]
+        Segment.HUMERUS: ["humerus_x", "humerus_y", "humerus_z", "humerus_origin"],
     }
     return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
@@ -147,7 +148,7 @@ def get_is_isb_column(segment: Segment) -> str:
         Segment.THORAX: "thorax_is_isb",
         Segment.CLAVICLE: "clavicle_is_isb",
         Segment.SCAPULA: "scapula_is_isb",
-        Segment.HUMERUS: "humerus_is_isb"
+        Segment.HUMERUS: "humerus_is_isb",
     }
     return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
@@ -157,7 +158,7 @@ def get_correction_column(segment: Segment) -> str:
         Segment.THORAX: "thorax_correction_method",
         Segment.CLAVICLE: "clavicle_correction_method",
         Segment.SCAPULA: "scapula_correction_method",
-        Segment.HUMERUS: "humerus_correction_method"
+        Segment.HUMERUS: "humerus_correction_method",
     }
     return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
@@ -167,7 +168,7 @@ def get_is_correctable_column(segment: Segment) -> str:
         Segment.THORAX: "thorax_is_isb_correctable",
         Segment.CLAVICLE: "clavicle_is_isb_correctable",
         Segment.SCAPULA: "scapula_is_isb_correctable",
-        Segment.HUMERUS: "humerus_is_isb_correctable"
+        Segment.HUMERUS: "humerus_is_isb_correctable",
     }
     return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
 
