@@ -117,12 +117,16 @@ class BiomechDirection(Enum):
 
     @property
     def sign(self):
-        if self == self.PlusPosteroAnterior or self == self.PlusMedioLateral or self == self.PlusInferoSuperior:
-            return 1
-        elif self == self.MinusPosteroAnterior or self == self.MinusMedioLateral or self == self.MinusInferoSuperior:
-            return -1
-        else:
-            raise ValueError("Unknown biomech direction")
+        sign = {
+            self.PlusPosteroAnterior: 1,
+            self.PlusMedioLateral: 1,
+            self.PlusInferoSuperior: 1,
+            self.MinusPosteroAnterior: -1,
+            self.MinusMedioLateral: -1,
+            self.MinusInferoSuperior: -1,
+        }
+
+        return sign[self]
 
 
 class BiomechOrigin:
@@ -231,18 +235,19 @@ class EulerSequence(Enum):
 
     @classmethod
     def isb_from_joint_type(cls, joint_type: JointType):
-        if joint_type == JointType.GLENO_HUMERAL:
-            return EulerSequence.YXY
-        elif joint_type == JointType.SCAPULO_THORACIC:
-            return EulerSequence.YXZ
-        elif joint_type == JointType.ACROMIO_CLAVICULAR:
-            return EulerSequence.YXZ
-        elif joint_type == JointType.STERNO_CLAVICULAR:
-            return EulerSequence.YXZ
-        elif joint_type == JointType.THORACO_HUMERAL:
-            return EulerSequence.YXY
-        else:
+        joint_type_to_euler_sequence = {
+            JointType.GLENO_HUMERAL: cls.YXY,
+            JointType.SCAPULO_THORACIC: cls.YXZ,
+            JointType.ACROMIO_CLAVICULAR: cls.YXZ,
+            JointType.STERNO_CLAVICULAR: cls.YXZ,
+            JointType.THORACO_HUMERAL: cls.YXY,
+        }
+
+        the_enum = joint_type_to_euler_sequence.get(joint_type)
+        if the_enum is None:
             raise ValueError("JointType not recognized")
+
+        return the_enum
 
     @classmethod
     def from_string(cls, sequence: str):

@@ -19,5 +19,7 @@ from .src.checks import (
 
 from .src.row_data import RowData
 from .src.load import load, Spartacus
-from .src.utils import Joint, BiomechCoordinateSystem
+from .src.utils import compute_rotation_matrix_from_axes, flip_rotations
+from .src.joint import Joint
+from .src.biomech_system import BiomechCoordinateSystem
 from .src.checks import check_same_orientation
