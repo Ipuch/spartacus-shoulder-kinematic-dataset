@@ -40,7 +40,6 @@ def from_euler_angles_to_rotation_matrix(
     rot2,
     rot3,
 ):
-
     rotation_matrix_object = biorbd.Rotation.fromEulerAngles(np.array([rot1, rot2, rot3]), seq=previous_sequence_str)
     rotation_matrix = rotation_matrix_object.to_array()
     return rotation_matrix
@@ -53,7 +52,7 @@ def isb_framed_rotation_matrix_from_euler_angles(
     rot3,
     bsys_parent: BiomechCoordinateSystem,
     bsys_child: BiomechCoordinateSystem,
-)-> np.ndarray:
+) -> np.ndarray:
     rotation_matrix = from_euler_angles_to_rotation_matrix(previous_sequence_str, rot1, rot2, rot3)
 
     converted_rotation_matrix = bsys_child.get_rotation_matrix() @ rotation_matrix @ bsys_parent.get_rotation_matrix().T
@@ -62,9 +61,9 @@ def isb_framed_rotation_matrix_from_euler_angles(
 
 
 def set_corrections_on_rotation_matrix(
-        matrix: np.ndarray,
-        child_matrix_correction: np.ndarray,
-        parent_matrix_correction: np.ndarray,
+    matrix: np.ndarray,
+    child_matrix_correction: np.ndarray,
+    parent_matrix_correction: np.ndarray,
 ):
     return child_matrix_correction @ matrix @ parent_matrix_correction.T
 
