@@ -19,7 +19,11 @@ from .angle_conversion_callbacks import (
     get_angle_conversion_callback_from_tuple,
     get_angle_conversion_callback_from_sequence,
     get_angle_conversion_callback_to_isb_with_sequence,
+    isb_framed_rotation_matrix_from_euler_angles,
+    set_corrections_on_rotation_matrix,
+    rotation_matrix_2_euler_angles,
 )
+from .kolz_matrices import get_kolz_rotation_matrix
 
 from .checks import (
     check_segment_filled_with_nan,
@@ -594,84 +598,31 @@ class RowData:
         """
         Set the rotation correction callback, for the joint. We rely on the corrections set in the table.
         """
-        # TODO: I will have a different philosophy here...
-        #   ALWAYS DO TO ISB CONVERSION based on the content of the .csv
-        #   And the extra correction also.
 
-        if self.parent_corrections is None or self.child_corrections is None:
-            if self.joint.is_joint_sequence_isb():
-                self.rotation_correction_callback = get_angle_conversion_callback_from_tuple((1, 1, 1))
-            else:
-                # -- TO ISB SEQUENCE --
-                # rebuild the rotation matrix from angles and sequence and identify the ISB angles from the rotation matrix
-                self.rotation_correction_callback = get_angle_conversion_callback_from_sequence(
-                    previous_sequence=self.joint.euler_sequence,
-                    new_sequence=self.joint.isb_euler_sequence(),
-                )
+        self.isb_rotation_matrix_callback = lambda rot1, rot2, rot3: isb_framed_rotation_matrix_from_euler_angles(
+                rot1=rot1,
+                rot2=rot2,
+                rot3=rot3,
+                previous_sequence_str=self.joint.euler_sequence.value,
+                bsys_parent=self.parent_biomech_sys,
+                bsys_child=self.child_biomech_sys,
+        )
 
-        elif self.parent_corrections is not None or self.child_corrections is not None:  # This is to isb correction !
-            # 1. Check if the two segments are oriented in the same direction
-            print("parent correction", self.parent_corrections)
-            print("child correction", self.child_corrections)
-            if not check_same_orientation(parent=self.parent_biomech_sys, child=self.child_biomech_sys):
-                # todo: i don't know yet if useful
-                self.rotation_correction_callback = None
-                raise NotImplementedError("Not implemented yet, I don't know what to do yet.")
+        parent_matrix_correction = np.eye(3) if self.parent_corrections is None else get_kolz_rotation_matrix(
+            correction=self.parent_corrections[0])
+        child_matrix_correction = np.eye(3) if self.child_corrections is None else get_kolz_rotation_matrix(
+            correction=self.child_corrections[0])
 
-            # get the kolz correction for the parent and child
-            kolz_corrections = (
-                Correction.SCAPULA_KOLZ_AC_TO_PA_ROTATION,
-                Correction.SCAPULA_KOLZ_GLENOID_TO_PA_ROTATION,
-            )
-            parent_kolz_correction = [
-                correction for correction in self.parent_corrections if correction in kolz_corrections
-            ]
-            child_kolz_correction = [
-                correction for correction in self.child_corrections if correction in kolz_corrections
-            ]
+        self.correct_isb_rotation_matrix_callback = lambda rot1, rot2, rot3: set_corrections_on_rotation_matrix(
+                matrix=self.isb_rotation_matrix_callback(rot1, rot2, rot3),
+                child_matrix_correction=child_matrix_correction,
+                parent_matrix_correction=parent_matrix_correction,
+        )
 
-            # 2.If they are the same orientation,
-            # convert the euler angles to get them such that the two segments are ISB oriented
-            # NOTE: we don't actually convert the coordinate systems, we just convert the euler angles
-            # Deprecated
-            # output = get_conversion_from_not_isb_to_isb_oriented(
-            #     parent=self.parent_biomech_sys,
-            #     child=self.child_biomech_sys,
-            #     joint=self.joint,
-            # )
-            # New method
-            (
-                is_sequence_convertible_through_factors,
-                sign_factors,
-            ) = convert_rotation_matrix_from_one_coordinate_system_to_another(
-                bsys=self.parent_biomech_sys,  # assuming they are oriented the same way
-                initial_sequence=self.joint.euler_sequence,
-                sequence_wanted=self.joint.isb_euler_sequence(),
-                child_extra_correction=child_kolz_correction[0] if child_kolz_correction else None,
-                parent_extra_correction=parent_kolz_correction[0] if parent_kolz_correction else None,
-            )
-            # Note: an extra check need to be done in the previous function
-            print("is_sequence_convertible_through_factors, sign_factors")
-            print(is_sequence_convertible_through_factors, sign_factors)
-            if (
-                self.joint.is_sequence_convertible_through_factors(print_warning=True)
-                and is_sequence_convertible_through_factors
-            ):
-                self.rotation_correction_callback = get_angle_conversion_callback_from_tuple(sign_factors)
-            else:
-                self.rotation_correction_callback = get_angle_conversion_callback_to_isb_with_sequence(
-                    previous_sequence=self.joint.euler_sequence,
-                    new_sequence=self.joint.isb_euler_sequence(),
-                    bsys_child=self.child_biomech_sys,
-                    bsys_parent=self.parent_biomech_sys,
-                )
-
-            # it may not include the step where we check if the origin is on an isb axis, especially for the scapula, consider kolz conversion
-            # build the rotation matrix from the euler angles and sequence, applied kolz conversion to the rotation matrix
-            # identify again the euler angles from the rotation matrix
-
-        else:
-            raise NotImplementedError("Check conversion not implemented yet")
+        self.rotation_correction_callback = lambda rot1, rot2, rot3: rotation_matrix_2_euler_angles(
+            rotation_matrix=self.correct_isb_rotation_matrix_callback(rot1, rot2, rot3),
+            euler_sequence=self.joint.isb_euler_sequence(),
+        )
 
     def import_data(self):
         """this function import the data of the following row"""

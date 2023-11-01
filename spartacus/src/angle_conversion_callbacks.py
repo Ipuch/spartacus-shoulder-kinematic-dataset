@@ -61,6 +61,14 @@ def isb_framed_rotation_matrix_from_euler_angles(
     return converted_rotation_matrix
 
 
+def set_corrections_on_rotation_matrix(
+        matrix: np.ndarray,
+        child_matrix_correction: np.ndarray,
+        parent_matrix_correction: np.ndarray,
+):
+    return child_matrix_correction @ matrix @ parent_matrix_correction.T
+
+
 def convert_euler_angles_and_frames_to_isb(
     previous_sequence_str: str,
     new_sequence_str: str,
@@ -81,6 +89,14 @@ def convert_euler_angles_and_frames_to_isb(
 
     new_rotation_matrix_object = mat_2_rotation(isb_framed_rotation_matrix)
     return biorbd.Rotation.toEulerAngles(new_rotation_matrix_object, seq=new_sequence_str).to_array()
+
+
+def rotation_matrix_2_euler_angles(
+    rotation_matrix: np.ndarray,
+    euler_sequence: EulerSequence,
+) -> np.ndarray:
+    rotation_matrix_object = mat_2_rotation(rotation_matrix)
+    return biorbd.Rotation.toEulerAngles(rotation_matrix_object, seq=euler_sequence.value.lower()).to_array()
 
 
 def get_angle_conversion_callback_to_isb_with_sequence(
