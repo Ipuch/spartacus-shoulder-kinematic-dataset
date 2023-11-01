@@ -599,6 +599,10 @@ class RowData:
         """
         Set the rotation correction callback, for the joint. We rely on the corrections set in the table.
         """
+        # TODO: I will have a different philosophy here...
+        #   ALWAYS DO TO ISB CONVERSION based on the content of the .csv
+        #   And the extra correction also.
+
         if self.parent_corrections is None or self.child_corrections is None:
             if self.joint.is_joint_sequence_isb():
                 self.rotation_correction_callback = get_angle_conversion_callback_from_tuple((1, 1, 1))
