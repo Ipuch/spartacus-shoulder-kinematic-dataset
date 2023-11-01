@@ -160,9 +160,11 @@ class BiomechCoordinateSystem:
 
         """
 
-        return compute_rotation_matrix_from_axes(anterior_posterior_axis=self.anterior_posterior_axis,
-                                                 infero_superior_axis=self.infero_superior_axis,
-                                                 medio_lateral_axis=self.medio_lateral_axis)
+        return compute_rotation_matrix_from_axes(
+            anterior_posterior_axis=self.anterior_posterior_axis,
+            infero_superior_axis=self.infero_superior_axis,
+            medio_lateral_axis=self.medio_lateral_axis,
+        )
 
     def __print__(self):
         print(f"Segment: {self.segment}")
@@ -946,4 +948,3 @@ def compute_rotation_matrix_from_axes(
         ],
         dtype=np.float64,
     ).T  # where the transpose was missing in the original code
-

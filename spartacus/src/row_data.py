@@ -409,13 +409,7 @@ class RowData:
 
         child_correction = self.extract_corrections(self.child_segment)
         self.child_corrections = self.extract_corrections(self.child_segment)
-        child_is_correctable = self.extract_is_correctable(self.child_segment)
-
-        #
-        # self._check_correction_consistency(
-        #     self.parent_biomech_sys.is_isb_oriented()
-        #     and self.parent_biomech_sys.is_origin_on_an_isb_axis()
-        # )
+        # child_is_correctable = self.extract_is_correctable(self.child_segment)
 
         # Thorax is global check
         if self.parent_segment == Segment.THORAX:
