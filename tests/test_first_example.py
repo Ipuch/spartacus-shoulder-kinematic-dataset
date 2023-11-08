@@ -43,10 +43,10 @@ articles_data = {
     "Kijima et al. 2015": (
         24,
         ["scapular elevation"],
-        ["glenohumeral"],
+        ["glenohumeral", "scapulothoracic"],
         ["1", "2", "3"],
-        0,
-        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
+        6.31180992544895,
+        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 0.7169817831629339)],
     ),
     "Cereatti et al. 2017": (
         3495,
@@ -191,7 +191,7 @@ def test_number_of_articles():
 
     assert len(articles) == 13
 
-    assert confident_values.shape[0] == 89226
+    assert confident_values.shape[0] == 89250
 
 
 def print_data(data, random_checks):
