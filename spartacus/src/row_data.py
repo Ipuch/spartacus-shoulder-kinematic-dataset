@@ -661,6 +661,7 @@ class RowData:
             columns=[
                 "article",
                 "joint",
+                "angle_translation",
                 "humeral_motion",
                 "humerothoracic_angle",
                 "value_dof1",
@@ -678,6 +679,7 @@ class RowData:
             corrected_angle_series_dataframe.loc[i] = [
                 self.row.article_author_year,
                 self.row.joint,
+                "angle",
                 self.row.humeral_motion,
                 row.humerothoracic_angle,
                 corrected_dof_1,
@@ -687,7 +689,7 @@ class RowData:
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "humeral_motion", "humerothoracic_angle"],
+            id_vars=["article", "joint","angle_translation", "humeral_motion", "humerothoracic_angle"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
