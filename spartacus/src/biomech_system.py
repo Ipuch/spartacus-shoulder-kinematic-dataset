@@ -145,7 +145,55 @@ class BiomechCoordinateSystem:
             infero_superior_axis=self.infero_superior_axis.value[1][:, np.newaxis],
             medio_lateral_axis=self.medio_lateral_axis.value[1][:, np.newaxis],
         )
+    def is_mislabeled(self):
 
+        condition_1 = (self.anterior_posterior is CartesianAxis.plusX) or (self.anterior_posterior is CartesianAxis.minusX)
+        condition_2 = (self.infero_superior is CartesianAxis.plusY) or (self.infero_superior is CartesianAxis.minusY)
+        condition_3 = (self.medio_lateral is CartesianAxis.plusZ) or (self.medio_lateral is CartesianAxis.minusZ)
+
+        return not (condition_1 and condition_2 and condition_3)
+
+    def get_risk_quantification(self,type_segment,type_risk):
+        """
+        Return the risk quantification of the segment
+        """
+        dict_coeff = dict()
+        dict_coeff["proximal"] = dict()
+        dict_coeff["distal"] = dict()
+
+        dict_coeff["proximal"]["Rotation"]["Label"] = 0.9
+        dict_coeff["proximal"]["Rotation"]["Sens"] = 0.9
+        dict_coeff["proximal"]["Rotation"]["Origin"] = 0.9
+        dict_coeff["proximal"]["Rotation"]["Direction"] = 0.5
+
+        dict_coeff["proximal"]["Displacement"]["Label"] = 0.9
+        dict_coeff["proximal"]["Displacement"]["Sens"] = 0.9
+        dict_coeff["proximal"]["Displacement"]["Origin"] = 0.5
+        dict_coeff["proximal"]["Displacement"]["Direction"] = 0.5
+
+        dict_coeff["proximal"]["Rotation"]["Label"] = 0.9
+        dict_coeff["proximal"]["Rotation"]["Sens"] = 0.9
+        dict_coeff["proximal"]["Rotation"]["Origin"] = 0.9
+        dict_coeff["proximal"]["Rotation"]["Direction"] = 0.5
+
+        dict_coeff["proximal"]["Displacement"]["Label"] = 0.9
+        dict_coeff["proximal"]["Displacement"]["Sens"] = 0.9
+        dict_coeff["proximal"]["Displacement"]["Origin"] = 0.5
+        dict_coeff["proximal"]["Displacement"]["Direction"] = 0.9
+
+
+        initial_risk = 1
+        if not self.is_mislabeled():
+            initial_risk = initial_risk * dict_coeff[type_segment][type_risk]["Label"]
+
+        
+        if not self.is_origin_isb():
+              initial_risk = initial_risk * dict_coeff[type_segment][type_risk]["Origin"]
+
+
+
+
+        return self.risk_quantification
     def __print__(self):
         print(f"Segment: {self.segment}")
         print(f"Origin: {self.origin}")

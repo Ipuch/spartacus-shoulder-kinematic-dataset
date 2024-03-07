@@ -629,6 +629,23 @@ class RowData:
             euler_sequence=self.joint.isb_euler_sequence(),
         )
 
+    def quantify_segment_risk(self):
+        """
+        Quantify the risk of the joint.
+        """
+        risk_proximal = 1
+        risk_distal = 1
+        self.parent_biomech_sys.is_isb_oriented()
+
+        if self.parent_biomech_sys.is_isb_oriented():
+            risk_proximal = risk_proximal * 1
+        else:
+            if self.parent_biomech_sys
+
+
+
+
+
     def import_data(self):
         """this function import the data of the following row"""
         # todo: translation
