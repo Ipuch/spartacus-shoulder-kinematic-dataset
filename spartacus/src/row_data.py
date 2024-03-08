@@ -640,14 +640,14 @@ class RowData:
         risk_parent_direction = 1
         risk_child_direction = 1
         if self.parent_corrections is not None:
-            if 'KOLZ' in self.parent_corrections[0].name:
+            if "KOLZ" in self.parent_corrections[0].name:
                 if type_risk == "rotation":
                     risk_parent_direction = 0.5
                 elif type_risk == "displacement":
                     risk_parent_direction = 0.5
 
         if self.child_corrections is not None:
-            if 'KOLZ' in self.parent_corrections[0].name:
+            if "KOLZ" in self.parent_corrections[0].name:
                 if type_risk == "rotation":
                     risk_parent_direction = 0.5
                 elif type_risk == "displacement":
