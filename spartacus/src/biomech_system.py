@@ -153,6 +153,17 @@ class BiomechCoordinateSystem:
 
         return not (condition_1 and condition_2 and condition_3)
 
+
+    def is_frame_wrong_sens(self):
+
+        is_ant_post_wrong_sens = is_axis_wrong_sens(self.anterior_posterior)
+        is_med_lat_wrong_sens = is_axis_wrong_sens(self.medio_lateral)
+        is_inf_sup_wrong_sens = is_axis_wrong_sens(self.infero_superior)
+
+        return is_ant_post_wrong_sens or is_med_lat_wrong_sens or is_inf_sup_wrong_sens
+
+    def has_wrong_direction(self):
+        pass
     def get_risk_quantification(self,type_segment,type_risk):
         """
         Return the risk quantification of the segment
@@ -182,21 +193,28 @@ class BiomechCoordinateSystem:
         dict_coeff["proximal"]["Displacement"]["Direction"] = 0.9
 
 
-        initial_risk = 1
+        risk = 1
         if not self.is_mislabeled():
-            initial_risk = initial_risk * dict_coeff[type_segment][type_risk]["Label"]
+            risk = risk * dict_coeff[type_segment][type_risk]["Label"]
 
-        
         if not self.is_origin_isb():
-              initial_risk = initial_risk * dict_coeff[type_segment][type_risk]["Origin"]
+            risk = risk * dict_coeff[type_segment][type_risk]["Origin"]
 
+        if self.is_wrong_sens():
+            risk = risk * dict_coeff[type_segment][type_risk]["Sens"]
 
+        return risk
 
-
-        return self.risk_quantification
     def __print__(self):
         print(f"Segment: {self.segment}")
         print(f"Origin: {self.origin}")
         print(f"Anterior Posterior Axis: {self.anterior_posterior_axis}")
         print(f"Medio Lateral Axis: {self.medio_lateral_axis}")
         print(f"Infero Superior Axis: {self.infero_superior_axis}")
+
+def is_axis_wrong_sens(axis)->bool:
+    condition_1 = axis is CartesianAxis.minusX
+    condition_2 = axis is CartesianAxis.minusY
+    condition_3 = axis is CartesianAxis.minusZ
+
+    return condition_1 or condition_2 or condition_3
