@@ -629,20 +629,14 @@ class RowData:
             euler_sequence=self.joint.isb_euler_sequence(),
         )
 
-    def quantify_segment_risk(self):
+    def quantify_segment_risk(self,type_risk:str):
         """
         Quantify the risk of the joint.
         """
-        risk_proximal = 1
-        risk_distal = 1
-        self.parent_biomech_sys.is_isb_oriented()
+        risk_parent = self.parent_biomech_sys.get_risk_quantification('proximal', type_risk)
+        risk_child = self.child_biomech_sys.get_risk_quantification('distal', type_risk)
 
-        if self.parent_biomech_sys.is_isb_oriented():
-            risk_proximal = risk_proximal * 1
-        else:
-            if self.parent_biomech_sys
-
-
+        return risk_parent*risk_child
 
 
 
