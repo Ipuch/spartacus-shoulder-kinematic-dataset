@@ -180,10 +180,6 @@ class BiomechCoordinateSystem:
 
         return is_ant_post_wrong_sens or is_med_lat_wrong_sens or is_inf_sup_wrong_sens
 
-    def is_wrong_direction(self):
-        # TODO : implement this function
-        return False
-
     def get_segment_risk_quantification(self, type_segment, type_risk):
         """
         Return the risk quantification of the segment which is the product of the risk of each type of risk described in the dictionnary dict_coeff.
@@ -219,9 +215,6 @@ class BiomechCoordinateSystem:
 
         if self.is_any_axis_wrong_sens():
             risk = risk * dict_coeff[type_segment][type_risk]["sens"]
-
-        if self.is_wrong_direction():
-            risk = risk * dict_coeff[type_segment][type_risk]["direction"]
 
         return risk
 
