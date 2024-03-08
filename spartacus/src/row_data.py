@@ -636,7 +636,32 @@ class RowData:
         risk_parent = self.parent_biomech_sys.get_segment_risk_quantification("proximal", type_risk)
         risk_child = self.child_biomech_sys.get_segment_risk_quantification("distal", type_risk)
 
-        return risk_parent * risk_child
+        # The direction risk cannot be calculated in the biomech system object
+        risk_parent_direction = 1
+        risk_child_direction = 1
+        if self.parent_corrections is not None:
+            if 'KOLZ' in self.parent_corrections[0].name:
+                if type_risk == "rotation":
+                    risk_parent_direction = 0.5
+                elif type_risk == "displacement":
+                    risk_parent_direction = 0.5
+
+        if self.child_corrections is not None:
+            if 'KOLZ' in self.parent_corrections[0].name:
+                if type_risk == "rotation":
+                    risk_parent_direction = 0.5
+                elif type_risk == "displacement":
+                    risk_parent_direction = 0.9
+
+        # Quantification of the risk linked to euler
+        if self.joint.is_joint_sequence_isb():
+            risk_sequences = 1
+        else:
+            risk_sequences = 0.8
+
+        final_risk = risk_parent * risk_child * risk_sequences * risk_parent_direction * risk_child_direction
+
+        return final_risk
 
     def import_data(self):
         """this function import the data of the following row"""
