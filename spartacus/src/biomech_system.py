@@ -1,5 +1,6 @@
 import biorbd
 import numpy as np
+import collections
 
 from .enums import CartesianAxis, BiomechDirection, BiomechOrigin, Segment
 from .utils import compute_rotation_matrix_from_axes
@@ -146,62 +147,75 @@ class BiomechCoordinateSystem:
             medio_lateral_axis=self.medio_lateral_axis.value[1][:, np.newaxis],
         )
     def is_mislabeled(self):
+        """
+        Return True if the segment is mislabeled, False otherwise
+        Mislabeling is defined as the only difference with ISB being the wrong name of the axis. Which means that :
+            - the antero posterior axis is not along the x axis
+            - the infero superior axis is not along the y axis
+            - the medio lateral axis is not along the z axis
+        """
 
-        condition_1 = (self.anterior_posterior is CartesianAxis.plusX) or (self.anterior_posterior is CartesianAxis.minusX)
-        condition_2 = (self.infero_superior is CartesianAxis.plusY) or (self.infero_superior is CartesianAxis.minusY)
-        condition_3 = (self.medio_lateral is CartesianAxis.plusZ) or (self.medio_lateral is CartesianAxis.minusZ)
+        condition_1 = (self.anterior_posterior_axis is CartesianAxis.plusX) or (self.anterior_posterior_axis is CartesianAxis.minusX)
+        condition_2 = (self.infero_superior_axis is CartesianAxis.plusY) or (self.infero_superior_axis is CartesianAxis.minusY)
+        condition_3 = (self.medio_lateral_axis is CartesianAxis.plusZ) or (self.medio_lateral_axis is CartesianAxis.minusZ)
 
         return not (condition_1 and condition_2 and condition_3)
 
 
-    def is_frame_wrong_sens(self):
+    def is_any_axis_wrong_sens(self):
+        """
+        Return True if any of the axis is in the wrong sens, False otherwise
+        The wrong sens is defined as the axis pointing in the positive direction (which here correspond to forward, to the right and up).
+        """
 
-        is_ant_post_wrong_sens = is_axis_wrong_sens(self.anterior_posterior)
-        is_med_lat_wrong_sens = is_axis_wrong_sens(self.medio_lateral)
-        is_inf_sup_wrong_sens = is_axis_wrong_sens(self.infero_superior)
+        is_ant_post_wrong_sens = is_axis_wrong_sens(self.anterior_posterior_axis)
+        is_med_lat_wrong_sens = is_axis_wrong_sens(self.medio_lateral_axis)
+        is_inf_sup_wrong_sens = is_axis_wrong_sens(self.infero_superior_axis)
 
         return is_ant_post_wrong_sens or is_med_lat_wrong_sens or is_inf_sup_wrong_sens
 
-    def has_wrong_direction(self):
-        pass
+    def is_wrong_direction(self):
+        #TODO : implement this function
+        return False
     def get_risk_quantification(self,type_segment,type_risk):
         """
-        Return the risk quantification of the segment
+        Return the risk quantification of the segment which is the product of the risk of each type of risk described in the dictionnary dict_coeff.
         """
-        dict_coeff = dict()
-        dict_coeff["proximal"] = dict()
-        dict_coeff["distal"] = dict()
+        nested_dict = lambda :collections.defaultdict(nested_dict)
+        dict_coeff = nested_dict()
+        dict_coeff["proximal"]["rotation"]["label"] = 0.9
+        dict_coeff["proximal"]["rotation"]["sens"] = 0.9
+        dict_coeff["proximal"]["rotation"]["origin"] = 0.9
+        dict_coeff["proximal"]["rotation"]["direction"] = 0.5
 
-        dict_coeff["proximal"]["Rotation"]["Label"] = 0.9
-        dict_coeff["proximal"]["Rotation"]["Sens"] = 0.9
-        dict_coeff["proximal"]["Rotation"]["Origin"] = 0.9
-        dict_coeff["proximal"]["Rotation"]["Direction"] = 0.5
+        dict_coeff["proximal"]["displacement"]["label"] = 0.9
+        dict_coeff["proximal"]["displacement"]["sens"] = 0.9
+        dict_coeff["proximal"]["displacement"]["origin"] = 0.5
+        dict_coeff["proximal"]["displacement"]["direction"] = 0.5
 
-        dict_coeff["proximal"]["Displacement"]["Label"] = 0.9
-        dict_coeff["proximal"]["Displacement"]["Sens"] = 0.9
-        dict_coeff["proximal"]["Displacement"]["Origin"] = 0.5
-        dict_coeff["proximal"]["Displacement"]["Direction"] = 0.5
+        dict_coeff["distal"]["rotation"]["label"] = 0.9
+        dict_coeff["distal"]["rotation"]["sens"] = 0.9
+        dict_coeff["distal"]["rotation"]["origin"] = 0.9
+        dict_coeff["distal"]["rotation"]["direction"] = 0.5
 
-        dict_coeff["proximal"]["Rotation"]["Label"] = 0.9
-        dict_coeff["proximal"]["Rotation"]["Sens"] = 0.9
-        dict_coeff["proximal"]["Rotation"]["Origin"] = 0.9
-        dict_coeff["proximal"]["Rotation"]["Direction"] = 0.5
-
-        dict_coeff["proximal"]["Displacement"]["Label"] = 0.9
-        dict_coeff["proximal"]["Displacement"]["Sens"] = 0.9
-        dict_coeff["proximal"]["Displacement"]["Origin"] = 0.5
-        dict_coeff["proximal"]["Displacement"]["Direction"] = 0.9
+        dict_coeff["distal"]["displacement"]["label"] = 0.9
+        dict_coeff["distal"]["displacement"]["sens"] = 0.9
+        dict_coeff["distal"]["displacement"]["origin"] = 0.5
+        dict_coeff["distal"]["displacement"]["direction"] = 0.9
 
 
         risk = 1
-        if not self.is_mislabeled():
-            risk = risk * dict_coeff[type_segment][type_risk]["Label"]
+        if self.is_mislabeled():
+            risk = risk * dict_coeff[type_segment][type_risk]["label"]
 
-        if not self.is_origin_isb():
-            risk = risk * dict_coeff[type_segment][type_risk]["Origin"]
+        if not self.is_isb_origin():
+            risk = risk * dict_coeff[type_segment][type_risk]["origin"]
 
-        if self.is_wrong_sens():
-            risk = risk * dict_coeff[type_segment][type_risk]["Sens"]
+        if self.is_any_axis_wrong_sens():
+            risk = risk * dict_coeff[type_segment][type_risk]["sens"]
+
+        if self.is_wrong_direction():
+            risk = risk * dict_coeff[type_segment][type_risk]["direction"]
 
         return risk
 
