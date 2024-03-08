@@ -146,6 +146,7 @@ class BiomechCoordinateSystem:
             infero_superior_axis=self.infero_superior_axis.value[1][:, np.newaxis],
             medio_lateral_axis=self.medio_lateral_axis.value[1][:, np.newaxis],
         )
+
     def is_mislabeled(self):
         """
         Return True if the segment is mislabeled, False otherwise
@@ -155,12 +156,17 @@ class BiomechCoordinateSystem:
             - the medio lateral axis is not along the z axis
         """
 
-        condition_1 = (self.anterior_posterior_axis is CartesianAxis.plusX) or (self.anterior_posterior_axis is CartesianAxis.minusX)
-        condition_2 = (self.infero_superior_axis is CartesianAxis.plusY) or (self.infero_superior_axis is CartesianAxis.minusY)
-        condition_3 = (self.medio_lateral_axis is CartesianAxis.plusZ) or (self.medio_lateral_axis is CartesianAxis.minusZ)
+        condition_1 = (self.anterior_posterior_axis is CartesianAxis.plusX) or (
+            self.anterior_posterior_axis is CartesianAxis.minusX
+        )
+        condition_2 = (self.infero_superior_axis is CartesianAxis.plusY) or (
+            self.infero_superior_axis is CartesianAxis.minusY
+        )
+        condition_3 = (self.medio_lateral_axis is CartesianAxis.plusZ) or (
+            self.medio_lateral_axis is CartesianAxis.minusZ
+        )
 
         return not (condition_1 and condition_2 and condition_3)
-
 
     def is_any_axis_wrong_sens(self):
         """
@@ -175,13 +181,14 @@ class BiomechCoordinateSystem:
         return is_ant_post_wrong_sens or is_med_lat_wrong_sens or is_inf_sup_wrong_sens
 
     def is_wrong_direction(self):
-        #TODO : implement this function
+        # TODO : implement this function
         return False
+
     def get_segment_risk_quantification(self, type_segment, type_risk):
         """
         Return the risk quantification of the segment which is the product of the risk of each type of risk described in the dictionnary dict_coeff.
         """
-        nested_dict = lambda :collections.defaultdict(nested_dict)
+        nested_dict = lambda: collections.defaultdict(nested_dict)
         dict_coeff = nested_dict()
         dict_coeff["proximal"]["rotation"]["label"] = 0.9
         dict_coeff["proximal"]["rotation"]["sens"] = 0.9
@@ -202,7 +209,6 @@ class BiomechCoordinateSystem:
         dict_coeff["distal"]["displacement"]["sens"] = 0.9
         dict_coeff["distal"]["displacement"]["origin"] = 0.5
         dict_coeff["distal"]["displacement"]["direction"] = 0.9
-
 
         risk = 1
         if self.is_mislabeled():
@@ -226,7 +232,8 @@ class BiomechCoordinateSystem:
         print(f"Medio Lateral Axis: {self.medio_lateral_axis}")
         print(f"Infero Superior Axis: {self.infero_superior_axis}")
 
-def is_axis_wrong_sens(axis)->bool:
+
+def is_axis_wrong_sens(axis) -> bool:
     condition_1 = axis is CartesianAxis.minusX
     condition_2 = axis is CartesianAxis.minusY
     condition_3 = axis is CartesianAxis.minusZ

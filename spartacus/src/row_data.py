@@ -629,16 +629,14 @@ class RowData:
             euler_sequence=self.joint.isb_euler_sequence(),
         )
 
-    def quantify_segment_risk(self,type_risk:str):
+    def quantify_segment_risk(self, type_risk: str):
         """
         Quantify the risk of the joint.
         """
-        risk_parent = self.parent_biomech_sys.get_segment_risk_quantification('proximal', type_risk)
-        risk_child = self.child_biomech_sys.get_segment_risk_quantification('distal', type_risk)
+        risk_parent = self.parent_biomech_sys.get_segment_risk_quantification("proximal", type_risk)
+        risk_child = self.child_biomech_sys.get_segment_risk_quantification("distal", type_risk)
 
-        return risk_parent*risk_child
-
-
+        return risk_parent * risk_child
 
     def import_data(self):
         """this function import the data of the following row"""
@@ -700,7 +698,7 @@ class RowData:
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint","angle_translation", "humeral_motion", "humerothoracic_angle"],
+            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
