@@ -177,7 +177,7 @@ class BiomechCoordinateSystem:
     def is_wrong_direction(self):
         #TODO : implement this function
         return False
-    def get_risk_quantification(self,type_segment,type_risk):
+    def get_segment_risk_quantification(self, type_segment, type_risk):
         """
         Return the risk quantification of the segment which is the product of the risk of each type of risk described in the dictionnary dict_coeff.
         """

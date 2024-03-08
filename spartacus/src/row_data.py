@@ -633,8 +633,8 @@ class RowData:
         """
         Quantify the risk of the joint.
         """
-        risk_parent = self.parent_biomech_sys.get_risk_quantification('proximal', type_risk)
-        risk_child = self.child_biomech_sys.get_risk_quantification('distal', type_risk)
+        risk_parent = self.parent_biomech_sys.get_segment_risk_quantification('proximal', type_risk)
+        risk_child = self.child_biomech_sys.get_segment_risk_quantification('distal', type_risk)
 
         return risk_parent*risk_child
 
