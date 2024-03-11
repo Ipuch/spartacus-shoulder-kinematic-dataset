@@ -3,7 +3,6 @@ Rewritting the rotation matrices from the paper in a way that they can be used i
 a_in_AC = R_ac_gc @ a_in_GC
 """
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 
