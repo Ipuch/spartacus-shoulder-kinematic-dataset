@@ -8,6 +8,7 @@ Then we try to retrieve the euler angles from the ISB axes, and we compare the r
 but in fact it restored it for me" Pierre Puchaud.
 
 """
+
 import numpy as np
 
 # We can either do it with scipy or with biorbd
