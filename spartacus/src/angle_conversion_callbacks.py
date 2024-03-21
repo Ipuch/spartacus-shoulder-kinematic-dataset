@@ -73,7 +73,7 @@ def set_corrections_on_rotation_matrix(
     child_matrix_correction: np.ndarray,
     parent_matrix_correction: np.ndarray,
 ):
-    """ Returns the rotation matrix with the child and parent correction applied """
+    """Returns the rotation matrix with the child and parent correction applied"""
     return child_matrix_correction @ matrix @ parent_matrix_correction.T
 
 
