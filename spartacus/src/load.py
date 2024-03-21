@@ -18,7 +18,7 @@ class Spartacus:
         self.dataframe = dataframe
 
         self.clean_df()
-        self.remove_rows_not_ready_for_analysis()
+        # self.remove_rows_not_ready_for_analysis() # Todo: remove this function ultimately
         self.rows = []
         self.rows_output = None
 
@@ -183,6 +183,7 @@ def load() -> Spartacus:
 
     print(df.shape)
     sp = Spartacus(dataframe=df)
+    sp.remove_rows_not_ready_for_analysis()
     sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=True)
     sp.import_confident_data()
     # df = load_confident_data(df, print_warnings=True)
