@@ -638,6 +638,43 @@ class RowData:
 
         return risk_parent * risk_child
 
+    def is_joint_euler_angle_ISB_with_adaptation_from_segment(self):
+        raw_euler_seq = self.joint.euler_sequence.value
+        supposed_euler_seq = EulerSequence.isb_from_joint_type(self.joint.joint_type).value
+        # Z is supposed to be the +mediolat (point right)
+        # Y is supposed to be the +inferosup (point up )
+        # X is supposed to be the +anteropost (point front)
+        adapted_euler_seq = ''
+        for charac in supposed_euler_seq.lower()[0:2]:
+            if charac == 'x':
+                adapted_euler_seq += self.parent_biomech_sys.anterior_posterior_axis.value[0]
+            elif charac == 'y':
+                adapted_euler_seq += self.parent_biomech_sys.infero_superior_axis.value[0]
+            elif charac == 'z':
+                adapted_euler_seq += self.parent_biomech_sys.medio_lateral_axis.value[0]
+
+        if supposed_euler_seq.lower()[2] == 'x':
+            adapted_euler_seq += self.child_biomech_sys.anterior_posterior_axis.value[0]
+        elif supposed_euler_seq.lower()[2] == 'y':
+            adapted_euler_seq += self.child_biomech_sys.infero_superior_axis.value[0]
+        elif supposed_euler_seq.lower()[2] == 'z':
+            adapted_euler_seq += self.child_biomech_sys.medio_lateral_axis.value[0]
+
+        adapted_euler_seq.replace("-", "")
+
+        return adapted_euler_seq == raw_euler_seq
+
+    def quantify_joint_risk(self):
+        """
+        Quantify the risk associated with the joint which is associated to the euler sequences.
+        """
+        if self.is_joint_euler_angle_ISB_with_adaptation_from_segment():
+            risk = 1.0
+        else:
+            risk = 0.5
+
+        return risk
+
     def import_data(self):
         """this function import the data of the following row"""
         # todo: translation
