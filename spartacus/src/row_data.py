@@ -644,21 +644,21 @@ class RowData:
         # Z is supposed to be the +mediolat (point right)
         # Y is supposed to be the +inferosup (point up )
         # X is supposed to be the +anteropost (point front)
-        adapted_euler_seq = ''
+        adapted_euler_seq = ""
         for charac in supposed_euler_seq.lower()[0:2]:
             # TODO : probably put this in the biomech_sys function
-            if charac == 'x':
+            if charac == "x":
                 adapted_euler_seq += self.parent_biomech_sys.anterior_posterior_axis.value[0]
-            elif charac == 'y':
+            elif charac == "y":
                 adapted_euler_seq += self.parent_biomech_sys.infero_superior_axis.value[0]
-            elif charac == 'z':
+            elif charac == "z":
                 adapted_euler_seq += self.parent_biomech_sys.medio_lateral_axis.value[0]
 
-        if supposed_euler_seq.lower()[2] == 'x':
+        if supposed_euler_seq.lower()[2] == "x":
             adapted_euler_seq += self.child_biomech_sys.anterior_posterior_axis.value[0]
-        elif supposed_euler_seq.lower()[2] == 'y':
+        elif supposed_euler_seq.lower()[2] == "y":
             adapted_euler_seq += self.child_biomech_sys.infero_superior_axis.value[0]
-        elif supposed_euler_seq.lower()[2] == 'z':
+        elif supposed_euler_seq.lower()[2] == "z":
             adapted_euler_seq += self.child_biomech_sys.medio_lateral_axis.value[0]
 
         adapted_euler_seq.replace("-", "")
@@ -727,8 +727,6 @@ class RowData:
                 row.value_dof1, row.value_dof2, row.value_dof3
             )
 
-
-
             # populate the dataframe
             corrected_angle_series_dataframe.loc[i] = [
                 self.row.article_author_year,
@@ -744,7 +742,7 @@ class RowData:
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle","risk"],
+            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle", "risk"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
