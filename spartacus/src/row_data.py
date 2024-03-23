@@ -646,6 +646,7 @@ class RowData:
         # X is supposed to be the +anteropost (point front)
         adapted_euler_seq = ''
         for charac in supposed_euler_seq.lower()[0:2]:
+            # TODO : probably put this in the biomech_sys function
             if charac == 'x':
                 adapted_euler_seq += self.parent_biomech_sys.anterior_posterior_axis.value[0]
             elif charac == 'y':
@@ -713,13 +714,20 @@ class RowData:
                 "value_dof1",
                 "value_dof2",
                 "value_dof3",
+                "risk",
             ],
         )
 
+        risk_segments = self.quantify_segment_risk("rotation")
+        risk_joint = self.quantify_joint_risk()
+        total_risk = risk_segments * risk_joint
+        # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
                 row.value_dof1, row.value_dof2, row.value_dof3
             )
+
+
 
             # populate the dataframe
             corrected_angle_series_dataframe.loc[i] = [
@@ -731,11 +739,12 @@ class RowData:
                 corrected_dof_1,
                 corrected_dof_2,
                 corrected_dof_3,
+                total_risk,
             ]
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle"],
+            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle","risk"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
