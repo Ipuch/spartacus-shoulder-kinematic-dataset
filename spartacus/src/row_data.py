@@ -638,6 +638,44 @@ class RowData:
 
         return risk_parent * risk_child
 
+    def is_joint_euler_angle_ISB_with_adaptation_from_segment(self):
+        raw_euler_seq = self.joint.euler_sequence.value
+        supposed_euler_seq = EulerSequence.isb_from_joint_type(self.joint.joint_type).value
+        # Z is supposed to be the +mediolat (point right)
+        # Y is supposed to be the +inferosup (point up )
+        # X is supposed to be the +anteropost (point front)
+        adapted_euler_seq = ""
+        for charac in supposed_euler_seq.lower()[0:2]:
+            # TODO : probably put this in the biomech_sys function
+            if charac == "x":
+                adapted_euler_seq += self.parent_biomech_sys.anterior_posterior_axis.value[0]
+            elif charac == "y":
+                adapted_euler_seq += self.parent_biomech_sys.infero_superior_axis.value[0]
+            elif charac == "z":
+                adapted_euler_seq += self.parent_biomech_sys.medio_lateral_axis.value[0]
+
+        if supposed_euler_seq.lower()[2] == "x":
+            adapted_euler_seq += self.child_biomech_sys.anterior_posterior_axis.value[0]
+        elif supposed_euler_seq.lower()[2] == "y":
+            adapted_euler_seq += self.child_biomech_sys.infero_superior_axis.value[0]
+        elif supposed_euler_seq.lower()[2] == "z":
+            adapted_euler_seq += self.child_biomech_sys.medio_lateral_axis.value[0]
+
+        adapted_euler_seq.replace("-", "")
+
+        return adapted_euler_seq == raw_euler_seq
+
+    def quantify_joint_risk(self):
+        """
+        Quantify the risk associated with the joint which is associated to the euler sequences.
+        """
+        if self.is_joint_euler_angle_ISB_with_adaptation_from_segment():
+            risk = 1.0
+        else:
+            risk = 0.5
+
+        return risk
+
     def import_data(self):
         """this function import the data of the following row"""
         # todo: translation
@@ -676,9 +714,14 @@ class RowData:
                 "value_dof1",
                 "value_dof2",
                 "value_dof3",
+                "risk",
             ],
         )
 
+        risk_segments = self.quantify_segment_risk("rotation")
+        risk_joint = self.quantify_joint_risk()
+        total_risk = risk_segments * risk_joint
+        # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
                 row.value_dof1, row.value_dof2, row.value_dof3
@@ -694,11 +737,12 @@ class RowData:
                 corrected_dof_1,
                 corrected_dof_2,
                 corrected_dof_3,
+                total_risk,
             ]
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle"],
+            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle", "risk"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
