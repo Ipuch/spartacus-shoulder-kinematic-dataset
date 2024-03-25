@@ -1,6 +1,5 @@
-import biorbd
-import numpy as np
 import collections
+import numpy as np
 
 from .enums import CartesianAxis, BiomechDirection, BiomechOrigin, Segment
 from .utils import compute_rotation_matrix_from_axes
@@ -85,16 +84,14 @@ class BiomechCoordinateSystem:
         return cls(**my_arg)
 
     def is_isb_origin(self) -> bool:
-        if self.segment == Segment.THORAX and self.origin == BiomechOrigin.Thorax.IJ:
-            return True
-        elif self.segment == Segment.CLAVICLE and self.origin == BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER:
-            return True
-        elif self.segment == Segment.SCAPULA and self.origin == BiomechOrigin.Scapula.ANGULAR_ACROMIALIS:
-            return True
-        elif self.segment == Segment.HUMERUS and self.origin == BiomechOrigin.Humerus.GLENOHUMERAL_HEAD:
-            return True
-        else:
-            return False
+        segment_origin_mapping = {
+            Segment.THORAX: BiomechOrigin.Thorax.IJ,
+            Segment.CLAVICLE: BiomechOrigin.Clavicle.STERNOCLAVICULAR_JOINT_CENTER,
+            Segment.SCAPULA: BiomechOrigin.Scapula.ANGULAR_ACROMIALIS,
+            Segment.HUMERUS: BiomechOrigin.Humerus.GLENOHUMERAL_HEAD,
+        }
+
+        return segment_origin_mapping.get(self.segment) == self.origin
 
     def is_origin_on_an_isb_axis(self) -> bool:
         """
