@@ -5,6 +5,7 @@ import pandas as pd
 
 from .joint import Joint
 from .biomech_system import BiomechCoordinateSystem
+from .deviation import Deviation
 
 from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType
 from .utils import (
@@ -665,17 +666,6 @@ class RowData:
 
         return adapted_euler_seq == raw_euler_seq
 
-    def quantify_joint_risk(self):
-        """
-        Quantify the risk associated with the joint which is associated to the euler sequences.
-        """
-        if self.is_joint_euler_angle_ISB_with_adaptation_from_segment():
-            risk = 1.0
-        else:
-            risk = 0.5
-
-        return risk
-
     def import_data(self):
         """this function import the data of the following row"""
         # todo: translation
@@ -718,9 +708,7 @@ class RowData:
             ],
         )
 
-        risk_segments = self.quantify_segment_risk("rotation")
-        risk_joint = self.quantify_joint_risk()
-        total_risk = risk_segments * risk_joint
+        total_risk = Deviation.total_risk(self, "rotation")
         # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
