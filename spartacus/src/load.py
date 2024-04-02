@@ -141,7 +141,7 @@ class Spartacus:
                 "humeral_motion",
                 "humerothoracic_angle",
                 "value",
-                "risk",
+                "confidence",
             ]
         )
 

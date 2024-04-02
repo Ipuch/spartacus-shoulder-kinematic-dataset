@@ -737,11 +737,11 @@ class RowData:
                 "value_dof1",
                 "value_dof2",
                 "value_dof3",
-                "risk",
+                "confidence",
             ],
         )
 
-        total_risk = Deviation.total_risk(row_data=self, type_risk="rotation")
+        confidence_total = Deviation.confidence_total(row_data=self, type_risk="rotation")
         # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
@@ -758,7 +758,7 @@ class RowData:
                 corrected_dof_1,
                 corrected_dof_2,
                 corrected_dof_3,
-                total_risk,
+                confidence_total,
             ]
 
         (legend_dof1, legend_dof2, legend_dof3) = isb_legend_rotation(self.joint.joint_type)
@@ -771,7 +771,7 @@ class RowData:
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle", "risk"],
+            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle", "confidence"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",

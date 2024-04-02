@@ -1,7 +1,7 @@
 class Deviation:
 
     @staticmethod
-    def risk_euler_sequence(row_data) -> float:
+    def confidence_euler_sequence(row_data) -> float:
         """
         Quantify the risk of the joint euler sequence.
         """
@@ -12,7 +12,7 @@ class Deviation:
         return risk
 
     @staticmethod
-    def risk_segment_proximal(row_data, type_risk) -> float:
+    def confidence_segment_proximal(row_data, type_risk) -> float:
         """
         Quantify the risk of the joint.
         """
@@ -20,7 +20,7 @@ class Deviation:
         return risk
 
     @staticmethod
-    def risk_segment_distal(row_data, type_risk) -> float:
+    def confidence_segment_distal(row_data, type_risk) -> float:
         """
         Quantify the risk of the joint.
         """
@@ -28,21 +28,21 @@ class Deviation:
         return risk
 
     @staticmethod
-    def risk_segment(row_data, type_risk) -> float:
+    def confidence_segment(row_data, type_risk) -> float:
         """
         Quantify the risk of the joint.
         """
-        risk_parent = Deviation.risk_segment_proximal(row_data, type_risk)
-        risk_child = Deviation.risk_segment_distal(row_data, type_risk)
+        risk_parent = Deviation.confidence_segment_proximal(row_data, type_risk)
+        risk_child = Deviation.confidence_segment_distal(row_data, type_risk)
 
         return risk_child * risk_parent
 
     @staticmethod
-    def total_risk(row_data, type_risk) -> float:
+    def confidence_total(row_data, type_risk) -> float:
         """
         Quantify the risk of the joint.
         """
-        euler = Deviation.risk_euler_sequence(row_data)
-        segment = Deviation.risk_segment(row_data, type_risk)
+        euler = Deviation.confidence_euler_sequence(row_data)
+        segment = Deviation.confidence_segment(row_data, type_risk)
 
         return euler * segment
