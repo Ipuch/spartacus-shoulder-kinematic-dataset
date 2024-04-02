@@ -7,7 +7,16 @@ from .joint import Joint
 from .biomech_system import BiomechCoordinateSystem
 from .deviation import Deviation
 
-from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType, isb_legend_rotation
+from .enums import (
+    Segment,
+    Correction,
+    DataFolder,
+    EulerSequence,
+    BiomechDirection,
+    BiomechOrigin,
+    JointType,
+    isb_legend_rotation,
+)
 from .utils import (
     get_segment_columns,
     get_correction_column,
@@ -646,7 +655,7 @@ class RowData:
         To do it we use the fact that the mediolat, inferosup and anteropost axis of the parent and child segment are
         accessible through the biomech_sys object. As we know the equivalent between the anatomical axis and the ISB
         axis we can deduce the adapted euler sequence that should have been used in the article if it was respecting
-        the ISB. 
+        the ISB.
 
         Returns
         is_sequence_isb: bool
@@ -754,10 +763,12 @@ class RowData:
 
         (legend_dof1, legend_dof2, legend_dof3) = isb_legend_rotation(self.joint.joint_type)
         print((legend_dof1, legend_dof2, legend_dof3))
-        legend_df = pd.DataFrame({
-            'degree_of_freedom': ['value_dof1', 'value_dof2', 'value_dof3'],
-            'legend': [legend_dof1, legend_dof2, legend_dof3]
-        })
+        legend_df = pd.DataFrame(
+            {
+                "degree_of_freedom": ["value_dof1", "value_dof2", "value_dof3"],
+                "legend": [legend_dof1, legend_dof2, legend_dof3],
+            }
+        )
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
@@ -766,7 +777,7 @@ class RowData:
             var_name="degree_of_freedom",
             value_name="value",
         )
-        self.melted_corrected_data = pd.merge(self.melted_corrected_data, legend_df, on='degree_of_freedom')
+        self.melted_corrected_data = pd.merge(self.melted_corrected_data, legend_df, on="degree_of_freedom")
         self.melted_corrected_data["degree_of_freedom"] = self.melted_corrected_data["degree_of_freedom"].replace(
             {"value_dof1": "1", "value_dof2": "2", "value_dof3": "3"}
         )
