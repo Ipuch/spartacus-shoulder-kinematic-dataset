@@ -7,7 +7,7 @@ from .joint import Joint
 from .biomech_system import BiomechCoordinateSystem
 from .deviation import Deviation
 
-from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType
+from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType, isb_legend_rotation
 from .utils import (
     get_segment_columns,
     get_correction_column,
@@ -752,6 +752,13 @@ class RowData:
                 total_risk,
             ]
 
+        (legend_dof1, legend_dof2, legend_dof3) = isb_legend_rotation(self.joint.joint_type)
+        print((legend_dof1, legend_dof2, legend_dof3))
+        legend_df = pd.DataFrame({
+            'degree_of_freedom': ['value_dof1', 'value_dof2', 'value_dof3'],
+            'legend': [legend_dof1, legend_dof2, legend_dof3]
+        })
+
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
             id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle", "risk"],
@@ -759,6 +766,7 @@ class RowData:
             var_name="degree_of_freedom",
             value_name="value",
         )
+        self.melted_corrected_data = pd.merge(self.melted_corrected_data, legend_df, on='degree_of_freedom')
         self.melted_corrected_data["degree_of_freedom"] = self.melted_corrected_data["degree_of_freedom"].replace(
             {"value_dof1": "1", "value_dof2": "2", "value_dof3": "3"}
         )
