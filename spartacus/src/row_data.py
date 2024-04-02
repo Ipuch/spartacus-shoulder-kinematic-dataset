@@ -762,7 +762,6 @@ class RowData:
             ]
 
         (legend_dof1, legend_dof2, legend_dof3) = isb_legend_rotation(self.joint.joint_type)
-        print((legend_dof1, legend_dof2, legend_dof3))
         legend_df = pd.DataFrame(
             {
                 "degree_of_freedom": ["value_dof1", "value_dof2", "value_dof3"],
