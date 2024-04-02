@@ -732,7 +732,7 @@ class RowData:
             ],
         )
 
-        total_risk = Deviation.total_risk(self, "rotation")
+        total_risk = Deviation.total_risk(row_data=self, type_risk="rotation")
         # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
