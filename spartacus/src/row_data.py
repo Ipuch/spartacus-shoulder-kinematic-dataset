@@ -640,11 +640,28 @@ class RowData:
         return risk_parent * risk_child
 
     def is_joint_euler_angle_ISB_with_adaptation_from_segment(self):
+        """
+        Check if the joint euler angle is ISB with adaptation from segment.
+
+        To do it we use the fact that the mediolat, inferosup and anteropost axis of the parent and child segment are
+        accessible through the biomech_sys object. As we know the equivalent between the anatomical axis and the ISB
+        axis we can deduce the adapted euler sequence that should have been used in the article if it was respecting
+        the ISB. 
+
+        Returns
+        is_sequence_isb: bool
+        """
+        # We extract the euler sequences as found in the article and associated with the original segment definition
         raw_euler_seq = self.joint.euler_sequence.value
+        # We extract the supposed euler sequence from the joint type
         supposed_euler_seq = EulerSequence.isb_from_joint_type(self.joint.joint_type).value
+        # We know that in supposed_euler_seq
         # Z is supposed to be the +mediolat (point right)
         # Y is supposed to be the +inferosup (point up )
         # X is supposed to be the +anteropost (point front)
+
+        # We should now check for the two first direction of the rotation the associated axis with
+        # the parent segment (distal segment)
         adapted_euler_seq = ""
         for charac in supposed_euler_seq.lower()[0:2]:
             # TODO : probably put this in the biomech_sys function
@@ -655,16 +672,23 @@ class RowData:
             elif charac == "z":
                 adapted_euler_seq += self.parent_biomech_sys.medio_lateral_axis.value[0]
 
+        # We should now check for the last direction of the rotation the associated axis with
+        # the child segment (proximal segment)
         if supposed_euler_seq.lower()[2] == "x":
             adapted_euler_seq += self.child_biomech_sys.anterior_posterior_axis.value[0]
         elif supposed_euler_seq.lower()[2] == "y":
             adapted_euler_seq += self.child_biomech_sys.infero_superior_axis.value[0]
         elif supposed_euler_seq.lower()[2] == "z":
             adapted_euler_seq += self.child_biomech_sys.medio_lateral_axis.value[0]
+        # Now the adapted euler_seq is the euler sequence that should have been used in the article if it was respecting
+        # the ISB recomendation. So we can compare it to the raw euler sequence which has been used in the article.
 
+        # We remove all the minus ("-") sign in the adapted euler sequence as the orientation error is already taken into account
+        # in the deviation calculation.
         adapted_euler_seq.replace("-", "")
 
-        return adapted_euler_seq == raw_euler_seq
+        is_sequence_isb = adapted_euler_seq == raw_euler_seq
+        return is_sequence_isb
 
     def import_data(self):
         """this function import the data of the following row"""
