@@ -3,36 +3,38 @@ import os
 import numpy as np
 import pandas as pd
 
-from .joint import Joint
-from .biomech_system import BiomechCoordinateSystem
-
-from .enums import Segment, Correction, DataFolder, EulerSequence, BiomechDirection, BiomechOrigin, JointType
-from .utils import (
-    get_segment_columns,
-    get_correction_column,
-    get_is_correctable_column,
-    get_is_isb_column,
-)
-
 from .angle_conversion_callbacks import (
-    get_angle_conversion_callback_from_tuple,
-    get_angle_conversion_callback_from_sequence,
-    get_angle_conversion_callback_to_isb_with_sequence,
     isb_framed_rotation_matrix_from_euler_angles,
     set_corrections_on_rotation_matrix,
     rotation_matrix_2_euler_angles,
 )
-from .kolz_matrices import get_kolz_rotation_matrix
-
+from .biomech_system import BiomechCoordinateSystem
 from .checks import (
     check_segment_filled_with_nan,
     check_is_isb_segment,
     check_is_euler_sequence_provided,
     check_is_translation_provided,
     check_parent_child_joint,
-    check_same_orientation,
     check_is_isb_correctable,
     check_correction_methods,
+)
+from .deviation import Deviation
+from .enums import (
+    Segment,
+    Correction,
+    DataFolder,
+    EulerSequence,
+    BiomechDirection,
+    BiomechOrigin,
+    JointType,
+)
+from .joint import Joint
+from .kolz_matrices import get_kolz_rotation_matrix
+from .utils import (
+    get_segment_columns,
+    get_correction_column,
+    get_is_correctable_column,
+    get_is_isb_column,
 )
 
 
@@ -638,6 +640,57 @@ class RowData:
 
         return risk_parent * risk_child
 
+    def is_joint_euler_angle_ISB_with_adaptation_from_segment(self):
+        """
+        Check if the joint euler angle is ISB with adaptation from segment.
+
+        To do it we use the fact that the mediolat, inferosup and anteropost axis of the parent and child segment are
+        accessible through the biomech_sys object. As we know the equivalent between the anatomical axis and the ISB
+        axis we can deduce the adapted euler sequence that should have been used in the article if it was respecting
+        the ISB.
+
+        Returns
+        is_sequence_isb: bool
+        """
+        # We extract the euler sequences as found in the article and associated with the original segment definition
+        raw_euler_seq = self.joint.euler_sequence.value
+        # We extract the supposed euler sequence from the joint type
+        supposed_euler_seq = EulerSequence.isb_from_joint_type(self.joint.joint_type).value
+        # We know that in supposed_euler_seq
+        # Z is supposed to be the +mediolat (point right)
+        # Y is supposed to be the +inferosup (point up )
+        # X is supposed to be the +anteropost (point front)
+
+        # We should now check for the two first direction of the rotation the associated axis with
+        # the parent segment (distal segment)
+        adapted_euler_seq = ""
+        for charac in supposed_euler_seq.lower()[0:2]:
+            # TODO : probably put this in the biomech_sys function
+            if charac == "x":
+                adapted_euler_seq += self.parent_biomech_sys.anterior_posterior_axis.value[0]
+            elif charac == "y":
+                adapted_euler_seq += self.parent_biomech_sys.infero_superior_axis.value[0]
+            elif charac == "z":
+                adapted_euler_seq += self.parent_biomech_sys.medio_lateral_axis.value[0]
+
+        # We should now check for the last direction of the rotation the associated axis with
+        # the child segment (proximal segment)
+        if supposed_euler_seq.lower()[2] == "x":
+            adapted_euler_seq += self.child_biomech_sys.anterior_posterior_axis.value[0]
+        elif supposed_euler_seq.lower()[2] == "y":
+            adapted_euler_seq += self.child_biomech_sys.infero_superior_axis.value[0]
+        elif supposed_euler_seq.lower()[2] == "z":
+            adapted_euler_seq += self.child_biomech_sys.medio_lateral_axis.value[0]
+        # Now the adapted euler_seq is the euler sequence that should have been used in the article if it was respecting
+        # the ISB recomendation. So we can compare it to the raw euler sequence which has been used in the article.
+
+        # We remove all the minus ("-") sign in the adapted euler sequence as the orientation error is already taken into account
+        # in the deviation calculation.
+        adapted_euler_seq.replace("-", "")
+
+        is_sequence_isb = adapted_euler_seq == raw_euler_seq
+        return is_sequence_isb
+
     def import_data(self):
         """this function import the data of the following row"""
         # todo: translation
@@ -668,17 +721,20 @@ class RowData:
 
         corrected_angle_series_dataframe = pd.DataFrame(
             columns=[
-                "article",
-                "joint",
-                "angle_translation",
-                "humeral_motion",
-                "humerothoracic_angle",
-                "value_dof1",
-                "value_dof2",
-                "value_dof3",
+                "article",  # string
+                "joint",  # string
+                "humeral_motion",  # string
+                "humerothoracic_angle",  # float
+                "value_dof1",  # float
+                "value_dof2",  # float
+                "value_dof3",  # float
+                "unit",  # string "angle" or "translation"
+                "confidence",  # float
             ],
         )
 
+        confidence_total = Deviation.confidence_total(row_data=self, type_risk="rotation")
+        # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
                 row.value_dof1, row.value_dof2, row.value_dof3
@@ -688,21 +744,31 @@ class RowData:
             corrected_angle_series_dataframe.loc[i] = [
                 self.row.article_author_year,
                 self.row.joint,
-                "angle",
                 self.row.humeral_motion,
                 row.humerothoracic_angle,
                 corrected_dof_1,
                 corrected_dof_2,
                 corrected_dof_3,
+                "rad",
+                confidence_total,
             ]
+
+        (legend_dof1, legend_dof2, legend_dof3) = self.joint.isb_rotation_biomechanical_dof
+        legend_df = pd.DataFrame(
+            {
+                "degree_of_freedom": ["value_dof1", "value_dof2", "value_dof3"],
+                "biomechanical_dof": [legend_dof1, legend_dof2, legend_dof3],
+            }
+        )
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle"],
+            id_vars=["article", "joint", "humeral_motion", "humerothoracic_angle", "unit", "confidence"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
         )
+        self.melted_corrected_data = pd.merge(self.melted_corrected_data, legend_df, on="degree_of_freedom")
         self.melted_corrected_data["degree_of_freedom"] = self.melted_corrected_data["degree_of_freedom"].replace(
             {"value_dof1": "1", "value_dof2": "2", "value_dof3": "3"}
         )

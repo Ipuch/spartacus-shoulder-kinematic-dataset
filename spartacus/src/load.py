@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from .enums import DatasetCSV
 from .row_data import RowData
@@ -135,11 +135,13 @@ class Spartacus:
             columns=[
                 "article",
                 "joint",
-                "angle_translation",
                 "degree_of_freedom",
-                "movement",
+                "biomechanical_dof",
+                "humeral_motion",
                 "humerothoracic_angle",
                 "value",
+                "unit",
+                "confidence",
             ]
         )
 
@@ -151,7 +153,6 @@ class Spartacus:
             row_data.set_segments()
             row_data.check_segments_correction_validity(print_warnings=False)
             row_data.set_rotation_correction_callback()
-            row_data.quantify_segment_risk("rotation")
 
             row_data.import_data()
             df_angle_series = row_data.to_angle_series_dataframe()
