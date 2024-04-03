@@ -300,54 +300,6 @@ class Segment(Enum):
         return the_enum
 
 
-def isb_legend_rotation(joint_type: JointType) -> (str, str, str):
-    joint_mapping = {
-        JointType.GLENO_HUMERAL: ("plane of elevation", "elevation", "internal(+)-external(-) rotation"),
-        JointType.SCAPULO_THORACIC: (
-            "protraction(+)-retraction(-)",
-            "medial(+)-lateral(-) rotation",
-            "posterior(+)-anterior(-) tilt",
-        ),
-        JointType.ACROMIO_CLAVICULAR: (
-            "protraction(+)-retraction(-)",
-            "medial(+)-lateral(-) rotation",
-            "posterior(+)-anterior(-) tilt",
-        ),
-        JointType.STERNO_CLAVICULAR: (
-            "protraction(+)-retraction(-)",
-            "depression(+)-elevation(-)",
-            "backwards(+)-forward(-) rotation",
-        ),
-        JointType.THORACO_HUMERAL: ("plane of elevation", "elevation", "internal(+)-external(-) rotation"),
-    }
-    return joint_mapping.get(joint_type)
-
-
-def isb_legend_translation(joint_type: JointType) -> (str, str, str):
-    # TODO : Put correct dof
-    joint_mapping = {
-        JointType.GLENO_HUMERAL: ("flexion_extension", "abduction_adduction", "internal_external_rotation"),
-        JointType.SCAPULO_THORACIC: (
-            "upward_downward_rotation",
-            "anterior_posterior_tilt",
-            "internal_external_rotation",
-        ),
-        JointType.ACROMIO_CLAVICULAR: (
-            "anterior_posterior_tilt",
-            "internal_external_rotation",
-            "upward_downward_rotation",
-        ),
-        JointType.STERNO_CLAVICULAR: (
-            "anterior_posterior_tilt",
-            "internal_external_rotation",
-            "upward_downward_rotation",
-        ),
-        JointType.THORACO_HUMERAL: ("flexion_extension", "abduction_adduction", "internal_external_rotation"),
-    }
-
-    return joint_mapping.get(joint_type)
-
-
 class Correction(Enum):
     """Enum for the segment coordinate system corrections"""
 

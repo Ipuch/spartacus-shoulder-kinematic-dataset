@@ -3,10 +3,22 @@ import os
 import numpy as np
 import pandas as pd
 
-from .joint import Joint
+from .angle_conversion_callbacks import (
+    isb_framed_rotation_matrix_from_euler_angles,
+    set_corrections_on_rotation_matrix,
+    rotation_matrix_2_euler_angles,
+)
 from .biomech_system import BiomechCoordinateSystem
+from .checks import (
+    check_segment_filled_with_nan,
+    check_is_isb_segment,
+    check_is_euler_sequence_provided,
+    check_is_translation_provided,
+    check_parent_child_joint,
+    check_is_isb_correctable,
+    check_correction_methods,
+)
 from .deviation import Deviation
-
 from .enums import (
     Segment,
     Correction,
@@ -15,34 +27,14 @@ from .enums import (
     BiomechDirection,
     BiomechOrigin,
     JointType,
-    isb_legend_rotation,
 )
+from .joint import Joint
+from .kolz_matrices import get_kolz_rotation_matrix
 from .utils import (
     get_segment_columns,
     get_correction_column,
     get_is_correctable_column,
     get_is_isb_column,
-)
-
-from .angle_conversion_callbacks import (
-    get_angle_conversion_callback_from_tuple,
-    get_angle_conversion_callback_from_sequence,
-    get_angle_conversion_callback_to_isb_with_sequence,
-    isb_framed_rotation_matrix_from_euler_angles,
-    set_corrections_on_rotation_matrix,
-    rotation_matrix_2_euler_angles,
-)
-from .kolz_matrices import get_kolz_rotation_matrix
-
-from .checks import (
-    check_segment_filled_with_nan,
-    check_is_isb_segment,
-    check_is_euler_sequence_provided,
-    check_is_translation_provided,
-    check_parent_child_joint,
-    check_same_orientation,
-    check_is_isb_correctable,
-    check_correction_methods,
 )
 
 
@@ -729,15 +721,15 @@ class RowData:
 
         corrected_angle_series_dataframe = pd.DataFrame(
             columns=[
-                "article",
-                "joint",
-                "angle_translation",
-                "humeral_motion",
-                "humerothoracic_angle",
-                "value_dof1",
-                "value_dof2",
-                "value_dof3",
-                "confidence",
+                "article",  # string
+                "joint",  # string
+                "angle_translation",  # string "angle" or "translation"
+                "humeral_motion",  # string
+                "humerothoracic_angle",  # float
+                "value_dof1",  # float
+                "value_dof2",  # float
+                "value_dof3",  # float
+                "confidence",  # float
             ],
         )
 
@@ -761,7 +753,7 @@ class RowData:
                 confidence_total,
             ]
 
-        (legend_dof1, legend_dof2, legend_dof3) = isb_legend_rotation(self.joint.joint_type)
+        (legend_dof1, legend_dof2, legend_dof3) = self.joint.isb_rotation_biomechanical_dof
         legend_df = pd.DataFrame(
             {
                 "degree_of_freedom": ["value_dof1", "value_dof2", "value_dof3"],

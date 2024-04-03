@@ -66,3 +66,53 @@ class Joint:
             return False
 
         return True
+
+    @property
+    def isb_rotation_biomechanical_dof(self) -> (str, str, str):
+        joint_mapping = {
+            JointType.GLENO_HUMERAL: ("plane of elevation", "elevation", "internal(+)-external(-) rotation"),
+            JointType.SCAPULO_THORACIC: (
+                "protraction(+)-retraction(-)",
+                "medial(+)-lateral(-) rotation",
+                "posterior(+)-anterior(-) tilt",
+            ),
+            JointType.ACROMIO_CLAVICULAR: (
+                "protraction(+)-retraction(-)",
+                "medial(+)-lateral(-) rotation",
+                "posterior(+)-anterior(-) tilt",
+            ),
+            JointType.STERNO_CLAVICULAR: (
+                "protraction(+)-retraction(-)",
+                "depression(+)-elevation(-)",
+                "backwards(+)-forward(-) rotation",
+            ),
+            JointType.THORACO_HUMERAL: ("plane of elevation", "elevation", "internal(+)-external(-) rotation"),
+        }
+        return joint_mapping.get(self.joint_type)
+
+    @property
+    def isb_translation_biomechanical_dof(self) -> (str, str, str):
+        # TODO : Put correct dof
+        raise NotImplementedError("Not implemented yet")
+
+        joint_mapping = {
+            JointType.GLENO_HUMERAL: ("flexion_extension", "abduction_adduction", "internal_external_rotation"),
+            JointType.SCAPULO_THORACIC: (
+                "upward_downward_rotation",
+                "anterior_posterior_tilt",
+                "internal_external_rotation",
+            ),
+            JointType.ACROMIO_CLAVICULAR: (
+                "anterior_posterior_tilt",
+                "internal_external_rotation",
+                "upward_downward_rotation",
+            ),
+            JointType.STERNO_CLAVICULAR: (
+                "anterior_posterior_tilt",
+                "internal_external_rotation",
+                "upward_downward_rotation",
+            ),
+            JointType.THORACO_HUMERAL: ("flexion_extension", "abduction_adduction", "internal_external_rotation"),
+        }
+
+        return joint_mapping.get(self.joint_type)
