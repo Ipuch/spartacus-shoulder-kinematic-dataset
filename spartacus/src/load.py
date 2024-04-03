@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from .enums import DatasetCSV
 from .row_data import RowData
@@ -135,12 +135,12 @@ class Spartacus:
             columns=[
                 "article",
                 "joint",
-                "angle_translation",
                 "degree_of_freedom",
-                "legend",
+                "biomechanical_dof",
                 "humeral_motion",
                 "humerothoracic_angle",
                 "value",
+                "unit",
                 "confidence",
             ]
         )

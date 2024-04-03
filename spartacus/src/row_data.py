@@ -723,12 +723,12 @@ class RowData:
             columns=[
                 "article",  # string
                 "joint",  # string
-                "angle_translation",  # string "angle" or "translation"
                 "humeral_motion",  # string
                 "humerothoracic_angle",  # float
                 "value_dof1",  # float
                 "value_dof2",  # float
                 "value_dof3",  # float
+                "unit",  # string "angle" or "translation"
                 "confidence",  # float
             ],
         )
@@ -744,12 +744,12 @@ class RowData:
             corrected_angle_series_dataframe.loc[i] = [
                 self.row.article_author_year,
                 self.row.joint,
-                "angle",
                 self.row.humeral_motion,
                 row.humerothoracic_angle,
                 corrected_dof_1,
                 corrected_dof_2,
                 corrected_dof_3,
+                "rad",
                 confidence_total,
             ]
 
@@ -757,13 +757,13 @@ class RowData:
         legend_df = pd.DataFrame(
             {
                 "degree_of_freedom": ["value_dof1", "value_dof2", "value_dof3"],
-                "legend": [legend_dof1, legend_dof2, legend_dof3],
+                "biomechanical_dof": [legend_dof1, legend_dof2, legend_dof3],
             }
         )
 
         self.corrected_data = corrected_angle_series_dataframe
         self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "angle_translation", "humeral_motion", "humerothoracic_angle", "confidence"],
+            id_vars=["article", "joint", "humeral_motion", "humerothoracic_angle", "unit", "confidence"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
