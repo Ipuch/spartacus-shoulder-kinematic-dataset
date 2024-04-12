@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 from .enums import DatasetCSV
 from .row_data import RowData
@@ -162,6 +163,11 @@ class Spartacus:
 
         self.confident_data_values = output_dataframe
         return output_dataframe
+
+    def export(self):
+        path_next_to_clean = Path(DatasetCSV.CLEAN.value).parent
+        confident_path = Path.joinpath(path_next_to_clean, "confident_data.csv")
+        self.confident_data_values.to_csv(confident_path, index=False)
 
 
 def load() -> Spartacus:
