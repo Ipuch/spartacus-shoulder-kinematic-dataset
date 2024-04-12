@@ -23,7 +23,8 @@ class Spartacus:
         self.rows = []
         self.rows_output = None
 
-        self.confident_dataframe = None
+        self.corrected_confident = None
+        self.corrected_confident_data_values = None
         self.confident_data_values = None
 
     def clean_df(self):
@@ -143,8 +144,10 @@ class Spartacus:
                 "value",
                 "unit",
                 "confidence",
+                "shoulder_id",
             ]
         )
+        corrected_output_dataframe = output_dataframe.copy()
 
         for i, row in self.confident_dataframe.iterrows():
             row_data = RowData(row)
@@ -156,16 +159,26 @@ class Spartacus:
             row_data.set_rotation_correction_callback()
 
             row_data.import_data()
-            df_angle_series = row_data.to_angle_series_dataframe()
 
+            df_angle_series = row_data.to_angle_series_dataframe(correction=False)
+            corrected_angle_series = row_data.to_angle_series_dataframe(correction=True)
             # add the row to the dataframe
             output_dataframe = pd.concat([output_dataframe, df_angle_series], ignore_index=True)
+            corrected_output_dataframe = pd.concat(
+                [corrected_output_dataframe, corrected_angle_series], ignore_index=True
+            )
 
         self.confident_data_values = output_dataframe
-        return output_dataframe
+        self.corrected_confident_data_values = corrected_output_dataframe
+
+        return self.corrected_confident_data_values
 
     def export(self):
         path_next_to_clean = Path(DatasetCSV.CLEAN.value).parent
+
+        confident_path = Path.joinpath(path_next_to_clean, "corrected_confident_data.csv")
+        self.corrected_confident_data_values.to_csv(confident_path, index=False)
+
         confident_path = Path.joinpath(path_next_to_clean, "confident_data.csv")
         self.confident_data_values.to_csv(confident_path, index=False)
 

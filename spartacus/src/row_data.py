@@ -702,7 +702,7 @@ class RowData:
         self.data["joint"] = JointType.from_string(self.row.joint)
         self.data["humeral_motion"] = self.row.humeral_motion
 
-    def to_angle_series_dataframe(self):
+    def to_angle_series_dataframe(self, correction: bool = True):
         """
         This converts the row to a panda dataframe with the angles in degrees with the following columns:
          - article
@@ -719,7 +719,7 @@ class RowData:
             The dataframe with the angles in degrees
         """
 
-        corrected_angle_series_dataframe = pd.DataFrame(
+        angle_series_dataframe = pd.DataFrame(
             columns=[
                 "article",  # string
                 "joint",  # string
@@ -730,6 +730,7 @@ class RowData:
                 "value_dof3",  # float
                 "unit",  # string "angle" or "translation"
                 "confidence",  # float
+                "shoulder_id",  # int
             ],
         )
 
@@ -741,19 +742,28 @@ class RowData:
             )
 
             # populate the dataframe
-            corrected_angle_series_dataframe.loc[i] = [
+            angle_series_dataframe.loc[i] = [
                 self.row.article_author_year,
                 self.row.joint,
                 self.row.humeral_motion,
                 row.humerothoracic_angle,
-                corrected_dof_1,
-                corrected_dof_2,
-                corrected_dof_3,
+                corrected_dof_1 if correction else row.value_dof1,
+                corrected_dof_2 if correction else row.value_dof2,
+                corrected_dof_3 if correction else row.value_dof3,
                 "rad",
                 confidence_total,
+                self.row.shoulder_id,
             ]
 
-        (legend_dof1, legend_dof2, legend_dof3) = self.joint.isb_rotation_biomechanical_dof
+        if correction:
+            (legend_dof1, legend_dof2, legend_dof3) = self.joint.isb_rotation_biomechanical_dof
+        else:
+            legend_dof1, legend_dof2, legend_dof3 = (
+                self.joint.euler_sequence.value[0],
+                self.joint.euler_sequence.value[1],
+                self.joint.euler_sequence.value[2],
+            )
+
         legend_df = pd.DataFrame(
             {
                 "degree_of_freedom": ["value_dof1", "value_dof2", "value_dof3"],
@@ -761,18 +771,18 @@ class RowData:
             }
         )
 
-        self.corrected_data = corrected_angle_series_dataframe
-        self.melted_corrected_data = corrected_angle_series_dataframe.melt(
-            id_vars=["article", "joint", "humeral_motion", "humerothoracic_angle", "unit", "confidence"],
+        self.corrected_data = angle_series_dataframe
+        self.melted_data = angle_series_dataframe.melt(
+            id_vars=["article", "joint", "humeral_motion", "humerothoracic_angle", "unit", "confidence", "shoulder_id"],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
         )
-        self.melted_corrected_data = pd.merge(self.melted_corrected_data, legend_df, on="degree_of_freedom")
-        self.melted_corrected_data["degree_of_freedom"] = self.melted_corrected_data["degree_of_freedom"].replace(
+        self.melted_data = pd.merge(self.melted_data, legend_df, on="degree_of_freedom")
+        self.melted_data["degree_of_freedom"] = self.melted_data["degree_of_freedom"].replace(
             {"value_dof1": "1", "value_dof2": "2", "value_dof3": "3"}
         )
-        return self.melted_corrected_data
+        return self.melted_data
 
     def get_euler_csv_filenames(self) -> tuple[str, str, str]:
         """load the csv filenames from the row data"""
