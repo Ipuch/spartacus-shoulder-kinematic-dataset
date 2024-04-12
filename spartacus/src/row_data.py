@@ -737,9 +737,18 @@ class RowData:
         confidence_total = Deviation.confidence_total(row_data=self, type_risk="rotation")
         # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
+
+            rad_value_dof1 = np.deg2rad(row.value_dof1)
+            rad_value_dof2 = np.deg2rad(row.value_dof2)
+            rad_value_dof3 = np.deg2rad(row.value_dof3)
+
             corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
-                row.value_dof1, row.value_dof2, row.value_dof3
+                rad_value_dof1, rad_value_dof2, rad_value_dof3
             )
+
+            deg_corrected_dof_1 = np.rad2deg(corrected_dof_1)
+            deg_corrected_dof_2 = np.rad2deg(corrected_dof_2)
+            deg_corrected_dof_3 = np.rad2deg(corrected_dof_3)
 
             # populate the dataframe
             angle_series_dataframe.loc[i] = [
@@ -747,9 +756,9 @@ class RowData:
                 self.row.joint,
                 self.row.humeral_motion,
                 row.humerothoracic_angle,
-                corrected_dof_1 if correction else row.value_dof1,
-                corrected_dof_2 if correction else row.value_dof2,
-                corrected_dof_3 if correction else row.value_dof3,
+                deg_corrected_dof_1 if correction else row.value_dof1,
+                deg_corrected_dof_2 if correction else row.value_dof2,
+                deg_corrected_dof_3 if correction else row.value_dof3,
                 "rad",
                 confidence_total,
                 self.row.shoulder_id,
