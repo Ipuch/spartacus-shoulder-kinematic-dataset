@@ -1,14 +1,11 @@
 import base64
 import io
-import os
 import pandas as pd
 import plotly.express as px
 import webbrowser
 from dash import Dash, dcc, html, Input, Output, State, callback
-from pathlib import Path
 
-from spartacus import DatasetCSV
-from spartacus import load
+from spartacus.plots.quick_load import import_data
 
 # TODO : Put the correct joint in the article.
 # TODO : Add a curve directly from the app running
@@ -18,14 +15,6 @@ from spartacus import load
 # Todo : Change the name of the function to be more clean ==> not draft anymore.
 
 app = Dash(__name__)
-
-
-def import_data():
-    """Import the data from the confident_data.csv file if it exists, otherwise its computed from the raw data."""
-    if "confident_data.csv" in os.listdir(str(Path(DatasetCSV.CLEAN.value).parent)):
-        return pd.read_csv(Path(DatasetCSV.CLEAN.value).parent / "confident_data.csv")
-    else:
-        return load().import_confident_data()
 
 
 extracted_data = import_data()
