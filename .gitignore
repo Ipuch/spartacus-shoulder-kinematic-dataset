@@ -154,3 +154,27 @@ sandbox/
 spartacus/dataset/confident_data.csv
 
 spartacus/dataset/corrected_confident_data.csv
+
+examples/frontal elevation.html
+
+examples/frontal elevation.png
+
+examples/horizontal flexion.html
+
+examples/horizontal flexion.png
+
+examples/internal-external rotation 0 degree-abducted.html
+
+examples/internal-external rotation 0 degree-abducted.png
+
+examples/internal-external rotation 90 degree-abducted.html
+
+examples/internal-external rotation 90 degree-abducted.png
+
+examples/sagittal elevation.html
+
+examples/sagittal elevation.png
+
+examples/scapular elevation.html
+
+examples/scapular elevation.png
