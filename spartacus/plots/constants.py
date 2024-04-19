@@ -52,6 +52,7 @@ JOINT_ROW_COL_INDEX = {
 
 def author_colors_constant():
     palette = sns.color_palette(cc.glasbey, n_colors=24)
+    palette_c = sns.color_palette(cc.glasbey_cool, n_colors=24)
 
     return {
         "Bourne 2003": palette[0],
@@ -78,6 +79,30 @@ def author_colors_constant():
         "Sugi et al. 2021": palette[21],
         "Teece et al. 2008": palette[22],
         "Yoshida et al. 2023": palette[23],
+        "Bourne 2003_corrected": palette_c[0],
+        "Cereatti et al. 2017_corrected": palette_c[1],
+        "Charbonnier et al 2014_corrected": palette_c[2],
+        "Chu et al. 2012_corrected": palette_c[3],
+        "Dal Maso et al. 2014_corrected": palette_c[4],
+        "Fung et al. 2001_corrected": palette_c[5],
+        "Gutierrez Delgado et al 2017_corrected": palette_c[6],
+        "Kijima et al. 2015_corrected": palette_c[7],
+        "Kim et al. 2017_corrected": palette_c[8],
+        "Kolz et al. 2020_corrected": palette_c[9],
+        "Kozono et al. 2017_corrected": palette_c[10],
+        "Lawrence et al. 2014_corrected": palette_c[11],
+        "Matsuki et al. 2011_corrected": palette_c[12],
+        "Matsuki et al. 2012_corrected": palette_c[13],
+        "Matsuki et al. 2014_corrected": palette_c[14],
+        "Matsumura et al. 2013_corrected": palette_c[15],
+        "McClure et al. 2001_corrected": palette_c[16],
+        "Nishinaka et al. 2008_corrected": palette_c[17],
+        "Oki et al. 2012_corrected": palette_c[18],
+        "Sahara et al. 2006_corrected": palette_c[19],
+        "Sahara et al. 2007_corrected": palette_c[20],
+        "Sugi et al. 2021_corrected": palette_c[21],
+        "Teece et al. 2008_corrected": palette_c[22],
+        "Yoshida et al. 2023_corrected": palette_c[23],
     }
 
 

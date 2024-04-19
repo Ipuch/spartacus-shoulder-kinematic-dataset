@@ -1,3 +1,5 @@
+import pandas as pd
+
 from spartacus import import_data, DataFrameInterface, DataPlanchePlotting
 from pandas import DataFrame
 import os
@@ -21,26 +23,40 @@ def plot_mvt(df: DataFrame, dataset: str = ".", suffix: str = ""):
 
 
 def main():
+    df_before = import_data(correction=False)
     df = import_data(correction=True)
-    plot_mvt(df)
+    # modify "article" column from XX to "XX_corrected"
+    df["article"] = df["article"].apply(lambda x: x + "_corrected")
+    # merge/concatenate the two dataframes
+    df_merge = pd.concat([df_before, df], ignore_index=True, sort=False)
+
+    plot_mvt(df_merge)
 
 
 def before_after():
     df_before = import_data(correction=False)
     df_after = import_data(correction=True)
 
+    df_after_copy = df_after.copy()
+    df_after_copy["article"] = df_after_copy["article"].apply(lambda x: x + "_corrected")
+    df_both = pd.concat([df_before, df_after_copy], ignore_index=True, sort=False)
+
     datasets = df_after["article"].unique()
-    for dataset in datasets:
+    datasets_corrected = df_after_copy["article"].unique()
+    for dataset, dataset_corrected in zip(datasets, datasets_corrected):
 
         if not os.path.exists(dataset):
             os.mkdir(dataset)
 
         sub_df_before = df_before[df_before["article"] == dataset]
         sub_df_after = df_after[df_after["article"] == dataset]
-        plot_mvt(sub_df_before, dataset, suffix="_before")
-        plot_mvt(sub_df_after, dataset, suffix="_after")
+        condition = (df_both["article"] == dataset) + (df_both["article"] == dataset_corrected)
+        sub_df_both = df_both[condition]
+        # plot_mvt(sub_df_before, dataset, suffix="_before")
+        # plot_mvt(sub_df_after, dataset, suffix="_after")
+        plot_mvt(sub_df_both, dataset, suffix="_both")
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     before_after()
