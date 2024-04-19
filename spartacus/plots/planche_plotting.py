@@ -7,6 +7,9 @@ import plotly.graph_objs as go
 class DataPlanchePlotting:
     def __init__(self, dfi: DataFrameInterface):
         self.dfi = dfi
+
+        self.opacity = 0.5 if self.dfi.nb_articles > 1 else 1
+
         self.fig = make_subplots(
             shared_xaxes=False,
             shared_yaxes=False,
@@ -70,13 +73,11 @@ class DataPlanchePlotting:
                 name=article,
                 legendgroup=article,
                 showlegend=self.showlegend,
-                # legend=article_0,
                 mode="lines+markers",
-                opacity=0.5,
+                opacity=self.opacity,
                 marker=dict(
                     size=2,
                     color=f"rgba{AUTHORS_COLORS[article]}",
-                    # line=dict(width=0.5),
                 ),
                 line=dict(
                     width=0.5,

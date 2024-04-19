@@ -21,7 +21,7 @@ class DataFrameInterface:
 
     @property
     def nb_articles(self) -> int:
-        return self.df["article_author_year"].nunique()
+        return self.df["article"].nunique()
 
     @property
     def nb_units(self) -> int:
