@@ -23,14 +23,8 @@ def plot_mvt(df: DataFrame, dataset: str = ".", suffix: str = ""):
 
 
 def main():
-    df_before = import_data(correction=False)
     df = import_data(correction=True)
-    # modify "article" column from XX to "XX_corrected"
-    df["article"] = df["article"].apply(lambda x: x + "_corrected")
-    # merge/concatenate the two dataframes
-    df_merge = pd.concat([df_before, df], ignore_index=True, sort=False)
-
-    plot_mvt(df_merge)
+    plot_mvt(df)
 
 
 def before_after():
@@ -58,5 +52,5 @@ def before_after():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     before_after()
