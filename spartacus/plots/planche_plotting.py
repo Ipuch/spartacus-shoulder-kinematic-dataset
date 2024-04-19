@@ -1,57 +1,7 @@
-import numpy as np
-
-from pandas import DataFrame
-from plotly import graph_objs as go
-import plotly.express as px
+from .dataframe_interface import DataFrameInterface
+from .constants import BIOMECHANICAL_DOF_LEGEND, JOINT_ROW_COL_INDEX, AUTHORS_COLORS
 from plotly.subplots import make_subplots
-
-from spartacus import import_data
-from spartacus.plots.constants import AUTHORS_COLORS, JOINT_ROW_COL_INDEX, BIOMECHANICAL_DOF_LEGEND
-
-
-class DataFrameInterface:
-    def __init__(self, dataframe: DataFrame):
-        self.df = dataframe if dataframe is not None else import_data()
-
-    @property
-    def nb_mvt(self) -> int:
-        return self.df["movement"].nunique()
-
-    @property
-    def nb_joints(self) -> int:
-        return self.df["joint"].nunique()
-
-    @property
-    def nb_articles(self) -> int:
-        return self.df["article_author_year"].nunique()
-
-    @property
-    def nb_units(self) -> int:
-        return self.df["unit"].nunique()
-
-    @property
-    def nb_biomechanical_dof(self) -> int:
-        return self.df["biomechanical_dof"].nunique()
-
-    @property
-    def biomechanical_dof(self) -> list[str]:
-        return self.df["biomechanical_dof"].unique()
-
-    @property
-    def nb_dof(self) -> int:
-        return self.df["degree_of_freedom"].nunique()
-
-    def select_motion(self, motion: str) -> DataFrame:
-        return self.df[self.df["humeral_motion"] == motion]
-
-    def select_article(self, article: str) -> DataFrame:
-        return self.df[self.df["article"] == article]
-
-    def select_joint(self, joint: str) -> DataFrame:
-        return self.df[self.df["joint"] == joint]
-
-    def plot_motion(self, motion: str):
-        pass
+import plotly.graph_objs as go
 
 
 class DataPlanchePlotting:
@@ -136,6 +86,7 @@ class DataPlanchePlotting:
             row=row + 1,
             col=col + 1,
         )
+        # self.fig.update_xaxes(row=row + 1, col=col + 1, range=[-150, 180])
         self.showlegend = False
 
     def update_style(self):
@@ -160,31 +111,14 @@ class DataPlanchePlotting:
             yaxis=dict(color="black"),
             template="simple_white",
             boxgap=0.1,
+            title="<b>Shoulder kinematics</b> <br>" + f"<i>{self.dfi.motions}</i>",
+            title_x=0.5,
+            title_yanchor="middle",
+            title_y=0.965,
         )
+        self.fig.update_xaxes(title_text="Humerothoracic angle (°)", row=4, col=1)
+        self.fig.update_xaxes(title_text="Humerothoracic angle (°)", row=4, col=2)
+        self.fig.update_xaxes(title_text="Humerothoracic angle (°)", row=4, col=3)
 
     def show(self):
         self.fig.show()
-
-
-def main():
-
-    df = import_data(correction=False)
-    # df = import_data(correction=True)
-
-    humeral_motions = df["humeral_motion"].unique()
-
-    for mvt in humeral_motions:
-        sub_df = df[df["humeral_motion"] == mvt]
-        dfi = DataFrameInterface(sub_df)
-        plt = DataPlanchePlotting(dfi)
-        plt.plot()
-        # plt.plot_article(name="Bourne 2003")
-        plt.update_style()
-        plt.show()
-        plt.fig.write_image(f"{mvt}.png")
-        plt.fig.write_image(f"{mvt}.pdf")
-        plt.fig.write_html(f"{mvt}.html", include_mathjax="cdn")  #
-
-
-if __name__ == "__main__":
-    main()

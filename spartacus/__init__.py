@@ -24,3 +24,5 @@ from .src.joint import Joint
 from .src.biomech_system import BiomechCoordinateSystem
 from .src.checks import check_same_orientation
 from .plots.quick_load import import_data
+from .plots.dataframe_interface import DataFrameInterface
+from .plots.planche_plotting import DataPlanchePlotting
