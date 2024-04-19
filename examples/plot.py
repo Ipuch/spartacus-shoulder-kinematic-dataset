@@ -16,10 +16,10 @@ def plot_mvt(df: DataFrame, dataset: str = ".", suffix: str = ""):
         plt.plot()
         plt.update_style()
         plt.show()
-
-        plt.fig.write_image(f"{dataset+"/"}{mvt}{suffix}.png")
-        plt.fig.write_image(f"{dataset+"/"}{mvt}{suffix}.pdf")
-        plt.fig.write_html(f"{dataset+"/"}{mvt}{suffix}.html", include_mathjax="cdn")
+        dataset += "/"
+        plt.fig.write_image(f"{dataset}{mvt}{suffix}.png")
+        plt.fig.write_image(f"{dataset}{mvt}{suffix}.pdf")
+        plt.fig.write_html(f"{dataset}{mvt}{suffix}.html", include_mathjax="cdn")
 
 
 def main():
