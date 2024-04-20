@@ -827,6 +827,7 @@ class RowData:
 def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_data: bool = True) -> pd.DataFrame:
     """
     Load the csv file from the filename and return a pandas dataframe.
+    # TODO: handle the fact that some dataset have only one dof of Data.
     """
     df = pd.DataFrame(columns=["humerothoracic_angle"])
 
@@ -856,17 +857,86 @@ def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_
 
     concatenated_dataframe = pd.concat([df, csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
 
+    # --- Deprecated ---
     # mean of this three columns
     # assuming we should have the same value, this should minimize the error when collecting the data from figure.
-    concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[
-        ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
-    ].mean(axis=1)
+    # concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[
+    #     ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
+    # ].mean(axis=1)
+    # ------------------
 
-    if drop_humerothoracic_raw_data:
-        concatenated_dataframe.drop(
-            columns=["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"],
-            inplace=True,
+    # Test if the three columns are the same
+    contidition1 = not concatenated_dataframe["humerothoracic_angle_dof1"].equals(
+        concatenated_dataframe["humerothoracic_angle_dof2"]
+    )
+    contidition2 = not concatenated_dataframe["humerothoracic_angle_dof1"].equals(
+        concatenated_dataframe["humerothoracic_angle_dof3"]
+    )
+    contidition3 = not concatenated_dataframe["humerothoracic_angle_dof2"].equals(
+        concatenated_dataframe["humerothoracic_angle_dof3"]
+    )
+    if contidition1 or contidition2 or contidition3:
+        print("The three columns are not the same: Interpolating through the minimal range")
+        # Interpolating through the minimal range
+        min_value = max(
+            [
+                concatenated_dataframe["humerothoracic_angle_dof1"].min(),
+                concatenated_dataframe["humerothoracic_angle_dof2"].min(),
+                concatenated_dataframe["humerothoracic_angle_dof3"].min(),
+            ]
         )
+        max_value = min(
+            [
+                concatenated_dataframe["humerothoracic_angle_dof1"].max(),
+                concatenated_dataframe["humerothoracic_angle_dof2"].max(),
+                concatenated_dataframe["humerothoracic_angle_dof3"].max(),
+            ]
+        )
+        number_of_points = min(
+            [
+                len(concatenated_dataframe["humerothoracic_angle_dof1"]),
+                len(concatenated_dataframe["humerothoracic_angle_dof2"]),
+                len(concatenated_dataframe["humerothoracic_angle_dof3"]),
+            ]
+        )
+        interpolated_range = np.linspace(min_value, max_value, number_of_points)
+
+        # interpolate value_dof1, value_dof2, value_dof3
+        interpolated_value_dof1 = np.interp(
+            interpolated_range,
+            concatenated_dataframe["humerothoracic_angle_dof1"],
+            concatenated_dataframe["value_dof1"],
+        )
+        interpolated_value_dof2 = np.interp(
+            interpolated_range,
+            concatenated_dataframe["humerothoracic_angle_dof2"],
+            concatenated_dataframe["value_dof2"],
+        )
+        interpolated_value_dof3 = np.interp(
+            interpolated_range,
+            concatenated_dataframe["humerothoracic_angle_dof3"],
+            concatenated_dataframe["value_dof3"],
+        )
+
+        # replace the values
+        concatenated_dataframe = pd.DataFrame(
+            columns=["humerothoracic_angle", "value_dof1", "value_dof2", "value_dof3"]
+        )
+        concatenated_dataframe["humerothoracic_angle"] = interpolated_range
+        concatenated_dataframe["value_dof1"] = interpolated_value_dof1
+        concatenated_dataframe["value_dof2"] = interpolated_value_dof2
+        concatenated_dataframe["value_dof3"] = interpolated_value_dof3
+
+    else:
+        concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[
+            ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
+        ].mean(axis=1)
+
+        if drop_humerothoracic_raw_data:
+            concatenated_dataframe.drop(
+                columns=["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"],
+                inplace=True,
+            )
 
     return concatenated_dataframe
 
