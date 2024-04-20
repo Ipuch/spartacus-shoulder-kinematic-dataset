@@ -195,6 +195,7 @@ def load() -> Spartacus:
     # df = df[df["dataset_authors"] == "Chu et al."]
     # df = df[df["dataset_authors"] == "Dal Maso et al."]
     # df = df[df["dataset_authors"] == "Kolz et al."]
+    # df = df[df["dataset_authors"] == "Kijima et al."]
     # df = df[df["dataset_authors"] == "Kozono et al."]
     # df = df[df["dataset_authors"] == "Matsumura et al."]
     # df = df[df["dataset_authors"] == "Oki et al."]

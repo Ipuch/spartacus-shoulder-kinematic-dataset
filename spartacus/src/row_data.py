@@ -36,6 +36,7 @@ from .utils import (
     get_is_correctable_column,
     get_is_isb_column,
 )
+from .load_data import load_euler_csv
 
 
 class RowData:
@@ -694,7 +695,13 @@ class RowData:
     def import_data(self):
         """this function import the data of the following row"""
         # todo: translation
-
+        print(
+            f" Importing data ...\n"
+            f" for article {self.row.article_author_year},"
+            f" joint {self.row.joint},"
+            f" motion {self.row.humeral_motion},"
+            f" subject {self.row.shoulder_id}"
+        )
         # load the csv file
         self.csv_filenames = self.get_euler_csv_filenames()
         self.data = load_euler_csv(self.csv_filenames)
@@ -740,25 +747,20 @@ class RowData:
 
             rad_value_dof1 = np.deg2rad(row.value_dof1)
             rad_value_dof2 = np.deg2rad(row.value_dof2)
-            rad_value_dof3 = np.deg2rad(row.value_dof3)
 
-            corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
-                rad_value_dof1, rad_value_dof2, rad_value_dof3
+            (deg_corrected_dof_1, deg_corrected_dof_2, deg_corrected_dof_3) = self.apply_correction_in_radians(
+                row.value_dof1, row.value_dof2, row.value_dof3
             )
-
-            deg_corrected_dof_1 = np.rad2deg(corrected_dof_1)
-            deg_corrected_dof_2 = np.rad2deg(corrected_dof_2)
-            deg_corrected_dof_3 = np.rad2deg(corrected_dof_3)
 
             # populate the dataframe
             angle_series_dataframe.loc[i] = [
                 self.row.article_author_year,
                 self.row.joint,
                 self.row.humeral_motion,
-                row.humerothoracic_angle,
-                deg_corrected_dof_1 if correction else row.value_dof1,
-                deg_corrected_dof_2 if correction else row.value_dof2,
-                deg_corrected_dof_3 if correction else row.value_dof3,
+                row.humerothoracic_angle,  # in degrees
+                deg_corrected_dof_1 if correction else row.value_dof1,  # in degrees
+                deg_corrected_dof_2 if correction else row.value_dof2,  # in degrees
+                deg_corrected_dof_3 if correction else row.value_dof3,  # in degrees
                 "rad",
                 confidence_total,
                 self.row.shoulder_id,
@@ -823,129 +825,19 @@ class RowData:
 
         return csv_paths
 
+    def apply_correction_in_radians(self, dof1, dof2, dof3) -> tuple[float, float, float]:
+        """Apply the correction to the angles in radians"""
 
-def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_data: bool = True) -> pd.DataFrame:
-    """
-    Load the csv file from the filename and return a pandas dataframe.
-    # TODO: handle the fact that some dataset have only one dof of Data.
-    """
-    df = pd.DataFrame(columns=["humerothoracic_angle"])
+        rad_value_dof1 = np.deg2rad(dof1)
+        rad_value_dof2 = np.deg2rad(dof2)
+        rad_value_dof3 = np.deg2rad(dof3)
 
-    csv_file_dof1 = load_csv(
-        csv_filenames[0],
-        [
-            "humerothoracic_angle_dof1",
-            "value_dof1",
-        ],
-    )
-
-    csv_file_dof2 = load_csv(
-        csv_filenames[1],
-        [
-            "humerothoracic_angle_dof2",
-            "value_dof2",
-        ],
-    )
-
-    csv_file_dof3 = load_csv(
-        csv_filenames[2],
-        [
-            "humerothoracic_angle_dof3",
-            "value_dof3",
-        ],
-    )
-
-    concatenated_dataframe = pd.concat([df, csv_file_dof1, csv_file_dof2, csv_file_dof3], axis=1)
-
-    # --- Deprecated ---
-    # mean of this three columns
-    # assuming we should have the same value, this should minimize the error when collecting the data from figure.
-    # concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[
-    #     ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
-    # ].mean(axis=1)
-    # ------------------
-
-    # Test if the three columns are the same
-    contidition1 = not concatenated_dataframe["humerothoracic_angle_dof1"].equals(
-        concatenated_dataframe["humerothoracic_angle_dof2"]
-    )
-    contidition2 = not concatenated_dataframe["humerothoracic_angle_dof1"].equals(
-        concatenated_dataframe["humerothoracic_angle_dof3"]
-    )
-    contidition3 = not concatenated_dataframe["humerothoracic_angle_dof2"].equals(
-        concatenated_dataframe["humerothoracic_angle_dof3"]
-    )
-    if contidition1 or contidition2 or contidition3:
-        print("The three columns are not the same: Interpolating through the minimal range")
-        # Interpolating through the minimal range
-        min_value = max(
-            [
-                concatenated_dataframe["humerothoracic_angle_dof1"].min(),
-                concatenated_dataframe["humerothoracic_angle_dof2"].min(),
-                concatenated_dataframe["humerothoracic_angle_dof3"].min(),
-            ]
-        )
-        max_value = min(
-            [
-                concatenated_dataframe["humerothoracic_angle_dof1"].max(),
-                concatenated_dataframe["humerothoracic_angle_dof2"].max(),
-                concatenated_dataframe["humerothoracic_angle_dof3"].max(),
-            ]
-        )
-        number_of_points = min(
-            [
-                len(concatenated_dataframe["humerothoracic_angle_dof1"]),
-                len(concatenated_dataframe["humerothoracic_angle_dof2"]),
-                len(concatenated_dataframe["humerothoracic_angle_dof3"]),
-            ]
-        )
-        interpolated_range = np.linspace(min_value, max_value, number_of_points)
-
-        # interpolate value_dof1, value_dof2, value_dof3
-        interpolated_value_dof1 = np.interp(
-            interpolated_range,
-            concatenated_dataframe["humerothoracic_angle_dof1"],
-            concatenated_dataframe["value_dof1"],
-        )
-        interpolated_value_dof2 = np.interp(
-            interpolated_range,
-            concatenated_dataframe["humerothoracic_angle_dof2"],
-            concatenated_dataframe["value_dof2"],
-        )
-        interpolated_value_dof3 = np.interp(
-            interpolated_range,
-            concatenated_dataframe["humerothoracic_angle_dof3"],
-            concatenated_dataframe["value_dof3"],
+        corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
+            rad_value_dof1, rad_value_dof2, rad_value_dof3
         )
 
-        # replace the values
-        concatenated_dataframe = pd.DataFrame(
-            columns=["humerothoracic_angle", "value_dof1", "value_dof2", "value_dof3"]
-        )
-        concatenated_dataframe["humerothoracic_angle"] = interpolated_range
-        concatenated_dataframe["value_dof1"] = interpolated_value_dof1
-        concatenated_dataframe["value_dof2"] = interpolated_value_dof2
-        concatenated_dataframe["value_dof3"] = interpolated_value_dof3
+        deg_corrected_dof_1 = np.rad2deg(corrected_dof_1)
+        deg_corrected_dof_2 = np.rad2deg(corrected_dof_2)
+        deg_corrected_dof_3 = np.rad2deg(corrected_dof_3)
 
-    else:
-        concatenated_dataframe["humerothoracic_angle"] = concatenated_dataframe[
-            ["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"]
-        ].mean(axis=1)
-
-        if drop_humerothoracic_raw_data:
-            concatenated_dataframe.drop(
-                columns=["humerothoracic_angle_dof1", "humerothoracic_angle_dof2", "humerothoracic_angle_dof3"],
-                inplace=True,
-            )
-
-    return concatenated_dataframe
-
-
-def load_csv(csv_filenames, columns):
-    if csv_filenames is not None:
-        csv_file_dof1 = pd.read_csv(csv_filenames, sep=",", header=None)
-        csv_file_dof1.columns = columns
-    else:
-        csv_file_dof1 = pd.DataFrame(columns=columns)
-
-    return csv_file_dof1
+        return deg_corrected_dof_1, deg_corrected_dof_2, deg_corrected_dof_3
