@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from .angle_conversion_callbacks import (
+from .corrections.angle_conversion_callbacks import (
     isb_framed_rotation_matrix_from_euler_angles,
     set_corrections_on_rotation_matrix,
     rotation_matrix_2_euler_angles,
@@ -29,7 +29,7 @@ from .enums import (
     JointType,
 )
 from .joint import Joint
-from .kolz_matrices import get_kolz_rotation_matrix
+from .corrections.kolz_matrices import get_kolz_rotation_matrix
 from .utils import (
     get_segment_columns,
     get_correction_column,
@@ -744,9 +744,6 @@ class RowData:
         confidence_total = Deviation.confidence_total(row_data=self, type_risk="rotation")
         # TODO : detect if this is angle or translation
         for i, row in self.data.iterrows():
-
-            rad_value_dof1 = np.deg2rad(row.value_dof1)
-            rad_value_dof2 = np.deg2rad(row.value_dof2)
 
             (deg_corrected_dof_1, deg_corrected_dof_2, deg_corrected_dof_3) = self.apply_correction_in_radians(
                 row.value_dof1, row.value_dof2, row.value_dof3

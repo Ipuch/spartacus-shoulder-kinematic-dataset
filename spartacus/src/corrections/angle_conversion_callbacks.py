@@ -1,8 +1,8 @@
 import biorbd
 import numpy as np
-from .enums import EulerSequence
-from .utils import mat_2_rotation
-from .biomech_system import BiomechCoordinateSystem
+from ..enums import EulerSequence
+from ..utils import mat_2_rotation
+from ..biomech_system import BiomechCoordinateSystem
 
 
 def get_angle_conversion_callback_from_tuple(tuple_factors: tuple[int, int, int]) -> callable:

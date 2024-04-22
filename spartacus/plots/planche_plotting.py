@@ -12,7 +12,7 @@ class DataPlanchePlotting:
 
         self.fig = make_subplots(
             shared_xaxes=False,
-            shared_yaxes=False,
+            shared_yaxes=True,
             rows=4,
             cols=3,
             subplot_titles=self._rotation_titles,
@@ -88,6 +88,10 @@ class DataPlanchePlotting:
             col=col + 1,
         )
         # self.fig.update_xaxes(row=row + 1, col=col + 1, range=[-150, 180])
+        grid_color = "rgba(0, 0, 0, 0.1)"
+        n_ticks = 8  # It doesnt seem to exactly fit the number specified
+        self.fig.update_xaxes(gridcolor=grid_color, row=row + 1, col=col + 1, showgrid=True, nticks=n_ticks)
+        self.fig.update_yaxes(gridcolor=grid_color, row=row + 1, col=col + 1, showgrid=True, nticks=n_ticks)
         self.showlegend = False
 
     def update_style(self):
