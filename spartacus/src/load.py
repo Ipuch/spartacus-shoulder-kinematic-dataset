@@ -191,7 +191,7 @@ def load() -> Spartacus:
     # df = df[df["dataset_authors"] == "Fung et al."]
     # keep Fung and Bourne
     # df = df[df["dataset_authors"].isin(["Fung et al.", "Bourne"])]
-    # df = df[df["dataset_authors"].isin(["Bourne"])]
+    # df = df[df["dataset_authors"] == "Bourne"]
     # df = df[df["dataset_authors"] == "Chu et al."]
     # df = df[df["dataset_authors"] == "Dal Maso et al."] # expected to be the same
     # df = df[df["dataset_authors"] == "Fung et al."]  # One flipped angle in ST in the middle, looks ok
