@@ -743,25 +743,36 @@ class RowData:
 
         confidence_total = Deviation.confidence_total(row_data=self, type_risk="rotation")
         # TODO : detect if this is angle or translation
-        for i, row in self.data.iterrows():
 
-            (deg_corrected_dof_1, deg_corrected_dof_2, deg_corrected_dof_3) = self.apply_correction_in_radians(
-                row.value_dof1, row.value_dof2, row.value_dof3
-            )
+        value_dof = np.zeros((self.data.shape[0], 3))
 
-            # populate the dataframe
-            angle_series_dataframe.loc[i] = [
-                self.row.article_author_year,
-                self.row.joint,
-                self.row.humeral_motion,
-                row.humerothoracic_angle,  # in degrees
-                deg_corrected_dof_1 if correction else row.value_dof1,  # in degrees
-                deg_corrected_dof_2 if correction else row.value_dof2,  # in degrees
-                deg_corrected_dof_3 if correction else row.value_dof3,  # in degrees
-                "rad",
-                confidence_total,
-                self.row.shoulder_id,
-            ]
+        if correction:
+            for i, row in enumerate(self.data.itertuples()):
+                deg_corrected_dof_1, deg_corrected_dof_2, deg_corrected_dof_3 = self.apply_correction_in_radians(
+                    row.value_dof1, row.value_dof2, row.value_dof3
+                )
+                value_dof[i, 0] = deg_corrected_dof_1
+                value_dof[i, 1] = deg_corrected_dof_2
+                value_dof[i, 2] = deg_corrected_dof_3
+
+            # unwrap the angles to avoid discontinuities between -180 and 180 for example
+            for i in range(0, 3):
+                value_dof[:, i] = np.unwrap(value_dof[:, i], period=180)
+        else:
+            value_dof[:, 0] = self.data["value_dof1"].values
+            value_dof[:, 1] = self.data["value_dof2"].values
+            value_dof[:, 2] = self.data["value_dof3"].values
+
+        angle_series_dataframe["value_dof1"] = value_dof[:, 0]
+        angle_series_dataframe["value_dof2"] = value_dof[:, 1]
+        angle_series_dataframe["value_dof3"] = value_dof[:, 2]
+        angle_series_dataframe["article"] = self.row.article_author_year
+        angle_series_dataframe["joint"] = self.row.joint
+        angle_series_dataframe["humeral_motion"] = self.row.humeral_motion
+        angle_series_dataframe["humerothoracic_angle"] = self.data["humerothoracic_angle"]
+        angle_series_dataframe["unit"] = "rad"
+        angle_series_dataframe["confidence"] = confidence_total
+        angle_series_dataframe["shoulder_id"] = self.row.shoulder_id
 
         if correction:
             (legend_dof1, legend_dof2, legend_dof3) = self.joint.isb_rotation_biomechanical_dof

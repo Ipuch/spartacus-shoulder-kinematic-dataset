@@ -193,10 +193,12 @@ def load() -> Spartacus:
     # df = df[df["dataset_authors"].isin(["Fung et al.", "Bourne"])]
     # df = df[df["dataset_authors"].isin(["Bourne"])]
     # df = df[df["dataset_authors"] == "Chu et al."]
-    # df = df[df["dataset_authors"] == "Dal Maso et al."]
-    # df = df[df["dataset_authors"] == "Kolz et al."]
-    # df = df[df["dataset_authors"] == "Kijima et al."]
+    # df = df[df["dataset_authors"] == "Dal Maso et al."] # expected to be the same
+    # df = df[df["dataset_authors"] == "Fung et al."]  # One flipped angle in ST in the middle, looks ok
+    # df = df[df["dataset_authors"] == "Kolz et al."]  # expected to shift because of correction for now
+    # df = df[df["dataset_authors"] == "Kijima et al."]  # expected some Nan because only one dof for GH
     # df = df[df["dataset_authors"] == "Kozono et al."]
+    # df = df[df["dataset_authors"] == "Lawrence et al."]
     # df = df[df["dataset_authors"] == "Matsumura et al."]
     # df = df[df["dataset_authors"] == "Oki et al."]
     # df = df[df["dataset_authors"] == "Teece et al."]
