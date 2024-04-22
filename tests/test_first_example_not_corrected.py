@@ -3,6 +3,10 @@ import pytest
 
 from .utils import TestUtils
 
+import spartacus as sp
+
+spartacus_dataset = sp.load()
+confident_values = spartacus_dataset.confident_data_values
 
 # Data for each article test
 articles_data = {
@@ -19,32 +23,32 @@ articles_data = {
         ["frontal elevation", "horizontal flexion"],
         ["scapulothoracic"],
         ["1", "2", "3"],
-        30304.3459,
-        [(0, -16.366300000000003), (1001, 22.2405), (2000, -38.251900000000006), (-1, np.nan)],
+        32987.06725953286,
+        [(0, -16.3663), (1001, 21.925651818083274), (2000, -38.92291527743668), (-1, 17.319848672019763)],
     ),
     "Chu et al. 2012": (
         96,
         ["frontal elevation", "scapular elevation", "internal-external rotation 90 degree-abducted"],
         ["scapulothoracic"],
         ["1", "2", "3"],
-        -553.7318,
-        [(0, 20.832700000000003), (30, -2.386), (60, -8.4559), (-1, -4.9707)],
+        -554.7492646716876,
+        [(0, 20.8327), (30, -2.4029921148049445), (60, -8.436784721537704), (-1, -4.961429503563281)],
     ),
     "Fung et al. 2001": (
         621,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["scapulothoracic"],
         ["1", "2", "3"],
-        3676.4321999999997,
-        [(0, 36.84060000000001), (30, 29.6062), (60, 18.136000000000003), (-1, 9.294200000000002)],
+        10808.1338,
+        [(0, 36.8406), (30, 29.6062), (60, 18.136), (-1, 9.2942)],
     ),
     "Kijima et al. 2015": (
         48,
         ["scapular elevation"],
         ["glenohumeral", "scapulothoracic"],
         ["1", "2", "3"],
-        306.44232769340545,
-        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 7.412221776556216)],
+        1149.815953912212,
+        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 35.639)],
     ),
     "Cereatti et al. 2017": (
         3495,
@@ -65,81 +69,77 @@ articles_data = {
         ],
         ["glenohumeral", "scapulothoracic"],
         ["1", "2", "3"],
-        1856259.0365862055,
-        [(0, -20.35748376107582), (1001, 80.21966852594535), (40001, -16.285172647839502), (-1, 15.158979447120556)],
+        1788111.3421318345,
+        [(0, 16.7114492478597), (1001, 89.1886474934728), (40001, 2.1350129808377), (-1, 5.87426453808623)],
     ),
     "Kozono et al. 2017": (
         30,
         ["internal-external rotation 0 degree-abducted"],
         ["glenohumeral"],
         ["1", "2", "3"],
-        0,
-        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
+        392.947,
+        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 59.076)],
     ),
     "Lawrence et al. 2014": (
         684,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["glenohumeral", "scapulothoracic", "acromioclavicular", "sternoclavicular"],
         ["1", "2", "3"],
-        12601.038459374904,
-        [(0, 137.332189001885), (1, 138.62633045180257), (2, 139.82856070895113), (-1, 25.0)],
+        -3739.1000000000004,
+        [(0, -8.6), (1, -12.0), (2, -15.5), (-1, 25.0)],
     ),
     "Matsumura et al. 2013": (
         99,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["scapulothoracic"],
         ["1", "2", "3"],
-        -558.3220000000001,
-        [(0, -23.068), (20, 32.64), (60, -0.921), (-1, 11.971)],  # Repeating total value here as a placeholder
+        -558.4569560038939,
+        [(0, -23.068), (20, 32.595395315826835), (60, -0.8599417044686808), (-1, 11.971)],
     ),
     "Matsuki et al. 2012": (
         288,
         ["scapular elevation"],
         ["glenohumeral"],
         ["1", "2", "3"],
-        0,
-        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
+        9303.5162527,
+        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 79.56974273)],
     ),
     "Oki et al. 2012": (
         354,
         ["frontal elevation", "sagittal elevation", "horizontal flexion"],
         ["scapulothoracic", "sternoclavicular"],
         ["1", "2", "3"],
-        2341.1053,
-        [(0, -23.571499999999997), (100, 23.6982), (200, 15.422899999999998), (-1, 31.735099999999992)],
+        2343.222633228853,
+        [(0, -23.5715), (100, 23.698003331400965), (200, 15.424283835508106), (-1, 31.7351)],
     ),
     "Teece et al. 2008": (
         39,
         ["scapular elevation"],
         ["acromioclavicular"],
         ["1", "2", "3"],
-        1070.389125329676,  # Repeating total value here as a placeholder
-        [(0, 53.20906080633492), (10, 55.354366143249585), (22, 12.68647863928707), (-1, 21.701799415162878)],
-        # Random checks
+        1061.3874465806718,
+        [(0, 67.4405), (10, 69.0854773140717), (22, 6.135648345805435), (-1, 13.37)],
     ),
     "Yoshida et al. 2023": (
         84,
         ["sagittal elevation"],
         ["glenohumeral", "scapulothoracic"],
         ["1", "2", "3"],
-        1445.1089898448326,
-        [(0, -44.304576869953905), (40, -16.641814272341282), (65, 34.51266), (-1, 19.2415854)],
+        2011.9508906100002,
+        [(0, 2.8862207), (40, -20.767784), (65, 34.51266), (-1, 19.2415854)],
     ),
     # Add other articles here in the same format
 }
 transformed_data_article = [[name] + list(values) for name, values in articles_data.items()]
 
 
-spartacus = TestUtils.spartacus_folder()
-module = TestUtils.load_module(spartacus + "/examples/first_example.py")
-confident_values = module.main()
-
-
 # This line parameterizes the test function below
 @pytest.mark.parametrize(
     "article_name,expected_shape,humeral_motions,joints,dofs,total_value,random_checks", transformed_data_article
 )
-def test_article_data(article_name, expected_shape, humeral_motions, joints, dofs, total_value, random_checks):
+def test_article_data_no_correction(
+    article_name, expected_shape, humeral_motions, joints, dofs, total_value, random_checks
+):
     data = confident_values[confident_values["article"] == article_name]
     print_data(data, random_checks)
     assert data.shape[0] == expected_shape
