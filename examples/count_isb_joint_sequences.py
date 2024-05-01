@@ -37,13 +37,6 @@ def main():
         new_dict["parent"] = row.parent
         new_dict["child"] = row.child
         new_dict["comment"] = None
-
-        if not row_data.check_all_segments_validity(print_warnings=False):
-            print(row.article_author_year, "segment not valid")
-            new_dict["comment"] = "segment not valid"
-            df_new = pd.concat([df_new, pd.DataFrame([new_dict])], ignore_index=True)
-            continue
-
         new_dict["joint"] = row.joint
 
         if not row_data.check_joint_validity(print_warnings=False):
