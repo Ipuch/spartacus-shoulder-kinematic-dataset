@@ -1,12 +1,12 @@
-import os
-
 import numpy as np
+import os
 import pandas as pd
 
 from .corrections.angle_conversion_callbacks import (
     isb_framed_rotation_matrix_from_euler_angles,
     set_corrections_on_rotation_matrix,
     rotation_matrix_2_euler_angles,
+    to_left_handed_frame,
 )
 from .biomech_system import BiomechCoordinateSystem
 from .checks import (
@@ -60,6 +60,7 @@ class RowData:
         self.child_columns = get_segment_columns(self.child_segment)
 
         self.joint = None
+        self.right_side = True
 
         self.parent_biomech_sys = None
         self.parent_corrections = None
@@ -85,13 +86,17 @@ class RowData:
         self.rotation_data_risk = None
         self.translation_data_risk = None
 
-        self.rotation_correction_callback = None
+        self.euler_angles_correction_callback = None
         self.translation_correction_callback = None
 
         self.csv_filenames = None
         self.data = None
         self.corrected_data = None
         self.melted_corrected_data = None
+
+    @property
+    def left_side(self):
+        return not self.right_side
 
     def check_all_segments_validity(self, print_warnings: bool = False) -> bool:
         """
@@ -598,7 +603,22 @@ class RowData:
 
     def set_rotation_correction_callback(self):
         """
-        Set the rotation correction callback, for the joint. We rely on the corrections set in the table.
+        The idea is to prepare a function ready to receive 3 Euler Angles (rot1, rot2, rot3) from any Euler Sequence,
+        and from this sequence:
+        - Rebuild the corresponding rotation matrix R_proximal_distal
+        - Convert into a rotation matrix into x antero-posterior, y infero-superior, z medio-lateral (right)
+        - Switch to a left-handed coordinate system
+        if the data are on the left side to have the sign as for the right side on Euler angles
+        - Apply a correction if any to make it ISB
+        - Convert back into the Euler Sequence
+
+        More mathematically:
+        - 1st : R_proximal_distal = R(rot1, rot2, rot3, euler_sequence)
+        - 2nd : R_proximal_distal = R_parent_correction @ R_distal_proximal @ R_child_correction (now z is medio-lateral)
+        - 3rd if left side : R_proximal_distal = np.diag([1, 1, -1]) @ R_proximal_distal @ np.diag([1, 1, -1]) (now z is medio-lateral, for left side too)
+        - 4th : R_proximal_distal = R_parent_correction @ R_proximal_distal @ R_child_correction
+        - 5th : rot1, rot2, rot3 = euler_angles(R_proximal_distal, euler_sequence)
+
         """
 
         self.isb_rotation_matrix_callback = lambda rot1, rot2, rot3: isb_framed_rotation_matrix_from_euler_angles(
@@ -609,6 +629,20 @@ class RowData:
             bsys_parent=self.parent_biomech_sys,
             bsys_child=self.child_biomech_sys,
         )
+
+        if self.left_side:
+            self.mediolateral_matrix = lambda rot1, rot2, rot3: to_left_handed_frame(
+                maxtrix=isb_framed_rotation_matrix_from_euler_angles(
+                    rot1=rot1,
+                    rot2=rot2,
+                    rot3=rot3,
+                    previous_sequence_str=self.joint.euler_sequence.value,
+                    bsys_parent=self.parent_biomech_sys,
+                    bsys_child=self.child_biomech_sys,
+                )
+            )
+        else:
+            self.mediolateral_matrix = self.isb_rotation_matrix_callback
 
         parent_matrix_correction = (
             np.eye(3)
@@ -622,12 +656,12 @@ class RowData:
         )
 
         self.correct_isb_rotation_matrix_callback = lambda rot1, rot2, rot3: set_corrections_on_rotation_matrix(
-            matrix=self.isb_rotation_matrix_callback(rot1, rot2, rot3),
+            matrix=self.mediolateral_matrix(rot1, rot2, rot3),
             child_matrix_correction=child_matrix_correction,
             parent_matrix_correction=parent_matrix_correction,
         )
 
-        self.rotation_correction_callback = lambda rot1, rot2, rot3: rotation_matrix_2_euler_angles(
+        self.euler_angles_correction_callback = lambda rot1, rot2, rot3: rotation_matrix_2_euler_angles(
             rotation_matrix=self.correct_isb_rotation_matrix_callback(rot1, rot2, rot3),
             euler_sequence=self.joint.isb_euler_sequence(),
         )

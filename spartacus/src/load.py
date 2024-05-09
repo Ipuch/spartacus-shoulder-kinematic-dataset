@@ -113,10 +113,10 @@ class Spartacus:
                     print("detected child segment :", row.child)
                     row_data.child_biomech_sys.__print__()
                     print("detected joint coordinate system :", row_data.joint.euler_sequence)
-                    print("callback function :", row_data.rotation_correction_callback)
+                    print("callback function :", row_data.euler_angles_correction_callback)
                 continue
             # add the callback function to the dataframe
-            row.callback_function = row_data.rotation_correction_callback
+            row.callback_function = row_data.euler_angles_correction_callback
 
             # add the row to the dataframe
             self.confident_dataframe = pd.concat([self.confident_dataframe, row.to_frame().T], ignore_index=True)

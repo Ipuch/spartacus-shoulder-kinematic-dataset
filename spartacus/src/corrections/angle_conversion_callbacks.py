@@ -1,8 +1,9 @@
 import biorbd
 import numpy as np
+
+from ..biomech_system import BiomechCoordinateSystem
 from ..enums import EulerSequence
 from ..utils import mat_2_rotation
-from ..biomech_system import BiomechCoordinateSystem
 
 
 def get_angle_conversion_callback_from_tuple(tuple_factors: tuple[int, int, int]) -> callable:
@@ -66,6 +67,23 @@ def isb_framed_rotation_matrix_from_euler_angles(
     converted_rotation_matrix = bsys_child.get_rotation_matrix() @ rotation_matrix @ bsys_parent.get_rotation_matrix().T
 
     return converted_rotation_matrix
+
+
+def to_left_handed_frame(
+    matrix: np.ndarray,
+):
+    """
+    Convert a rotation matrix to a left-handed frame, by multiplying the z-axis by -1.
+
+    Consequently, the determinant of the matrix will be -1.
+    But, the identified euler angles of the left side (left shoulder) would have the same signs
+    as for the right-handed frame of the right side (right shoulder).
+    """
+    return set_corrections_on_rotation_matrix(
+        child_matrix_correction=np.diag([1, 1, -1]),
+        matrix=matrix,
+        parent_matrix_correction=np.diag([1, 1, -1]),
+    )
 
 
 def set_corrections_on_rotation_matrix(
