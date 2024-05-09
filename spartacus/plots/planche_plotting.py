@@ -1,7 +1,24 @@
-from .dataframe_interface import DataFrameInterface
-from .constants import BIOMECHANICAL_DOF_LEGEND, JOINT_ROW_COL_INDEX, AUTHORS_COLORS
-from plotly.subplots import make_subplots
+import numpy as np
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
+from .constants import BIOMECHANICAL_DOF_LEGEND, JOINT_ROW_COL_INDEX, AUTHORS_COLORS
+from .dataframe_interface import DataFrameInterface
+
+
+def get_color(article):
+    """
+    Get the color of the article.
+    If the article is not in the AUTHORS_COLORS dict, a random color is generated.
+    """
+    color = AUTHORS_COLORS.get(article)
+    if color is None:
+        random_ints = np.random.randint(0, 255, 3).tolist() + [0.5]
+        #     turn it in to a tuple[int]
+        random_ints = tuple(random_ints)
+        color = f"rgba{random_ints}"
+
+    return color
 
 
 class DataPlanchePlotting:
@@ -31,24 +48,25 @@ class DataPlanchePlotting:
 
     def plot_article(self, name):
         sub_dfi = DataFrameInterface(self.dfi.select_article(article=name))
+        color = get_color(name)
         for j, joint in enumerate(BIOMECHANICAL_DOF_LEGEND.keys()):
             sub_df_j = sub_dfi.select_joint(joint)
 
             if sub_df_j.empty:
                 continue
 
-            self.plot_dofs(article=name, joint=joint)
+            self.plot_dofs(article=name, joint=joint, color=color)
 
-    def plot_dofs(self, article, joint):
+    def plot_dofs(self, article, joint, color):
         sub_dfi = DataFrameInterface(self.dfi.select_article(article=article))
         sub_df_j = sub_dfi.select_joint(joint)
 
         dofs = sub_df_j["degree_of_freedom"].unique()
 
         for i, dof in enumerate(dofs):
-            self.plot_dof(article, joint, dof)
+            self.plot_dof(article, joint, dof, color)
 
-    def plot_dof(self, article, joint, dof):
+    def plot_dof(self, article, joint, dof, color):
         sub_dfi = DataFrameInterface(self.dfi.select_article(article=article))
         sub_df_j = sub_dfi.select_joint(joint)
         sub_df_ij = sub_df_j[sub_df_j["degree_of_freedom"] == dof]
@@ -58,14 +76,14 @@ class DataPlanchePlotting:
         if len(subjects) > 1:
             for s in subjects:
                 sub_df_ij_s = sub_df_ij[sub_df_ij["shoulder_id"] == s]
-                self.plot_timeserie(sub_df_ij_s, article, row, col)
+                self.plot_timeserie(sub_df_ij_s, article, row, col, color)
         else:
-            self.plot_timeserie(sub_df_ij, article, row, col)
+            self.plot_timeserie(sub_df_ij, article, row, col, color)
 
         row, col_left = JOINT_ROW_COL_INDEX[joint][0]
         self.fig.update_yaxes(title_text=f"{joint[0].upper()}{joint[1:].lower()}", row=row + 1, col=col_left + 1)
 
-    def plot_timeserie(self, df, article, row, col):
+    def plot_timeserie(self, df, article, row, col, color):
         self.fig.add_trace(
             go.Scatter(
                 x=df["humerothoracic_angle"],
@@ -77,11 +95,11 @@ class DataPlanchePlotting:
                 opacity=self.opacity,
                 marker=dict(
                     size=2,
-                    color=f"rgba{AUTHORS_COLORS[article]}",
+                    color=color,
                 ),
                 line=dict(
                     width=0.5,
-                    color=f"rgba{AUTHORS_COLORS[article]}",
+                    color=color,
                 ),
             ),
             row=row + 1,
