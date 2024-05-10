@@ -22,24 +22,12 @@ BIOMECHANICAL_DOF_LEGEND = {
     "thoracohumeral": ("plane of elevation", "elevation", "internal(+)/external(-) rotation"),
 }
 
-BIOMECHANICAL_DOF_LEGEND = {
-    "glenohumeral": ("plane of elevation", "elevation", "internal(+)/external(-) rotation"),
-    "scapulothoracic": (
-        "protraction(+)/retraction(-)",
-        "medial(+)/lateral(-) rotation",
-        "posterior(+)/anterior(-) tilt",
-    ),
-    "acromioclavicular": (
-        "protraction(+)/retraction(-)",
-        "medial(+)/lateral(-) rotation",
-        "posterior(+)/anterior(-) tilt",
-    ),
-    "sternoclavicular": (
-        "protraction(+)/retraction(-)",
-        "depression(+)/elevation(-)",
-        "backwards(+)/forward(-) rotation",
-    ),
-    "thoracohumeral": ("plane of elevation", "elevation", "internal(+)/external(-) rotation"),
+TRANSLATIONAL_BIOMECHANICAL_DOF_LEGEND = {
+    "glenohumeral": ("postero(-)/anterior(+)", "infero(-)/superior(+)", "medio(-)/lateral(+)"),
+    "scapulothoracic": ("postero(-)/anterior(+)", "infero(-)/superior(+)", "medio(-)/lateral(+)"),
+    "acromioclavicular": ("postero(-)/anterior(+)", "infero(-)/superior(+)", "medio(-)/lateral(+)"),
+    "sternoclavicular": ("postero(-)/anterior(+)", "infero(-)/superior(+)", "medio(-)/lateral(+)"),
+    "thoracohumeral": ("postero(-)/anterior(+)", "infero(-)/superior(+)", "medio(-)/lateral(+)"),
 }
 
 JOINT_ROW_COL_INDEX = {

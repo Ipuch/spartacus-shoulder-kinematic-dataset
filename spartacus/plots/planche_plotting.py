@@ -2,7 +2,12 @@ import numpy as np
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-from .constants import BIOMECHANICAL_DOF_LEGEND, JOINT_ROW_COL_INDEX, AUTHORS_COLORS
+from .constants import (
+    BIOMECHANICAL_DOF_LEGEND,
+    TRANSLATIONAL_BIOMECHANICAL_DOF_LEGEND,
+    JOINT_ROW_COL_INDEX,
+    AUTHORS_COLORS,
+)
 from .dataframe_interface import DataFrameInterface
 
 
@@ -23,22 +28,35 @@ def get_color(article):
 
 class DataPlanchePlotting:
     def __init__(self, dfi: DataFrameInterface):
-        self.dfi = dfi
 
+        if dfi.has_translations_and_rotations:
+            raise ValueError("The DataFrameInterface must contain only rotational data or translation data, not both.")
+
+        self.rotations = dfi.has_rotational_data
+        self.fig = self.make_fig(rotation=self.rotations)
+
+        self.dfi = dfi
         self.opacity = 0.5 if self.dfi.nb_articles > 1 else 1
 
-        self.fig = make_subplots(
+        self.showlegend = True
+
+    def make_fig(self, rotation: bool = True):
+        return make_subplots(
             shared_xaxes=False,
             shared_yaxes=True,
             rows=4,
             cols=3,
-            subplot_titles=self._rotation_titles,
+            subplot_titles=self._rotation_titles if rotation else self._translation_titles,
         )
-        self.showlegend = True
 
     @property
     def _rotation_titles(self) -> list[str]:
         suplot_titles = [list(v) for _, v in BIOMECHANICAL_DOF_LEGEND.items()]
+        return [item for sublist in suplot_titles for item in sublist]
+
+    @property
+    def _translation_titles(self) -> list[str]:
+        suplot_titles = [list(v) for _, v in TRANSLATIONAL_BIOMECHANICAL_DOF_LEGEND.items()]
         return [item for sublist in suplot_titles for item in sublist]
 
     def plot(self):

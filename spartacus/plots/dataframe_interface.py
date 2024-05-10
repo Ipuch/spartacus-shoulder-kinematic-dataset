@@ -7,6 +7,34 @@ class DataFrameInterface:
         self.df = dataframe if dataframe is not None else import_data()
 
     @property
+    def has_rotational_data(self) -> bool:
+        return "angle" in self.df["unit"].unique()
+
+    @property
+    def has_translational_data(self) -> bool:
+        return "translation" in self.df["unit"].unique()
+
+    @property
+    def has_translations_and_rotations(self) -> bool:
+        return self.has_rotational_data and self.has_translational_data
+
+    @property
+    def has_only_rotational_data(self) -> bool:
+        return self.has_rotational_data and not self.has_translational_data
+
+    @property
+    def has_only_translational_data(self) -> bool:
+        return not self.has_rotational_data and self.has_translational_data
+
+    @property
+    def rotational_interface(self):
+        return DataFrameInterface(self.df[self.df["unit"] == "angle"])
+
+    @property
+    def translational_interface(self):
+        return DataFrameInterface(self.df[self.df["unit"] == "angle"])
+
+    @property
     def motions(self) -> list[str]:
         motions = self.df["humeral_motion"].unique()
         return motions if len(motions) > 1 else motions[0]
