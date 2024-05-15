@@ -99,7 +99,8 @@ articles_data = {
         ["scapular elevation"],
         ["scapulothoracic", "glenohumeral", "sternoclavicular"],
         ["1", "2", "3"],
-        9303.5162527,
+        # 9303.5162527,
+        7909.994906189,
         [(0, 13.69204545), (1, 17.77429908), (2, 21.54803033), (-1, -34.11662691)],
     ),
     "Oki et al.": (
