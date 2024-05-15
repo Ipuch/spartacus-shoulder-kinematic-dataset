@@ -22,6 +22,7 @@ from .corrections.kolz_matrices import get_kolz_rotation_matrix
 from .deviation import Deviation
 from .enums import (
     Segment,
+    Frame,
     Correction,
     DataFolder,
     EulerSequence,
@@ -191,7 +192,7 @@ class RowData:
                 joint_type=JointType.from_string(self.row.joint),
                 euler_sequence=EulerSequence.from_string(self.row.euler_sequence),  # throw a None
                 translation_origin=BiomechOrigin.from_string(self.row.origin_displacement),
-                translation_frame=Segment.from_string(self.row.displacement_cs),
+                translation_frame=Frame.from_string(self.row.displacement_cs, self.row.joint),
             )
 
         elif no_translation:  # Only rotation is provided
@@ -207,7 +208,7 @@ class RowData:
                 joint_type=JointType.from_string(self.row.joint),
                 euler_sequence=EulerSequence.from_string(self.row.euler_sequence),
                 translation_origin=BiomechOrigin.from_string(self.row.origin_displacement),
-                translation_frame=Segment.from_string(self.row.displacement_cs),
+                translation_frame=Frame.from_string(self.row.displacement_cs, self.row.joint),
             )
 
         if not check_parent_child_joint(self.joint, row=self.row, print_warnings=print_warnings):
