@@ -1,7 +1,6 @@
+import numpy as np
 from enum import Enum
 from pathlib import Path
-
-import numpy as np
 
 
 class DatasetCSV(Enum):
@@ -137,6 +136,7 @@ class BiomechOrigin:
         T7 = "T7"
         IJ = "IJ"
         T1_ANTERIOR_FACE = "T1 anterior face"
+        T1s = "T1s"  # @todo: make sure to understand what is it
         C7 = "C7"
         T8 = "T8"
         PX = "PX"  # processus xiphoide
@@ -170,6 +170,7 @@ class BiomechOrigin:
             "T7": cls.Thorax.T7,
             "IJ": cls.Thorax.IJ,
             "T1 anterior face": cls.Thorax.T1_ANTERIOR_FACE,
+            "T1s": cls.Thorax.T1s,
             "GH": cls.Humerus.GLENOHUMERAL_HEAD,
             "midpoint EM EL": cls.Humerus.MIDPOINT_EPICONDYLES,
             "SC": cls.Clavicle.STERNOCLAVICULAR_JOINT_CENTER,
