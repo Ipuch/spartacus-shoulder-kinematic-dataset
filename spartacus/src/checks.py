@@ -261,17 +261,17 @@ def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = Fals
     """This function checks if the euler sequence is provided in the dataset."""
     if row.euler_sequence is None:
         if print_warnings:
-            print("WARNING : euler sequence is not provided, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is not provided, for joint", row.joint, row.dataset_authors)
         return False
     # todo: check nan should disappear
     if not isinstance(row.euler_sequence, str) and (row.euler_sequence == "nan" or np.isnan(row.euler_sequence)):
         if print_warnings:
-            print("WARNING : euler sequence is nan, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is nan, for joint", row.joint, row.dataset_authors)
         return False
     # check the three letters
     if not len(row.euler_sequence) == 3:
         if print_warnings:
-            print("WARNING : euler sequence is not 3 letters long, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is not 3 letters long, for joint", row.joint, row.dataset_authors)
         return False
     # check if the letters are x, y, or z
     authorized_letters = ["x", "y", "z"]
@@ -281,7 +281,7 @@ def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = Fals
         or not row.euler_sequence[2] in authorized_letters
     ):
         if print_warnings:
-            print("WARNING : euler sequence is not x, y, or z, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is not x, y, or z, for joint", row.joint, row.dataset_authors)
         return False
 
     return True
