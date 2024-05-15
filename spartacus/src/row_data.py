@@ -2,12 +2,6 @@ import numpy as np
 import os
 import pandas as pd
 
-from .corrections.angle_conversion_callbacks import (
-    isb_framed_rotation_matrix_from_euler_angles,
-    set_corrections_on_rotation_matrix,
-    rotation_matrix_2_euler_angles,
-    to_left_handed_frame,
-)
 from .biomech_system import BiomechCoordinateSystem
 from .checks import (
     check_segment_filled_with_nan,
@@ -18,6 +12,13 @@ from .checks import (
     check_is_isb_correctable,
     check_correction_methods,
 )
+from .corrections.angle_conversion_callbacks import (
+    isb_framed_rotation_matrix_from_euler_angles,
+    set_corrections_on_rotation_matrix,
+    rotation_matrix_2_euler_angles,
+    to_left_handed_frame,
+)
+from .corrections.kolz_matrices import get_kolz_rotation_matrix
 from .deviation import Deviation
 from .enums import (
     Segment,
@@ -29,14 +30,13 @@ from .enums import (
     JointType,
 )
 from .joint import Joint
-from .corrections.kolz_matrices import get_kolz_rotation_matrix
+from .load_data import load_euler_csv
 from .utils import (
     get_segment_columns,
     get_correction_column,
     get_is_correctable_column,
     get_is_isb_column,
 )
-from .load_data import load_euler_csv
 
 
 class RowData:
@@ -144,7 +144,7 @@ class RowData:
             if not bsys.is_direct():
                 if print_warnings:
                     print(
-                        f"{self.row.article_author_year}, "
+                        f"{self.row.dataset_authors}, "
                         f"Segment {segment_enum.value} is not direct, "
                         f"it should be !!!"
                     )
@@ -731,7 +731,7 @@ class RowData:
         # todo: translation
         print(
             f" Importing data ...\n"
-            f" for article {self.row.article_author_year},"
+            f" for article {self.row.dataset_authors},"
             f" joint {self.row.joint},"
             f" motion {self.row.humeral_motion},"
             f" subject {self.row.shoulder_id}"
@@ -739,7 +739,7 @@ class RowData:
         # load the csv file
         self.csv_filenames = self.get_euler_csv_filenames()
         self.data = load_euler_csv(self.csv_filenames)
-        self.data["article"] = self.row.article_author_year
+        self.data["article"] = self.row.dataset_authors
         self.data["joint"] = JointType.from_string(self.row.joint)
         self.data["humeral_motion"] = self.row.humeral_motion
 
@@ -800,7 +800,7 @@ class RowData:
         angle_series_dataframe["value_dof1"] = value_dof[:, 0]
         angle_series_dataframe["value_dof2"] = value_dof[:, 1]
         angle_series_dataframe["value_dof3"] = value_dof[:, 2]
-        angle_series_dataframe["article"] = self.row.article_author_year
+        angle_series_dataframe["article"] = self.row.dataset_authors
         angle_series_dataframe["joint"] = self.row.joint
         angle_series_dataframe["humeral_motion"] = self.row.humeral_motion
         angle_series_dataframe["humerothoracic_angle"] = self.data["humerothoracic_angle"]

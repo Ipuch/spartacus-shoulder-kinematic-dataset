@@ -37,9 +37,8 @@ class Spartacus:
         # remove lines I know they are not ready for analysis
         # drop line with "Charbonnier et al." in dataset_authors
         dataset_authors = [
-            "Charbonnier et al.",  # no data yet.
-            "Gutierrez Delgado et al.",  # not usable finally ?
-            "Kim et al.",  # no data yet.
+            # "Gutierrez Delgado et al.",  # not usable finally ?
+            # "Kim et al.",  # no data yet.
         ]
         for a in dataset_authors:
             self.dataframe.drop(
@@ -47,12 +46,12 @@ class Spartacus:
                 inplace=True,
             )
         article_author_year = [
-            "Sahara et al. 2006",  # no rotation data
-            "Sugi et al. 2021",
+            "Sahara et al.",  # no rotation data
+            "Sugi et al.",
         ]
         for a in article_author_year:
             self.dataframe.drop(
-                self.dataframe[self.dataframe["article_author_year"].str.contains(a)].index,
+                self.dataframe[self.dataframe["dataset_authors"].str.contains(a)].index,
                 inplace=True,
             )
 
@@ -85,7 +84,7 @@ class Spartacus:
                 print("")
                 print("")
                 print("")
-                print("row_data.joint", row.article_author_year)
+                print("row_data.joint", row.dataset_authors)
 
             if not row_data.check_all_segments_validity(print_warnings=print_warnings):
                 continue
@@ -106,7 +105,7 @@ class Spartacus:
             if not row_data.usable_rotation_data:
                 if print_warnings:
                     print("WARNING : inconsistency in the dataset")
-                    print(row.joint, row.article_author_year)
+                    print(row.joint, row.dataset_authors)
                     print("detected :", row_data.joint.joint_type)
                     print("detected parent segment :", row.parent)
                     row_data.parent_biomech_sys.__print__()
