@@ -37,8 +37,8 @@ class Spartacus:
         # remove lines I know they are not ready for analysis
         # drop line with "Charbonnier et al." in dataset_authors
         dataset_authors = [
-            # "Gutierrez Delgado et al.",  # not usable finally ?
-            # "Kim et al.",  # no data yet.
+            "Gutierrez Delgado et al.",  # not usable finally ?
+            "Kim et al.",  # no data yet.
         ]
         for a in dataset_authors:
             self.dataframe.drop(

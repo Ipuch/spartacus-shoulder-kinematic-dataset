@@ -20,12 +20,12 @@ class DataFolder(Enum):
     KIJIMA_2015 = Path(__file__).parent.parent / "data" / "#8_Kijima_et_al"
     KIM_2017 = Path(__file__).parent.parent / "data" / "#9_Kim_et_al"
     KONOZO_2017 = Path(__file__).parent.parent / "data" / "#10_Kozono_et_al"
-    LAWRENCE_2014 = Path(__file__).parent.parent / "data" / "#11_Ludwig_et_al"
+    LAWRENCE_2014 = Path(__file__).parent.parent / "data" / "#11_Ludewig_et_al"
     MATSUKI_2011 = Path(__file__).parent.parent / "data" / "#12_Matsuki_et_al"
     # MATSUKI_2011 = Path(__file__).parent.parent / "data" / "Matsuki et al 2011"
     # MATSUKI_2012 = Path(__file__).parent.parent / "data" / "Matsuki et al 2012"
     # MATSUKI_2014 = Path(__file__).parent.parent / "data" / "Matsuki et al 2014"
-    MATSUMURA_2013 = Path(__file__).parent.parent / "data" / "#13_Matsumara_et_al"
+    MATSUMURA_2013 = Path(__file__).parent.parent / "data" / "#13_Matsumura_et_al"
     MOISSENET = Path(__file__).parent.parent / "data" / "#14_Moissenet_et_al"
     NISHINAKA_2008 = Path(__file__).parent.parent / "data" / "#15_Nishinaka_et_al"
     OKI_2012 = Path(__file__).parent.parent / "data" / "#16_Oki_et_al"
@@ -54,12 +54,12 @@ class DataFolder(Enum):
             "#8_Kijima_et_al": cls.KIJIMA_2015,  # "Kijima et al 2015"
             "#9_Kim_et_al": cls.KIM_2017,  # "Kim et al 2017"
             "#10_Kozono_et_al": cls.KONOZO_2017,  # "Kozono et al 2017"
-            "#11_Ludwig_et_al": cls.LAWRENCE_2014,
+            "#11_Ludewig_et_al": cls.LAWRENCE_2014,
             "#12_Matsuki_et_al": cls.MATSUKI_2011,  # "Matsuki et al 2011"
             # "Matsuki et al 2011": cls.MATSUKI_2011,
             # "Matsuki et al 2012": cls.MATSUKI_2012,
             # "Matsuki et al 2014": cls.MATSUKI_2014,
-            "#13_Matsumara_et_al": cls.MATSUMURA_2013,  # "Matsumura et al 2013"
+            "#13_Matsumura_et_al": cls.MATSUMURA_2013,  # "Matsumura et al 2013"
             "#14_Moissenet_et_al": cls.MOISSENET,  # "Moissenet et al"
             "#15_Nishinaka_et_al": cls.NISHINAKA_2008,  # "Nishinaka et al 2008"
             "#16_Oki_et_al": cls.OKI_2012,  # "Oki et al 2012"
