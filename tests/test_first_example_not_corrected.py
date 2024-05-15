@@ -188,7 +188,7 @@ def test_number_of_articles():
     assert articles == experted_articles
     assert len(articles) == 13
 
-    assert confident_values.shape[0] == 89250
+    assert confident_values.shape[0] == 795060
 
 
 def print_data(data, random_checks):
