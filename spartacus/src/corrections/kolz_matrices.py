@@ -1,5 +1,5 @@
 import numpy as np
-from .enums import Correction
+from ..enums import Correction
 
 
 def get_kolz_rotation_matrix(correction: Correction, orthonormalize: bool = True) -> np.ndarray:
@@ -61,8 +61,9 @@ def get_kolz_rotation_matrix(correction: Correction, orthonormalize: bool = True
     return orthonormalize_matrix(R) if orthonormalize else R
 
 
-# normalize a matrix with svd and return the normalized matrix
+#
 def orthonormalize_matrix(matrix):
+    """Normalize a matrix with svd and return the normalized matrix"""
     # normalize the matrix
     u, s, vh = np.linalg.svd(matrix, full_matrices=True)
     normalized_matrix = u @ vh

@@ -1,4 +1,5 @@
 from .enums import EulerSequence, JointType, Segment, BiomechOrigin
+from .legend_utils import isb_rotation_biomechanical_dof
 
 
 class Joint:
@@ -66,3 +67,34 @@ class Joint:
             return False
 
         return True
+
+    @property
+    def isb_rotation_biomechanical_dof(self) -> (str, str, str):
+        return isb_rotation_biomechanical_dof(self.joint_type)
+
+    @property
+    def isb_translation_biomechanical_dof(self) -> (str, str, str):
+        # TODO : Put correct dof
+        raise NotImplementedError("Not implemented yet")
+
+        joint_mapping = {
+            JointType.GLENO_HUMERAL: ("flexion_extension", "abduction_adduction", "internal_external_rotation"),
+            JointType.SCAPULO_THORACIC: (
+                "upward_downward_rotation",
+                "anterior_posterior_tilt",
+                "internal_external_rotation",
+            ),
+            JointType.ACROMIO_CLAVICULAR: (
+                "anterior_posterior_tilt",
+                "internal_external_rotation",
+                "upward_downward_rotation",
+            ),
+            JointType.STERNO_CLAVICULAR: (
+                "anterior_posterior_tilt",
+                "internal_external_rotation",
+                "upward_downward_rotation",
+            ),
+            JointType.THORACO_HUMERAL: ("flexion_extension", "abduction_adduction", "internal_external_rotation"),
+        }
+
+        return joint_mapping.get(self.joint_type)

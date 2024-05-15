@@ -1,8 +1,9 @@
 import biorbd
 import numpy as np
-from .enums import EulerSequence
-from .utils import mat_2_rotation
-from .biomech_system import BiomechCoordinateSystem
+
+from ..biomech_system import BiomechCoordinateSystem
+from ..enums import EulerSequence
+from ..utils import mat_2_rotation
 
 
 def get_angle_conversion_callback_from_tuple(tuple_factors: tuple[int, int, int]) -> callable:
@@ -53,10 +54,36 @@ def isb_framed_rotation_matrix_from_euler_angles(
     bsys_parent: BiomechCoordinateSystem,
     bsys_child: BiomechCoordinateSystem,
 ) -> np.ndarray:
+    """
+    Returns the joint rotation matrix in a ISB-like manner by recomputing the rotation matrix from previous sequence
+    and applying rotation matrix to turn the parent and the child into ISB-like coordinate system
+
+    Returns
+    -------
+    np.ndarray
+        The joint rotation matrix in a ISB-like manner (we may add an extra correction later)
+    """
     rotation_matrix = from_euler_angles_to_rotation_matrix(previous_sequence_str, rot1, rot2, rot3)
     converted_rotation_matrix = bsys_child.get_rotation_matrix() @ rotation_matrix @ bsys_parent.get_rotation_matrix().T
 
     return converted_rotation_matrix
+
+
+def to_left_handed_frame(
+    matrix: np.ndarray,
+):
+    """
+    Convert a rotation matrix to a left-handed frame, by multiplying the z-axis by -1.
+
+    Consequently, the determinant of the matrix will be -1.
+    But, the identified euler angles of the left side (left shoulder) would have the same signs
+    as for the right-handed frame of the right side (right shoulder).
+    """
+    return set_corrections_on_rotation_matrix(
+        child_matrix_correction=np.diag([1, 1, -1]),
+        matrix=matrix,
+        parent_matrix_correction=np.diag([1, 1, -1]),
+    )
 
 
 def set_corrections_on_rotation_matrix(
@@ -64,6 +91,7 @@ def set_corrections_on_rotation_matrix(
     child_matrix_correction: np.ndarray,
     parent_matrix_correction: np.ndarray,
 ):
+    """Returns the rotation matrix with the child and parent correction applied"""
     return child_matrix_correction @ matrix @ parent_matrix_correction.T
 
 
@@ -75,7 +103,11 @@ def convert_euler_angles_and_frames_to_isb(
     rot3,
     bsys_parent: BiomechCoordinateSystem,
     bsys_child: BiomechCoordinateSystem,
-):
+) -> np.ndarray:
+    """
+    Returns the Euler angles in ISB-like manner by recomputing the rotation matrix
+    and applying rotation matrix to turn the parent and the child into ISB coordinate system
+    """
     isb_framed_rotation_matrix = isb_framed_rotation_matrix_from_euler_angles(
         previous_sequence_str,
         rot1,

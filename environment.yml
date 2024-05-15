@@ -12,4 +12,6 @@ dependencies:
 - biorbd
 - dash
 - scipy
+- colorcet
+- seaborn
 

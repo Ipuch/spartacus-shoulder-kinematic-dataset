@@ -4,9 +4,6 @@ The rotation matrix is computed from the axes of the ISB coordinate system.
 The rotation matrix is then converted to Euler angles, and the axes are permuted to match the sequence of the ISB axes.
 Then we try to retrieve the euler angles from the ISB axes, and we compare the results.
 
-"The title is broke your ISB intuition
-but in fact it restored it for me" Pierre Puchaud.
-
 """
 
 import numpy as np
