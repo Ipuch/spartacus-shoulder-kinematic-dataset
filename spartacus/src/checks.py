@@ -1,14 +1,13 @@
 import numpy as np
 import pandas as pd
 
+from .biomech_system import BiomechCoordinateSystem
 from .enums import JointType, Segment, BiomechOrigin, Correction
+from .joint import Joint
 from .utils import (
     get_is_isb_column,
     get_is_correctable_column,
-    get_correction_column,
 )
-from .joint import Joint
-from .biomech_system import BiomechCoordinateSystem
 
 
 def check_parent_child_joint(bjoint: Joint, row: pd.Series, print_warnings: bool = False):
@@ -262,17 +261,17 @@ def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = Fals
     """This function checks if the euler sequence is provided in the dataset."""
     if row.euler_sequence is None:
         if print_warnings:
-            print("WARNING : euler sequence is not provided, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is not provided, for joint", row.joint, row.dataset_authors)
         return False
     # todo: check nan should disappear
     if not isinstance(row.euler_sequence, str) and (row.euler_sequence == "nan" or np.isnan(row.euler_sequence)):
         if print_warnings:
-            print("WARNING : euler sequence is nan, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is nan, for joint", row.joint, row.dataset_authors)
         return False
     # check the three letters
     if not len(row.euler_sequence) == 3:
         if print_warnings:
-            print("WARNING : euler sequence is not 3 letters long, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is not 3 letters long, for joint", row.joint, row.dataset_authors)
         return False
     # check if the letters are x, y, or z
     authorized_letters = ["x", "y", "z"]
@@ -282,7 +281,7 @@ def check_is_euler_sequence_provided(row: pd.Series, print_warnings: bool = Fals
         or not row.euler_sequence[2] in authorized_letters
     ):
         if print_warnings:
-            print("WARNING : euler sequence is not x, y, or z, for joint", row.joint, row.article_author_year)
+            print("WARNING : euler sequence is not x, y, or z, for joint", row.joint, row.dataset_authors)
         return False
 
     return True
@@ -332,7 +331,7 @@ def check_is_translation_provided(row: pd.Series, print_warnings: bool = False) 
 
     if not origin_displacement_provided or not displacement_cs_provided:
         if print_warnings:
-            print("WARNING : translation is not entirely provided, for joint", row.joint, row.article_author_year)
+            print("WARNING : translation is not entirely provided, for joint", row.joint, row.dataset_authors)
             print(f"origin_displacement_provided : {origin_displacement_provided}")
             print(f"displacement_cs_provided : {displacement_cs_provided}")
         return False

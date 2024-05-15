@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from spartacus.src.kolz_matrices import get_kolz_rotation_matrix
+from spartacus.src.corrections.kolz_matrices import get_kolz_rotation_matrix
 from spartacus.src.enums import Correction
 
 

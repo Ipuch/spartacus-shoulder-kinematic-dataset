@@ -75,7 +75,10 @@ def get_segment_columns(segment: Segment) -> list[str]:
         Segment.SCAPULA: ["scapula_x", "scapula_y", "scapula_z", "scapula_origin"],
         Segment.HUMERUS: ["humerus_x", "humerus_y", "humerus_z", "humerus_origin"],
     }
-    return columns.get(segment, ValueError(f"{segment} is not a valid segment."))
+
+    the_columns = columns.get(segment, ValueError(f"{segment} is not a valid segment."))
+    add_suffix = "_sense"
+    return [f"{column}{add_suffix}" for column in the_columns[:3]] + [the_columns[3]]
 
 
 def get_is_isb_column(segment: Segment) -> str:

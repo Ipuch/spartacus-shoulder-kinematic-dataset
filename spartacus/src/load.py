@@ -23,7 +23,8 @@ class Spartacus:
         self.rows = []
         self.rows_output = None
 
-        self.confident_dataframe = None
+        self.corrected_confident = None
+        self.corrected_confident_data_values = None
         self.confident_data_values = None
 
     def clean_df(self):
@@ -36,7 +37,6 @@ class Spartacus:
         # remove lines I know they are not ready for analysis
         # drop line with "Charbonnier et al." in dataset_authors
         dataset_authors = [
-            "Charbonnier et al.",  # no data yet.
             "Gutierrez Delgado et al.",  # not usable finally ?
             "Kim et al.",  # no data yet.
         ]
@@ -46,12 +46,12 @@ class Spartacus:
                 inplace=True,
             )
         article_author_year = [
-            "Sahara et al. 2006",  # no rotation data
-            "Sugi et al. 2021",
+            "Sahara et al.",  # no rotation data
+            "Sugi et al.",
         ]
         for a in article_author_year:
             self.dataframe.drop(
-                self.dataframe[self.dataframe["article_author_year"].str.contains(a)].index,
+                self.dataframe[self.dataframe["dataset_authors"].str.contains(a)].index,
                 inplace=True,
             )
 
@@ -84,7 +84,7 @@ class Spartacus:
                 print("")
                 print("")
                 print("")
-                print("row_data.joint", row.article_author_year)
+                print("row_data.joint", row.dataset_authors)
 
             if not row_data.check_all_segments_validity(print_warnings=print_warnings):
                 continue
@@ -105,17 +105,17 @@ class Spartacus:
             if not row_data.usable_rotation_data:
                 if print_warnings:
                     print("WARNING : inconsistency in the dataset")
-                    print(row.joint, row.article_author_year)
+                    print(row.joint, row.dataset_authors)
                     print("detected :", row_data.joint.joint_type)
                     print("detected parent segment :", row.parent)
                     row_data.parent_biomech_sys.__print__()
                     print("detected child segment :", row.child)
                     row_data.child_biomech_sys.__print__()
                     print("detected joint coordinate system :", row_data.joint.euler_sequence)
-                    print("callback function :", row_data.rotation_correction_callback)
+                    print("callback function :", row_data.euler_angles_correction_callback)
                 continue
             # add the callback function to the dataframe
-            row.callback_function = row_data.rotation_correction_callback
+            row.callback_function = row_data.euler_angles_correction_callback
 
             # add the row to the dataframe
             self.confident_dataframe = pd.concat([self.confident_dataframe, row.to_frame().T], ignore_index=True)
@@ -143,8 +143,10 @@ class Spartacus:
                 "value",
                 "unit",
                 "confidence",
+                "shoulder_id",
             ]
         )
+        corrected_output_dataframe = output_dataframe.copy()
 
         for i, row in self.confident_dataframe.iterrows():
             row_data = RowData(row)
@@ -156,16 +158,26 @@ class Spartacus:
             row_data.set_rotation_correction_callback()
 
             row_data.import_data()
-            df_angle_series = row_data.to_angle_series_dataframe()
 
+            df_angle_series = row_data.to_angle_series_dataframe(correction=False)
+            corrected_angle_series = row_data.to_angle_series_dataframe(correction=True)
             # add the row to the dataframe
             output_dataframe = pd.concat([output_dataframe, df_angle_series], ignore_index=True)
+            corrected_output_dataframe = pd.concat(
+                [corrected_output_dataframe, corrected_angle_series], ignore_index=True
+            )
 
         self.confident_data_values = output_dataframe
-        return output_dataframe
+        self.corrected_confident_data_values = corrected_output_dataframe
+
+        return self.corrected_confident_data_values
 
     def export(self):
         path_next_to_clean = Path(DatasetCSV.CLEAN.value).parent
+
+        confident_path = Path.joinpath(path_next_to_clean, "corrected_confident_data.csv")
+        self.corrected_confident_data_values.to_csv(confident_path, index=False)
+
         confident_path = Path.joinpath(path_next_to_clean, "confident_data.csv")
         self.confident_data_values.to_csv(confident_path, index=False)
 
@@ -178,11 +190,14 @@ def load() -> Spartacus:
     # df = df[df["dataset_authors"] == "Fung et al."]
     # keep Fung and Bourne
     # df = df[df["dataset_authors"].isin(["Fung et al.", "Bourne"])]
-    # df = df[df["dataset_authors"].isin(["Bourne"])]
+    # df = df[df["dataset_authors"] == "Bourne"]
     # df = df[df["dataset_authors"] == "Chu et al."]
-    # df = df[df["dataset_authors"] == "Dal Maso et al."]
-    # df = df[df["dataset_authors"] == "Kolz et al."]
+    # df = df[df["dataset_authors"] == "Dal Maso et al."] # expected to be the same
+    # df = df[df["dataset_authors"] == "Fung et al."]  # One flipped angle in ST in the middle, looks ok
+    # df = df[df["dataset_authors"] == "Kolz et al."]  # expected to shift because of correction for now
+    # df = df[df["dataset_authors"] == "Kijima et al."]  # expected some Nan because only one dof for GH
     # df = df[df["dataset_authors"] == "Kozono et al."]
+    # df = df[df["dataset_authors"] == "Lawrence et al."]
     # df = df[df["dataset_authors"] == "Matsumura et al."]
     # df = df[df["dataset_authors"] == "Oki et al."]
     # df = df[df["dataset_authors"] == "Teece et al."]
