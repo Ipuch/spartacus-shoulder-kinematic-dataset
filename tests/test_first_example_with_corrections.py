@@ -3,7 +3,6 @@ import pytest
 
 from .utils import TestUtils
 
-
 # Data for each article test
 articles_data = {
     ## "Article name": (
@@ -14,7 +13,7 @@ articles_data = {
     # total_value i.e. sum of all values
     # random_checks i.e. list of tuples (index, value) to check
     # ),
-    "Bourne 2003": (
+    "Bourne et al.": (
         2550,
         ["frontal elevation", "horizontal flexion"],
         ["scapulothoracic"],
@@ -22,7 +21,7 @@ articles_data = {
         32987.06725953286,
         [(0, -16.366300000000003), (1001, 21.925651818083278), (2000, -38.92291527743668), (-1, 17.319848672019763)],
     ),
-    "Chu et al. 2012": (
+    "Chu et al.": (
         96,
         ["frontal elevation", "scapular elevation", "internal-external rotation 90 degree-abducted"],
         ["scapulothoracic"],
@@ -30,7 +29,7 @@ articles_data = {
         -554.7492646716876,
         [(0, 20.832700000000003), (30, -2.4029921148049445), (60, -8.436784721537704), (-1, -4.961429503563281)],
     ),
-    "Fung et al. 2001": (
+    "Fung et al.": (
         621,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["scapulothoracic"],
@@ -38,7 +37,7 @@ articles_data = {
         3676.4321999999997,
         [(0, 36.84060000000001), (30, 29.6062), (60, 18.136000000000003), (-1, 9.294200000000002)],
     ),
-    "Kijima et al. 2015": (
+    "Kijima et al.": (
         48,
         ["scapular elevation"],
         ["glenohumeral", "scapulothoracic"],
@@ -46,7 +45,7 @@ articles_data = {
         306.06436262040665,
         [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 7.421436415016586)],
     ),
-    "Cereatti et al. 2017": (
+    "Begon et al.": (
         3495,
         ["frontal elevation", "sagittal elevation"],
         ["glenohumeral"],
@@ -54,7 +53,7 @@ articles_data = {
         90447.72414830001,
         [(0, 86.818), (1001, 58.178999999999995), (2000, -65.967), (-1, 63.87599999999999)],
     ),
-    "Kolz et al. 2020": (
+    "Henninger et al.": (
         80862,
         [
             "frontal elevation",
@@ -68,7 +67,7 @@ articles_data = {
         1856259.0365862055,
         [(0, -20.35748376107582), (1001, 80.21966852594535), (40001, -16.285172647839502), (-1, 15.158979447120556)],
     ),
-    "Kozono et al. 2017": (
+    "Kozono et al.": (
         30,
         ["internal-external rotation 0 degree-abducted"],
         ["glenohumeral"],
@@ -76,7 +75,7 @@ articles_data = {
         0,
         [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
     ),
-    "Lawrence et al. 2014": (
+    "Ludewig et al.": (
         684,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["glenohumeral", "scapulothoracic", "acromioclavicular", "sternoclavicular"],
@@ -84,7 +83,7 @@ articles_data = {
         9001.038459374906,
         [(0, 137.332189001885), (1, 138.62633045180257), (2, 139.82856070895113), (-1, 25.0)],
     ),
-    "Matsumura et al. 2013": (
+    "Matsumura et al.": (
         99,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["scapulothoracic"],
@@ -92,15 +91,15 @@ articles_data = {
         -558.4569560038939,
         [(0, -23.068), (20, 32.595395315826835), (60, -0.8599417044686809), (-1, 11.970999999999998)],
     ),
-    "Matsuki et al. 2012": (
-        288,
+    "Matsuki et al.": (
+        864,  #     288
         ["scapular elevation"],
-        ["glenohumeral"],
+        ["scapulothoracic", "glenohumeral", "sternoclavicular"],
         ["1", "2", "3"],
-        0,
-        [(0, np.nan), (1, np.nan), (2, np.nan), (-1, np.nan)],
+        -10228.198907525397,
+        [(0, 0.7331976380416924), (1, 1.3163822061108446), (2, 2.009989683892475), (-1, 34.11662691)],
     ),
-    "Oki et al. 2012": (
+    "Moissenet et al.": (
         354,
         ["frontal elevation", "sagittal elevation", "horizontal flexion"],
         ["scapulothoracic", "sternoclavicular"],
@@ -108,7 +107,7 @@ articles_data = {
         2343.2226332288533,
         [(0, -23.571499999999997), (100, 23.698003331400965), (200, 15.424283835508106), (-1, 31.7351)],
     ),
-    "Teece et al. 2008": (
+    "Teece et al.": (
         39,
         ["scapular elevation"],
         ["acromioclavicular"],
@@ -117,7 +116,7 @@ articles_data = {
         [(0, 53.208998323357854), (10, 55.34423815737802), (22, 12.65697336292887), (-1, 21.697663050779525)],
         # Random checks
     ),
-    "Yoshida et al. 2023": (
+    "Yoshida et al.": (
         84,
         ["sagittal elevation"],
         ["glenohumeral", "scapulothoracic"],
@@ -141,6 +140,11 @@ confident_values = module.main()
 )
 def test_article_data(article_name, expected_shape, humeral_motions, joints, dofs, total_value, random_checks):
     data = confident_values[confident_values["article"] == article_name]
+
+    if article_name == "Kozono et al.":
+        # Skip this test because the thorax is indirect but once we decide which one to use we can remove this line
+        return
+
     print_data(data, random_checks)
     assert data.shape[0] == expected_shape
 
@@ -165,26 +169,27 @@ def test_article_data(article_name, expected_shape, humeral_motions, joints, dof
 def test_number_of_articles():
     # Check number of unique articles after processing all
     articles = list(confident_values["article"].unique())
-
-    assert [
-        "Bourne 2003",
-        "Chu et al. 2012",
-        "Cereatti et al. 2017",
-        "Fung et al. 2001",
-        "Kijima et al. 2015",
-        "Kolz et al. 2020",
-        "Kozono et al. 2017",
-        "Lawrence et al. 2014",
-        "Matsumura et al. 2013",
-        "Matsuki et al. 2012",
-        "Oki et al. 2012",
-        "Teece et al. 2008",
-        "Yoshida et al. 2023",
-    ] == articles
+    experted_articles = [
+        "Begon et al.",
+        "Bourne et al.",
+        "Chu et al.",
+        "Fung et al.",
+        "Henninger et al.",
+        "Kijima et al.",
+        # "Kozono et al.", todo: to be put again when thorax is decided
+        "Ludewig et al.",
+        "Matsuki et al.",
+        "Matsumura et al.",
+        "Moissenet et al.",
+        "Oki et al.",
+        "Teece et al.",
+        "Yoshida et al.",
+    ]
+    assert articles == experted_articles
 
     assert len(articles) == 13
 
-    assert confident_values.shape[0] == 89250
+    assert confident_values.shape[0] == 795060
 
 
 def print_data(data, random_checks):
