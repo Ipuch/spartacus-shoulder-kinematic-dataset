@@ -875,7 +875,7 @@ class RowData:
         rad_value_dof2 = np.deg2rad(dof2)
         rad_value_dof3 = np.deg2rad(dof3)
 
-        corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.rotation_correction_callback(
+        corrected_dof_1, corrected_dof_2, corrected_dof_3 = self.euler_angles_correction_callback(
             rad_value_dof1, rad_value_dof2, rad_value_dof3
         )
 
