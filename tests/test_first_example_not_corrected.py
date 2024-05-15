@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
 
-from .utils import TestUtils
-
 import spartacus as sp
 
 spartacus_dataset = sp.load()
@@ -18,7 +16,7 @@ articles_data = {
     # total_value i.e. sum of all values
     # random_checks i.e. list of tuples (index, value) to check
     # ),
-    "Bourne 2003": (
+    "Bourne et al.": (
         2550,
         ["frontal elevation", "horizontal flexion"],
         ["scapulothoracic"],
@@ -26,7 +24,7 @@ articles_data = {
         32987.06725953286,
         [(0, -16.3663), (1001, 21.925651818083274), (2000, -38.92291527743668), (-1, 17.319848672019763)],
     ),
-    "Chu et al. 2012": (
+    "Chu et al.": (
         96,
         ["frontal elevation", "scapular elevation", "internal-external rotation 90 degree-abducted"],
         ["scapulothoracic"],
@@ -34,7 +32,7 @@ articles_data = {
         -554.7492646716876,
         [(0, 20.8327), (30, -2.4029921148049445), (60, -8.436784721537704), (-1, -4.961429503563281)],
     ),
-    "Fung et al. 2001": (
+    "Fung et al.": (
         621,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["scapulothoracic"],
@@ -42,7 +40,7 @@ articles_data = {
         10808.1338,
         [(0, 36.8406), (30, 29.6062), (60, 18.136), (-1, 9.2942)],
     ),
-    "Kijima et al. 2015": (
+    "Kijima et al.": (
         48,
         ["scapular elevation"],
         ["glenohumeral", "scapulothoracic"],
@@ -58,7 +56,7 @@ articles_data = {
         90447.72414830001,
         [(0, 86.818), (1001, 58.178999999999995), (2000, -65.967), (-1, 63.87599999999999)],
     ),
-    "Kolz et al. 2020": (
+    "Kolz et al.": (
         80862,
         [
             "frontal elevation",
@@ -72,7 +70,7 @@ articles_data = {
         1788111.3421318345,
         [(0, 16.7114492478597), (1001, 89.1886474934728), (40001, 2.1350129808377), (-1, 5.87426453808623)],
     ),
-    "Kozono et al. 2017": (
+    "Kozono et al.": (
         30,
         ["internal-external rotation 0 degree-abducted"],
         ["glenohumeral"],
@@ -80,7 +78,7 @@ articles_data = {
         392.947,
         [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 59.076)],
     ),
-    "Lawrence et al. 2014": (
+    "Ludewig et al.": (
         684,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["glenohumeral", "scapulothoracic", "acromioclavicular", "sternoclavicular"],
@@ -88,7 +86,7 @@ articles_data = {
         -3739.1000000000004,
         [(0, -8.6), (1, -12.0), (2, -15.5), (-1, 25.0)],
     ),
-    "Matsumura et al. 2013": (
+    "Matsumura et al.": (
         99,
         ["frontal elevation", "scapular elevation", "sagittal elevation"],
         ["scapulothoracic"],
@@ -96,7 +94,7 @@ articles_data = {
         -558.4569560038939,
         [(0, -23.068), (20, 32.595395315826835), (60, -0.8599417044686808), (-1, 11.971)],
     ),
-    "Matsuki et al. 2012": (
+    "Matsuki et al.": (
         288,
         ["scapular elevation"],
         ["glenohumeral"],
@@ -104,7 +102,7 @@ articles_data = {
         9303.5162527,
         [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 79.56974273)],
     ),
-    "Oki et al. 2012": (
+    "Oki et al.": (
         354,
         ["frontal elevation", "sagittal elevation", "horizontal flexion"],
         ["scapulothoracic", "sternoclavicular"],
@@ -112,7 +110,7 @@ articles_data = {
         2343.222633228853,
         [(0, -23.5715), (100, 23.698003331400965), (200, 15.424283835508106), (-1, 31.7351)],
     ),
-    "Teece et al. 2008": (
+    "Teece et al.": (
         39,
         ["scapular elevation"],
         ["acromioclavicular"],
@@ -120,7 +118,7 @@ articles_data = {
         1061.3874465806718,
         [(0, 67.4405), (10, 69.0854773140717), (22, 6.135648345805435), (-1, 13.37)],
     ),
-    "Yoshida et al. 2023": (
+    "Yoshida et al.": (
         84,
         ["sagittal elevation"],
         ["glenohumeral", "scapulothoracic"],

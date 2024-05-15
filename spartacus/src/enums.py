@@ -37,7 +37,7 @@ class DataFolder(Enum):
     YOSHIDA_2023 = Path(__file__).parent.parent / "data" / "#20_Yoshida_et_al"
     CEREATTI_2017 = Path(__file__).parent.parent / "data" / "Cereatti et al 2017" / "S2M"
     DAL_MASO_2014 = Path(__file__).parent.parent / "data" / "Dal Maso et al 2014"
-    MALBERG = "TODO"
+    # MALBERG = "TODO"
 
     @classmethod
     def from_string(cls, data_folder: str):
@@ -69,7 +69,7 @@ class DataFolder(Enum):
             "#18_Sugi_et_al": cls.SUGI_2021,  # "Sugi et al 2021"
             "#19_Teece_et_al": cls.TEECE_2008,  # "Teece et al 2008"
             "#20_Yoshida_et_al": cls.YOSHIDA_2023,  # "Yoshida et al 2023"
-            "#XX_Malberg": cls.MALBERG,
+            # "#XX_Malberg": cls.MALBERG, TODO
         }
 
         the_enum = folder_name_to_enum.get(data_folder)

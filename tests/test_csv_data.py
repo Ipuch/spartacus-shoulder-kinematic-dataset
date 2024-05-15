@@ -12,7 +12,7 @@ from spartacus import DataFolder, Spartacus, DatasetCSV, RowData
 
 @pytest.mark.parametrize("data_folder", DataFolder)
 def test_data_format(data_folder):
-    if data_folder == DataFolder.DAL_MASO_2014 or data_folder == DataFolder.CHARBONNIER_2014:
+    if data_folder == DataFolder.DAL_MASO_2014:
         return
 
     for subfile in os.listdir(data_folder.value):
