@@ -169,17 +169,18 @@ class BiomechOrigin:
         biomech_origin_to_enum = {
             "T7": cls.Thorax.T7,
             "IJ": cls.Thorax.IJ,
-            "T1 anterior face": cls.Thorax.T1_ANTERIOR_FACE,
+            "T1 anterior face": cls.Thorax.T1_ANTERIOR_FACE,  # old
             "T1s": cls.Thorax.T1_ANTERIOR_FACE,
             "GH": cls.Humerus.GLENOHUMERAL_HEAD,
-            "midpoint EM EL": cls.Humerus.MIDPOINT_EPICONDYLES,
+            "midpoint EM EL": cls.Humerus.MIDPOINT_EPICONDYLES,  # old
             "(EM+EL)/2": cls.Humerus.MIDPOINT_EPICONDYLES,
             "SC": cls.Clavicle.STERNOCLAVICULAR_JOINT_CENTER,
             "CM": cls.Clavicle.MIDTHIRD,
             "point of intersection between the mesh model and the Zc axis": cls.Clavicle.CUSTOM,
             "AC": cls.Scapula.ACROMIOCLAVICULAR_JOINT_CENTER,
             "AA": cls.Scapula.ANGULAR_ACROMIALIS,
-            "glenoid center": cls.Scapula.GLENOID_CENTER,
+            "glenoid center": cls.Scapula.GLENOID_CENTER,  # old
+            "GC": cls.Scapula.GLENOID_CENTER,
             "TS": cls.Scapula.TRIGNONUM_SPINAE,
             "clavicle origin": cls.Clavicle.CUSTOM,
         }
