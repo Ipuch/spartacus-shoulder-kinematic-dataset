@@ -1,11 +1,11 @@
+import os
 import pandas as pd
+from pandas import DataFrame
 
 from spartacus import import_data, DataFrameInterface, DataPlanchePlotting
-from pandas import DataFrame
-import os
 
 
-def plot_mvt(df: DataFrame, dataset: str = ".", suffix: str = ""):
+def plot_mvt(df: DataFrame, dataset: str = ".", suffix: str = "", export: bool = False):
 
     humeral_motions = df["humeral_motion"].unique()
 
@@ -16,10 +16,11 @@ def plot_mvt(df: DataFrame, dataset: str = ".", suffix: str = ""):
         plt.plot()
         plt.update_style()
         plt.show()
-        dataset += "/"
-        plt.fig.write_image(f"{dataset}{mvt}{suffix}.png")
-        plt.fig.write_image(f"{dataset}{mvt}{suffix}.pdf")
-        plt.fig.write_html(f"{dataset}{mvt}{suffix}.html", include_mathjax="cdn")
+        if export:
+            dataset += "/"
+            plt.fig.write_image(f"{dataset}{mvt}{suffix}.png")
+            plt.fig.write_image(f"{dataset}{mvt}{suffix}.pdf")
+            plt.fig.write_html(f"{dataset}{mvt}{suffix}.html", include_mathjax="cdn")
 
 
 def main():
