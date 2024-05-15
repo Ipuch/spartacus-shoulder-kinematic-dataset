@@ -100,6 +100,19 @@ articles_data = {
         [(0, 0.7331976380416924), (1, 1.3163822061108446), (2, 2.009989683892475), (-1, 34.11662691)],
     ),
     "Moissenet et al.": (
+        705264,
+        [
+            "frontal elevation",
+            "sagittal elevation",
+            "horizontal flexion",
+            "internal-external rotation 0 degree-abducted",
+        ],
+        ["glenohumeral", "scapulothoracic", "acromioclavicular", "sternoclavicular"],
+        ["1", "2", "3"],
+        8884019.476285355,
+        [(0, -174.48745378048477), (1, -174.48745022345523), (2, -174.48739377357717), (-1, -0.447039217459609)],
+    ),
+    "Oki et al.": (
         354,
         ["frontal elevation", "sagittal elevation", "horizontal flexion"],
         ["scapulothoracic", "sternoclavicular"],
