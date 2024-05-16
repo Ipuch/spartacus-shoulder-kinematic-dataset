@@ -1,4 +1,5 @@
 from pandas import DataFrame
+
 from .quick_load import import_data
 
 
@@ -8,11 +9,11 @@ class DataFrameInterface:
 
     @property
     def has_rotational_data(self) -> bool:
-        return "angle" in self.df["unit"].unique()
+        return "rad" in self.df["unit"].unique()
 
     @property
     def has_translational_data(self) -> bool:
-        return "translation" in self.df["unit"].unique()
+        return "mm" in self.df["unit"].unique()
 
     @property
     def has_translations_and_rotations(self) -> bool:
