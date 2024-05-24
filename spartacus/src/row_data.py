@@ -1,5 +1,6 @@
-import numpy as np
 import os
+
+import numpy as np
 import pandas as pd
 
 from .biomech_system import BiomechCoordinateSystem
@@ -89,6 +90,7 @@ class RowData:
 
         self.euler_angles_correction_callback = None
         self.translation_correction_callback = None
+        self.translation_isb_matrix_callback = None
 
         self.csv_filenames = None
         self.data = None
@@ -666,6 +668,55 @@ class RowData:
             rotation_matrix=self.correct_isb_rotation_matrix_callback(rot1, rot2, rot3),
             euler_sequence=self.joint.isb_euler_sequence(),
         )
+
+    def set_translation_correction_callback(self):
+        """
+        Work in Progress but here is the idea.
+
+        I feel like we want to express the translation in the proximal segment coordinate system in ISB frame
+        on the right side.
+
+        It only fixes the ISB orientation, restoring x as antero-posterior, y as infero-superior, z as medio-lateral.
+        and the side of the coordinate system left to right if needed.
+
+        Missing features:
+        - transport local to distal SCS ?
+
+        """
+
+        self.translation_isb_matrix_callback = (
+            lambda trans_x, trans_y, trans_z: self.child_biomech_sys.get_rotation_matrix()
+            @ np.array([[trans_x, trans_y, trans_z]]).T
+        )
+
+        if self.left_side:
+            self.translation_mediolateral_matrix = (
+                lambda trans_x, trans_y, trans_z: self.translation_isb_matrix_callback(trans_x, trans_y, trans_z)
+                * np.array([1, 1, -1])
+            )
+        else:
+            self.translation_mediolateral_matrix = self.translation_isb_matrix_callback
+
+        # parent_matrix_correction = (
+        #     np.eye(3)
+        #     if self.parent_corrections is None
+        #     else get_kolz_rotation_matrix(correction=self.parent_corrections[0])
+        # )
+        # child_matrix_correction = (
+        #     np.eye(3)
+        #     if self.child_corrections is None
+        #     else get_kolz_rotation_matrix(correction=self.child_corrections[0])
+        # )
+        #
+        # self.correct_isb_rotation_matrix_callback = lambda rot1, rot2, rot3: set_corrections_on_rotation_matrix(
+        #     matrix=self.mediolateral_matrix(rot1, rot2, rot3),
+        #     child_matrix_correction=child_matrix_correction,
+        #     parent_matrix_correction=parent_matrix_correction,
+        # )
+        #
+        # self.euler_angles_correction_callback = lambda rot1, rot2, rot3: rotation_matrix_2_euler_angles(
+        #     rotation_matrix=self.correct_isb_rotation_matrix_callback(rot1, rot2, rot3),
+        #     euler_sequence=self.joint.isb_euler_sequence(),
 
     def quantify_segment_risk(self, type_risk: str):
         """
