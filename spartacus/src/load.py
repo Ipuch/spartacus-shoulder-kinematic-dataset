@@ -1,8 +1,9 @@
-import numpy as np
-import pandas as pd
 from pathlib import Path
 
-from .enums import DatasetCSV
+import numpy as np
+import pandas as pd
+
+from .enums import DatasetCSV, DataFolder
 from .row_data import RowData
 
 
@@ -210,4 +211,16 @@ def load() -> Spartacus:
     sp.import_confident_data()
     # df = load_confident_data(df, print_warnings=True)
     print(df.shape)
+    return sp
+
+
+def load_subdataset(name: DataFolder | str) -> Spartacus:
+    """Load the confident dataset"""
+    # open the file only_dataset_raw.csv
+    df = pd.read_csv(DatasetCSV.CLEAN.value)
+    datafolder_string = name if isinstance(name, str) else name.to_dataset_author()
+    df = df[df["dataset_authors"] == datafolder_string]
+    sp = Spartacus(dataframe=df)
+    sp.set_correction_callbacks_from_segment_joint_validity(print_warnings=True)
+    sp.import_confident_data()
     return sp

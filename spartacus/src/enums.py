@@ -76,6 +76,36 @@ class DataFolder(Enum):
 
         return the_enum
 
+    def to_dataset_author(self):
+        enum_to_dataset_author = {
+            self.BEGON_2014: "Begon et al.",
+            self.BOURNE_2003: "Bourne et al.",
+            self.CHU_2012: "Chu et al.",
+            self.FUNG_2001: "Fung et al.",
+            self.GUTIERREZ_DELGADO_2017: "Gutierrez Delgado et al.",
+            self.KOLZ_2020: "Kolz et al.",
+            self.MCCLURE_2001: "McClure et al.",
+            self.KIJIMA_2015: "Kijima et al.",
+            self.KIM_2017: "Kim et al.",
+            self.KONOZO_2017: "Kozono et al.",
+            self.LAWRENCE_2014: "Lawrence et al.",
+            self.MATSUKI_2011: "Matsuki et al.",
+            self.MATSUMURA_2013: "Matsumura et al.",
+            self.MOISSENET: "Moissenet et al.",
+            self.NISHINAKA_2008: "Nishinaka et al.",
+            self.OKI_2012: "Oki et al.",
+            self.SAHARA_2006: "Sahara et al.",
+            self.SUGI_2021: "Sugi et al.",
+            self.TEECE_2008: "Teece et al.",
+            self.YOSHIDA_2023: "Yoshida et al.",
+        }
+
+        the_dataset_author = enum_to_dataset_author.get(self)
+        if the_dataset_author is None:
+            raise ValueError(f"Unknown data folder: {self}")
+
+        return the_dataset_author
+
 
 class CartesianAxis(Enum):
     plusX = ("x", np.array([1, 0, 0]))

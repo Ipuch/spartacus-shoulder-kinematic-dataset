@@ -60,7 +60,7 @@ articles_data = {
             # "sternoclavicular"    Not yet imported with success need to figure out why
         ],
         ["1", "2", "3"],
-        579009.1651314753,
+        108669.16513147527,
         [(0, 158.6358722876054), (1001, -42.02715455270432), (2000, 55.35292342750893), (-1, -2.4577462635887737)],
     ),
     "Henninger et al.": (
