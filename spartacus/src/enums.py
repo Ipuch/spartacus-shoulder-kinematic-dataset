@@ -1,6 +1,7 @@
-import numpy as np
 from enum import Enum
 from pathlib import Path
+
+import numpy as np
 
 
 class DatasetCSV(Enum):
@@ -11,6 +12,7 @@ class DatasetCSV(Enum):
 
 
 class DataFolder(Enum):
+    BEGON_2014 = Path(__file__).parent.parent / "data" / "#1_Begon_et_al"
     BOURNE_2003 = Path(__file__).parent.parent / "data" / "#2_Bourne_et_al"
     CHU_2012 = Path(__file__).parent.parent / "data" / "#3_Chu_et_al"
     FUNG_2001 = Path(__file__).parent.parent / "data" / "#4_Fung_et_al"
@@ -35,16 +37,12 @@ class DataFolder(Enum):
     SUGI_2021 = Path(__file__).parent.parent / "data" / "#18_Sugi_et_al"
     TEECE_2008 = Path(__file__).parent.parent / "data" / "#19_Teece_et_al"
     YOSHIDA_2023 = Path(__file__).parent.parent / "data" / "#20_Yoshida_et_al"
-    CEREATTI_2017 = Path(__file__).parent.parent / "data" / "Cereatti et al 2017" / "S2M"
-    DAL_MASO_2014 = Path(__file__).parent.parent / "data" / "Dal Maso et al 2014"
     # MALBERG = "TODO"
 
     @classmethod
     def from_string(cls, data_folder: str):
         folder_name_to_enum = {
-            "Cereatti et al 2017/S2M": cls.CEREATTI_2017,
-            "Dal Maso et al 2014": cls.DAL_MASO_2014,
-            # "Bourne 2003": cls.BOURNE_2003,
+            "#1_Begon_et_al": cls.BEGON_2014,
             "#2_Bourne_et_al": cls.BOURNE_2003,
             "#3_Chu_et_al": cls.CHU_2012,  # "Chu et al 2012"
             "#4_Fung_et_al": cls.FUNG_2001,  # "Fung et al 2001"
@@ -77,6 +75,36 @@ class DataFolder(Enum):
             raise ValueError(f"Unknown data folder: {data_folder}")
 
         return the_enum
+
+    def to_dataset_author(self):
+        enum_to_dataset_author = {
+            self.BEGON_2014: "Begon et al.",
+            self.BOURNE_2003: "Bourne et al.",
+            self.CHU_2012: "Chu et al.",
+            self.FUNG_2001: "Fung et al.",
+            self.GUTIERREZ_DELGADO_2017: "Gutierrez Delgado et al.",
+            self.KOLZ_2020: "Kolz et al.",
+            self.MCCLURE_2001: "McClure et al.",
+            self.KIJIMA_2015: "Kijima et al.",
+            self.KIM_2017: "Kim et al.",
+            self.KONOZO_2017: "Kozono et al.",
+            self.LAWRENCE_2014: "Lawrence et al.",
+            self.MATSUKI_2011: "Matsuki et al.",
+            self.MATSUMURA_2013: "Matsumura et al.",
+            self.MOISSENET: "Moissenet et al.",
+            self.NISHINAKA_2008: "Nishinaka et al.",
+            self.OKI_2012: "Oki et al.",
+            self.SAHARA_2006: "Sahara et al.",
+            self.SUGI_2021: "Sugi et al.",
+            self.TEECE_2008: "Teece et al.",
+            self.YOSHIDA_2023: "Yoshida et al.",
+        }
+
+        the_dataset_author = enum_to_dataset_author.get(self)
+        if the_dataset_author is None:
+            raise ValueError(f"Unknown data folder: {self}")
+
+        return the_dataset_author
 
 
 class CartesianAxis(Enum):
@@ -165,6 +193,9 @@ class BiomechOrigin:
         GLENOHUMERAL_HEAD = "GH"
         MIDPOINT_EPICONDYLES = "midpoint epicondyles"  # middle of Medial and Lateral epicondyles
 
+    class Other(Enum):
+        FUNCTIONAL_CENTER = "functional"  # found by score but not meant to represent a real anatomical point
+
     class Any(Enum):
         NAN = "nan"
 
@@ -190,6 +221,7 @@ class BiomechOrigin:
             "GC": cls.Scapula.GLENOID_CENTER,
             "TS": cls.Scapula.TRIGNONUM_SPINAE,
             "clavicle origin": cls.Clavicle.CUSTOM,
+            "functional": cls.Other.FUNCTIONAL_CENTER,
         }
 
         the_enum = biomech_origin_to_enum.get(biomech_origin)

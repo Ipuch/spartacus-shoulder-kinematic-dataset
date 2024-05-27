@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 from pandas import DataFrame
 
@@ -18,9 +19,9 @@ def plot_mvt(df: DataFrame, dataset: str = ".", suffix: str = "", export: bool =
         plt.show()
         if export:
             dataset += "/"
-            plt.fig.write_image(f"{dataset}{mvt}{suffix}.png")
-            plt.fig.write_image(f"{dataset}{mvt}{suffix}.pdf")
-            plt.fig.write_html(f"{dataset}{mvt}{suffix}.html", include_mathjax="cdn")
+            plt.fig.write_image(f"../plots/{dataset}{mvt}{suffix}.png")
+            plt.fig.write_image(f"../plots/{dataset}{mvt}{suffix}.pdf")
+            plt.fig.write_html(f"../plots/{dataset}{mvt}{suffix}.html", include_mathjax="cdn")
 
 
 def main():

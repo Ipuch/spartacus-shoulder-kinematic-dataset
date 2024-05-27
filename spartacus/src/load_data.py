@@ -2,8 +2,8 @@
 This module is used to load the data from the csv file for individual datasets for each dofs.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_data: bool = True) -> pd.DataFrame:
@@ -89,6 +89,7 @@ def load_euler_csv(csv_filenames: tuple[str, str, str], drop_humerothoracic_raw_
 def load_csv(csv_filenames, columns):
     """Load the csv file from the filename and return a pandas dataframe."""
     if csv_filenames is not None:
+        print(f"Loading {csv_filenames}")
         csv_file_dof1 = pd.read_csv(csv_filenames, sep=",", header=None)
         csv_file_dof1.columns = columns
     else:

@@ -4,6 +4,7 @@ It is expected to have only two columns per csv file and at least 1 row.
 """
 
 import os
+
 import pandas as pd
 import pytest
 
@@ -12,8 +13,6 @@ from spartacus import DataFolder, Spartacus, DatasetCSV, RowData
 
 @pytest.mark.parametrize("data_folder", DataFolder)
 def test_data_format(data_folder):
-    if data_folder == DataFolder.DAL_MASO_2014:
-        return
 
     for subfile in os.listdir(data_folder.value):
         if subfile.endswith(".csv"):
