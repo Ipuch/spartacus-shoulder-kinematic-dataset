@@ -46,7 +46,7 @@ articles_data = {
         [(0, np.nan), (1, np.nan), (2, np.nan), (-1, 7.421436415016586)],
     ),
     "Begon et al.": (
-        14472,
+        28341,
         [
             "frontal elevation",
             "sagittal elevation",
@@ -56,12 +56,12 @@ articles_data = {
         [
             "glenohumeral",
             "scapulothoracic",
-            # "acromioclavicular",  Not yet imported with success need to figure out why
-            # "sternoclavicular"    Not yet imported with success need to figure out why
+            "acromioclavicular",
+            "sternoclavicular",
         ],
         ["1", "2", "3"],
-        108669.16513147527,
-        [(0, 158.6358722876054), (1001, -42.02715455270432), (2000, 55.35292342750893), (-1, -2.4577462635887737)],
+        -127332.45166744101,
+        [(0, 158.6358722876054), (1001, -42.02715455270432), (2000, -43.38469183509911), (-1, -2.4577462635887737)],
     ),
     "Henninger et al.": (
         80862,
@@ -212,7 +212,7 @@ def test_number_of_articles():
 
     assert len(articles) == 13
 
-    assert confident_values.shape[0] == 806037
+    assert confident_values.shape[0] == 819906
 
 
 def print_data(data, random_checks):
