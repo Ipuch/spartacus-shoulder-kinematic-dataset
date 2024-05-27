@@ -24,8 +24,4 @@ def plot_mvt(df: DataFrame):
 
 if __name__ == "__main__":
     data = main()
-
-    plot_mvt(data[data["shoulder_id"] == 1])
-    # pause the code here, press enter to continue
-    input("Press Enter to continue...")
-    plot_mvt(data[data["shoulder_id"] == 2])
+    plot_mvt(data)
