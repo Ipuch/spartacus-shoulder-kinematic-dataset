@@ -885,7 +885,7 @@ class RowData:
         )
         self.melted_data = pd.merge(self.melted_data, legend_df, on="degree_of_freedom")
         self.melted_data["degree_of_freedom"] = self.melted_data["degree_of_freedom"].replace(
-            {"value_dof1": "1", "value_dof2": "2", "value_dof3": "3"}
+            {"value_dof1": 1, "value_dof2": 2, "value_dof3": 3}
         )
         return self.melted_data
 
