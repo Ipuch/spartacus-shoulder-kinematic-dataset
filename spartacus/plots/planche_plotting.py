@@ -9,6 +9,7 @@ from .constants import (
     AUTHORS_COLORS,
 )
 from .dataframe_interface import DataFrameInterface
+from ..src.enums import JointType
 
 
 def get_color(article):
@@ -30,12 +31,15 @@ def get_color(article):
 
 
 class DataPlanchePlotting:
-    def __init__(self, dfi: DataFrameInterface):
+    def __init__(self, dfi: DataFrameInterface, restrict_to_joints: list[str | JointType] = None):
 
         if dfi.has_translations_and_rotations:
             raise ValueError("The DataFrameInterface must contain only rotational data or translation data, not both.")
 
         self.rotations = dfi.has_rotational_data
+
+        self.restrict_to_joints = restrict_to_joints
+
         self.fig = self.make_fig(rotation=self.rotations)
 
         self.dfi = dfi
@@ -43,23 +47,41 @@ class DataPlanchePlotting:
 
         self.showlegend = True
 
+    @property
+    def nb_joints(self):
+        return len(self.restrict_to_joints) if self.restrict_to_joints is not None else 4
+
+    @property
+    def joints(self):
+        return self.restrict_to_joints if self.restrict_to_joints is not None else BIOMECHANICAL_DOF_LEGEND.keys()
+
+    def joint_row_col_index(self, joint):
+        count = 0
+        for j in JOINT_ROW_COL_INDEX.keys():
+            if j == joint:
+                break
+            if not j in joint:
+                count -= 1
+
+        return [(JOINT_ROW_COL_INDEX[joint][i][0] + count, JOINT_ROW_COL_INDEX[joint][i][1]) for i in range(3)]
+
     def make_fig(self, rotation: bool = True):
         return make_subplots(
             shared_xaxes=False,
             shared_yaxes=True,
-            rows=4,
+            rows=self.nb_joints,
             cols=3,
             subplot_titles=self._rotation_titles if rotation else self._translation_titles,
         )
 
     @property
     def _rotation_titles(self) -> list[str]:
-        suplot_titles = [list(v) for _, v in BIOMECHANICAL_DOF_LEGEND.items()]
+        suplot_titles = [list(BIOMECHANICAL_DOF_LEGEND[j]) for j in self.joints]
         return [item for sublist in suplot_titles for item in sublist]
 
     @property
     def _translation_titles(self) -> list[str]:
-        suplot_titles = [list(v) for _, v in TRANSLATIONAL_BIOMECHANICAL_DOF_LEGEND.items()]
+        suplot_titles = [list(TRANSLATIONAL_BIOMECHANICAL_DOF_LEGEND[j]) for j in self.joints]
         return [item for sublist in suplot_titles for item in sublist]
 
     def plot(self):
@@ -70,7 +92,7 @@ class DataPlanchePlotting:
     def plot_article(self, name):
         sub_dfi = DataFrameInterface(self.dfi.select_article(article=name))
         color = get_color(name)
-        for j, joint in enumerate(BIOMECHANICAL_DOF_LEGEND.keys()):
+        for j, joint in enumerate(self.joints):
             sub_df_j = sub_dfi.select_joint(joint)
 
             if sub_df_j.empty:
@@ -91,7 +113,7 @@ class DataPlanchePlotting:
         sub_dfi = DataFrameInterface(self.dfi.select_article(article=article))
         sub_df_j = sub_dfi.select_joint(joint)
         sub_df_ij = sub_df_j[sub_df_j["degree_of_freedom"] == dof]
-        row, col = JOINT_ROW_COL_INDEX[joint][dof - 1]
+        row, col = self.joint_row_col_index(joint)[dof - 1]
         subjects = sub_df_ij["shoulder_id"].unique()
 
         if len(subjects) > 1:
@@ -101,7 +123,7 @@ class DataPlanchePlotting:
         else:
             self.plot_timeserie(sub_df_ij, article, row, col, color)
 
-        row, col_left = JOINT_ROW_COL_INDEX[joint][0]
+        row, col_left = self.joint_row_col_index(joint)[0]
         self.fig.update_yaxes(title_text=f"{joint[0].upper()}{joint[1:].lower()}", row=row + 1, col=col_left + 1)
 
     def plot_timeserie(self, df, article, row, col, color):
@@ -138,16 +160,17 @@ class DataPlanchePlotting:
         self.fig.update_layout(
             # If we fix only the height the width will be adapted to the size of the screen
             # However not fixing the height AND the width make the graph not readable
-            height=1000,
+            height=1000 * self.nb_joints / 4 if self.nb_joints >= 2 else 350,
             width=1000,
             paper_bgcolor="rgba(255,255,255,1)",
             plot_bgcolor="rgba(255,255,255,1)",
             legend=dict(
                 title_font_family="Times New Roman",
                 font=dict(family="Times New Roman", color="black", size=16),
-                orientation="v",
-                x=1,
-                y=1,
+                orientation="v" if self.nb_joints > 2 else "h",
+                x=1 if self.nb_joints > 2 else 0.5,
+                y=1.1 if self.nb_joints > 2 else -0.2,
+                xanchor="left" if self.nb_joints > 2 else "center",
             ),
             font=dict(
                 size=16,
