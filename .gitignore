@@ -179,31 +179,31 @@ examples/scapular elevation.html
 
 examples/scapular elevation.png
 
-examples/Yoshida et al. 2023/
+plots/old/Yoshida et al. 2023/
 
-examples/Teece et al. 2008/
+plots/old/Teece et al. 2008/
 
-examples/Oki et al. 2012/
+plots/old/Oki et al. 2012/
 
-examples/Matsumura et al. 2013/
+plots/old/Matsumura et al. 2013/
 
-examples/Matsuki et al. 2012/
+plots/old/Matsuki et al. 2012/
 
-examples/Lawrence et al. 2014/
+plots/old/Lawrence et al. 2014/
 
-examples/Kozono et al. 2017/
+plots/old/Kozono et al. 2017/
 
-examples/Kolz et al. 2020/
+plots/old/Kolz et al. 2020/
 
-examples/Kijima et al. 2015/
+plots/old/Kijima et al. 2015/
 
-examples/Fung et al. 2001/
+plots/old/Fung et al. 2001/
 
-examples/Chu et al. 2012/
+plots/old/Chu et al. 2012/
 
-examples/Cereatti et al. 2017/
+plots/old/Cereatti et al. 2017/
 
-examples/Bourne 2003/
+plots/old/Bourne 2003/
 
 examples/already_isb_by_joint_proportion.csv
 
@@ -218,3 +218,5 @@ examples/excluded_study.csv
 examples/is_isb_joint.csv
 
 spartacus/dataset/dataset_clean_old.csv
+
+plots/
