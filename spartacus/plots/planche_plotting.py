@@ -17,11 +17,14 @@ def get_color(article):
     If the article is not in the AUTHORS_COLORS dict, a random color is generated.
     """
     color = AUTHORS_COLORS.get(article)
+    opacity = 0.5
     if color is None:
-        random_ints = np.random.randint(0, 255, 3).tolist() + [0.5]
+        random_ints = np.random.randint(0, 255, 3).tolist() + [opacity]
         #     turn it in to a tuple[int]
         random_ints = tuple(random_ints)
         color = f"rgba{random_ints}"
+    else:
+        color = f"rgba{tuple(list(color) + [opacity])}"
 
     return color
 
@@ -106,7 +109,7 @@ class DataPlanchePlotting:
             go.Scatter(
                 x=df["humerothoracic_angle"],
                 y=df["value"],
-                name=article,
+                name=f"{article}",
                 legendgroup=article,
                 showlegend=self.showlegend,
                 mode="lines+markers",
@@ -123,6 +126,7 @@ class DataPlanchePlotting:
             row=row + 1,
             col=col + 1,
         )
+
         # self.fig.update_xaxes(row=row + 1, col=col + 1, range=[-150, 180])
         grid_color = "rgba(0, 0, 0, 0.1)"
         n_ticks = 8  # It doesnt seem to exactly fit the number specified
