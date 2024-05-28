@@ -824,6 +824,8 @@ class RowData:
                 "unit",  # string "angle" or "translation"
                 "confidence",  # float
                 "shoulder_id",  # int
+                "in_vivo",  # bool
+                "xp_mean",  # string
             ],
         )
 
@@ -859,6 +861,8 @@ class RowData:
         angle_series_dataframe["unit"] = "rad"
         angle_series_dataframe["confidence"] = confidence_total
         angle_series_dataframe["shoulder_id"] = self.row.shoulder_id
+        angle_series_dataframe["in_vivo"] = self.row.in_vivo
+        angle_series_dataframe["xp_mean"] = self.row.experimental_mean
 
         if correction:
             (legend_dof1, legend_dof2, legend_dof3) = self.joint.isb_rotation_biomechanical_dof
@@ -878,7 +882,17 @@ class RowData:
 
         self.corrected_data = angle_series_dataframe
         self.melted_data = angle_series_dataframe.melt(
-            id_vars=["article", "joint", "humeral_motion", "humerothoracic_angle", "unit", "confidence", "shoulder_id"],
+            id_vars=[
+                "article",
+                "joint",
+                "humeral_motion",
+                "humerothoracic_angle",
+                "unit",
+                "confidence",
+                "shoulder_id",
+                "in_vivo",
+                "xp_mean",
+            ],
             value_vars=["value_dof1", "value_dof2", "value_dof3"],
             var_name="degree_of_freedom",
             value_name="value",
