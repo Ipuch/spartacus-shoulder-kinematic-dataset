@@ -30,7 +30,7 @@ Moissenet, F., Puchaud, P., Naaïm, A., Holzer, N., & Begon, M. (2024). Spartacu
   url          = {https://doi.org/10.5281/zenodo.11455521}
 }
 ```
-
+Please star ⭐ this repository where everything will be released: [The repo](https://github.com/Spartacus-shoulder-kinematics-dataset/shoulder-kinematics)
 # Table of Contents
 [The dataset columns](#The-dataset-columns)
  - [Metadata](##Metadata)
